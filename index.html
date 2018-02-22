@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Jelly-Chart | a chart library based on D3v4 and SVG</title>
+  <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.css">
+  <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+  <link type="text/css" rel="stylesheet" href="./style/main.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+</head>
+
+<body>
+  <header id="top">
+    <div>
+      <div id="header-logo">📊 JELLY-CHART</div>
+      <nav id="header-nav">
+        <ul>
+          <li><a href="./release/latest/doc">API Documents</a></li>
+          <li><a href="./demo/mono-bar">Demo</a></li>
+          <li><a href="https://github.com/NewsJelly/jelly-chart">Source</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <div id="wrapper">
+    <h1 id="jelly-chart">Jelly-Chart</h1>
+<p>Jelly-Chart is a chart library based on D3v4 and SVG.</p>
+<p><img src="https://user-images.githubusercontent.com/253408/36471496-f56f6ed6-1731-11e8-8eaf-e9446b32b3cd.png" alt="chart-types"></p>
+<h2 id="chart-types">Chart Types</h2>
+<ul>
+<li>Bar (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/Bar.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/grouped-bar">Demo</a>)</li>
+<li>Line (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/Line.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/multi-line">Demo</a>)</li>
+<li>Pie (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/Pie.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/donut-pie">Demo</a>)</li>
+<li>Scatter (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/Scatter.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/color-scatter">Demo</a>)</li>
+<li>Parallel Coordinates (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/ParCoords.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/color-par-coords">Demo</a>)</li>
+<li>Treemap (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/Treemap.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/treemap">Demo</a>)</li>
+<li>XY Heatmap (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/XYHeatmap.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/xy-heatmap">Demo</a>)</li>
+<li>Marker Map (<a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/MarkerMap.html">API</a> | <a href="https://newsjelly.github.io/jelly-chart/demo/address-marker-map">Demo</a>)</li>
+</ul>
+<h2 id="documents">Documents</h2>
+<ul>
+<li><a href="https://newsjelly.github.io/jelly-chart/release/latest/doc">API Documents</a></li>
+<li><a href="https://newsjelly.github.io/jelly-chart/demo">Demo</a></li>
+</ul>
+<h2 id="download-installation">Download &amp;&amp; Installation</h2>
+<h3 id="download">Download</h3>
+<h4 id="use-cdn">Use CDN</h4>
+<pre><code class="lang-html">&lt;!-- jsDelivr --&gt;
+&lt;script src=&quot;//cdn.jsdelivr.net/npm/jelly-chart/dist/jelly.min.js&quot;&gt;&lt;/script&gt; 
+&lt;!-- unpkg --&gt;
+&lt;script src=&quot;//unpkg.com/jelly-chart/dist/jelly.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<h4 id="install-from-npm">Install from NPM</h4>
+<pre><code>$ npm install --save jelly-chart
+</code></pre><h3 id="dependency">Dependency</h3>
+<table>
+<thead>
+<tr>
+<th><a href="https://d3js.org/">D3</a> (required)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="html">HTML</h4>
+<pre><code class="lang-html">&lt;!-- Load D3 and jelly-chart separately --&gt;
+&lt;!-- Load D3 first--&gt;
+&lt;script src=&quot;//d3js.org/d3.v4.min.js&quot;&gt;&lt;/script&gt;    
+&lt;!-- Load jelly-chart after D3 --&gt;
+&lt;script src=&quot;$PATH/jelly.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<h4 id="es6-module">ES6 Module</h4>
+<p>Jelly-Chart is written using <a href="http://2ality.com/2014/09/es6-modules-final.html">ECMAScript 6 modules</a>. After importing it, you can create a custom bundle using your preferred bundler.</p>
+<pre><code class="lang-js">import jelly from &quot;jelly-chart&quot;;
+</code></pre>
+<h2 id="basic-usage">Basic Usage</h2>
+<h3 id="1-insert-a-chart-holder-element">1) Insert a chart holder element</h3>
+<pre><code class="lang-html">&lt;div id=&quot;chart&quot;&gt;&lt;/div&gt;
+</code></pre>
+<h3 id="2-call-a-chart-generator">2) Call a chart generator</h3>
+<pre><code class="lang-javascript">var bar = jelly.bar();
+//or
+var bar = jelly.type(&#39;bar&#39;);
+</code></pre>
+<h3 id="3-set-a-container-data-and-options-then-render">3) set a container, data and options, then render</h3>
+<pre><code class="lang-javascript">bar.container(&#39;#chart&#39;)
+  .data([
+    {x: &#39;A&#39;, y: 10},
+    {x: &#39;A&#39;, y: 20},
+    {x: &#39;B&#39;, y: 15},
+    {x: &#39;B&#39;, y: 10}
+  ])
+  .dimensions([&#39;x&#39;])
+  .measures([&#39;y&#39;])
+
+bar.render();
+</code></pre>
+<p>To find more detailed usages, check <a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/Bar.html">Demo</a> and <a href="https://newsjelly.github.io/jelly-chart/release/latest/doc/">API Docs</a>.</p>
+<h2 id="development">Development</h2>
+<p>Use NPM Script to build Jelly-chart</p>
+<pre><code># Install dependencies
+$ npm install
+
+# Run dev-server for development
+$ npm start
+
+# Test
+$ npm test
+
+# Build
+$ npm run build
+</code></pre><h2 id="license">LICENSE</h2>
+<p>GPL-3.0+</p>
+
+    <footer><p>© Newsjelly Corp.</p></footer>
+  </div>
+
+</body>
+
+</html>

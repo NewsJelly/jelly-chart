@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Jelly-Chart Source: par-coords/index.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.lumen.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Jelly-Chart</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="jelly.html">jelly</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Bar.html">Bar</a></li><li><a href="Combo.html">Combo</a></li><li><a href="Core.html">Core</a></li><li><a href="Facet.html">Facet</a></li><li><a href="Line.html">Line</a></li><li><a href="MarkerMap.html">MarkerMap</a></li><li><a href="ParCoords.html">ParCoords</a></li><li><a href="Pie.html">Pie</a></li><li><a href="RectLinear.html">RectLinear</a></li><li><a href="Scatter.html">Scatter</a></li><li><a href="Treemap.html">Treemap</a></li><li><a href="XYHeatmap.html">XYHeatmap</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: par-coords/index.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">import RectLinear from '../rectLinear/';
+import seriesMixin from '../seriesMixin';
+import brushMixin from '../brushMixin';
+import paddingMixin from '../paddingMixin';
+import shapeMixin from '../shapeMixin';
+import {genFunc, mix} from '../../modules/util';
+import conditionForMute from '../core/_condtionForMute';
+import _munge from './_munge';
+import _scale from './_scale';
+import _mark from './_mark';
+import _axis from './_axis';
+import _legend from './_legend';
+import _region from './_region';
+import _facet from './_facet';
+import _brush from './_brush';
+
+const size = {range: [1,1], scale: 'linear', reverse: false};
+const shapes = ['par-coords', 'scatter-matrix'];
+const conditions = ['normal', 'color'];
+const _attrs = {
+  regionPadding: 0.1,
+  size: size,
+  shape: shapes[0]
+};
+
+/**
+ * renders a parallel coordinates
+ * @class ParCoords
+ * @augments Core
+ * @augments RectLinear
+ * @augments SeriesMixin
+ * @augments BrushMixin
+ * @augments PaddingMixin
+ * @augments ShapeMixin
+ */
+class ParCoords extends mix(RectLinear).with(seriesMixin, brushMixin, paddingMixin, shapeMixin) {
+  constructor() {
+    super();
+    this.setAttrs(_attrs);
+    this.brush(true);
+  }
+
+  isColor() {
+    return this.condition() === conditions[1];
+  }
+  
+  muteRegions(callback) { 
+    let _parCoords = region => {
+      this.mute(region, this.muteIntensity());
+    }
+    let _matrix = region => {
+      let nodes = region.selectAll(this.nodeName()).classed('mute', true);
+      this.mute(nodes, this.muteIntensity());
+    }
+    if (!arguments.length) {
+      if (this.shape() === shapes[0]) {
+        return this.filterRegions().call(_parCoords);
+      } else {  
+        return this.regions().selectAll(this.regionName())  
+          .call(_matrix);
+      }
+    } 
+    if (this.shape() === shapes[0]) {
+      return this.filterRegions(conditionForMute(callback), true).call(_parCoords);
+    } else {
+      return this.regions().selectAll(this.regionName()).filter(conditionForMute(callback)).call(_matrix);
+    }
+  }
+  
+  demuteRegions(callback) {
+    let _parCoords = region => {
+      this.demute(region);
+    }
+    let _matrix = region => {
+      let nodes = region.selectAll(this.nodeName());
+      this.demute(nodes);
+    }
+    if (!arguments.length) {
+      if (this.shape() === shapes[0]) {
+        return this.filterRegions().call(_parCoords);
+      } else {  
+        return this.regions().selectAll(this.regionName())  
+          .call(_matrix);
+      }
+    }
+    if (this.shape() === shapes[0]) {
+      return this.filterRegions(conditionForMute(callback), true).call(_parCoords);
+    } else {
+      return this.regions().selectAll(this.regionName()).filter(conditionForMute(callback)).call(_matrix);
+    }
+  }
+  
+  muteFromLegend(legend) {
+    this.muteRegions(legend.key);
+  }
+  
+  demuteFromLegend(legend) {
+    this.demuteRegions(legend.key);
+  }
+  
+  renderLayout(keep) { 
+    if (this.shape() === shapes[0] &amp;&amp; this.axisX()) {
+      let findIndex = this.axis().findIndex(d => d.target === 'x');
+      if (findIndex >= 0) {
+        this.axis().splice(findIndex, 1);
+      }
+    }
+    this.reset(keep);
+    this.renderFrame();
+    _munge.call(this);
+    _scale.call(this, keep);
+    this.renderCanvas();
+    _axis.call(this);
+    if (this.shape !== shapes[0] || this.isColor()) _region.call(this);
+    if (this.shape() === shapes[0]) {
+      _mark.call(this); 
+    } else {
+      _facet.call(this);
+    }
+    
+    _legend.call(this);
+    _brush.call(this);
+  }
+  
+}
+
+function xMeasureName (measure) {
+  return 'x-' + (measure.field ? measure.field : measure);
+}
+
+function yMeasureName (measure) {
+  return 'y-' + (measure.field ? measure.field : measure);
+}
+
+export default genFunc(ParCoords);
+export {xMeasureName, yMeasureName, conditions, shapes};
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
