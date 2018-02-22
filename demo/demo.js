@@ -18,7 +18,7 @@ if (!fs.existsSync(path.resolve(__dirname, distDir))) {
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
-
+const dev = process.argv.length > 2 && process.argv[2] === 'dev';
 
 async function generate() {
   try {
@@ -42,6 +42,7 @@ async function generate() {
       const code = await readFile(path.resolve(__dirname, srcDir, categoryPath, l.path, 'index.js'));
       const desc = await readFile(path.resolve(__dirname, srcDir, categoryPath, l.path, 'index.md'));
       const context = {
+        dev: dev,
         path: l.path, 
         title: l.title, 
         desc: new handlebars.SafeString(marked(desc.toString())),
