@@ -1,0 +1,1 @@
+`.stacekd(true)` turns a [grouped bar chart](./grouped-bar.html) into a stacked bar chart.

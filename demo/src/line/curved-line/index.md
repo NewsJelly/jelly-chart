@@ -1,0 +1,1 @@
+`.curve('curved')` changes the curve style from `linear line` to `catmull-rom spline`.

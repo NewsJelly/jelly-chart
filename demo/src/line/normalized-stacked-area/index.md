@@ -1,0 +1,1 @@
+`.normalized(true)` normalizes the [stacked area chart](./stacked-area.html).

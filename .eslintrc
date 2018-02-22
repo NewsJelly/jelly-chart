@@ -1,0 +1,21 @@
+{
+    "extends": "eslint:recommended",
+    "rules": {
+        "no-cond-assign": 0,
+        "no-constant-condition": 0
+    },
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "globals": {
+        "d3": true,
+        "daum": true,
+        "jelly": true,
+        "console" : true
+    },
+    "env": {
+      "browser": true,
+      "node": true
+    }
+} 

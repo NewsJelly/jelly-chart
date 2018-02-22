@@ -1,0 +1,16 @@
+node_modules
+test/
+doc/
+gh-pages/
+demo/
+.babelrc
+.jsdoc.json
+rollup.config.js
+rollup.node.js
+.vscode/
+.history/
+.babelrc
+.eslintrc
+.npmignore
+yarn.lock
+karma.conf.js

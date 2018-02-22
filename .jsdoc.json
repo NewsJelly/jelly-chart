@@ -1,0 +1,28 @@
+{
+  "tags": {
+    "allowUnknownTags": false
+  },
+  "source": {
+    "include": [
+      "src/layouts/",
+      "./README.md"
+    ],
+    "excludePattern": "(node_modules/|doc/|theme/)"
+  },
+  "opts": {
+    "template": "node_modules/ink-docstrap/template",
+    "encoding": "utf8",
+    "destination": "doc/",
+    "recurse": true,
+    "verbose": true
+  },
+  "templates": {
+    "systemName": "Jelly-Chart",
+    "theme": "lumen",
+    "linenums": true,
+    "cleverLinks": false,
+    "monospaceLinks": true,
+    "outputSourceFiles": true,
+    "includeDate": false
+  }
+}

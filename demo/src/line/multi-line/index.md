@@ -1,0 +1,1 @@
+Two `dimensions` and a `measure` generate a multi-series line chart. The first dimension locates data points along horizontal axis. The second dimension seperates data points into multiple series. 

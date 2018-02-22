@@ -1,0 +1,1 @@
+Multiple `measures` without any `dimensions` generates series as many as `measures' length`.

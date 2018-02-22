@@ -1,0 +1,1 @@
+module.exports = ['bar', 'line', 'scatter', 'xyHeatmap', 'treemap', 'parCoords', 'pie', 'markerMap', 'combo'];

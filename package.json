@@ -1,0 +1,61 @@
+{
+  "name": "jelly-chart",
+  "version": "1.0.0",
+  "author": "Newsjelly Corp.",
+  "license": "GPL-3.0+",
+  "description": "Jelly-Chart is a chart library based on D3v4 and SVG.",
+  "main": "dist/jelly.js",
+  "unpkg": "dist/jelly.min.js",
+  "jsdelivr": "dist/jelly.min.js",
+  "module": "index",
+  "jsnext:main": "index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NewsJelly/jelly-chart.git"
+  },
+  "homepage": "https://newsjelly.github.io/jelly-chart",
+  "scripts": {
+    "demo": "rimraf gh-pages && copyfiles -f demo/style/*.css gh-pages/style && node demo/main && node demo/demo",
+    "pretest": "rollup -c rollup.node.js",
+    "test": "karma start karma.conf.js --single-run && eslint src",
+    "start": "http-server -c-1 | rollup -c --watch",
+    "build": "rimraf dist && rollup -c && uglifyjs dist/jelly.js --source-map -m -o dist/jelly.min.js",
+    "prepublish" : "npm run test && npm run build",
+    "jsdoc": "rimraf doc && mkdir doc && jsdoc -c .jsdoc.json"
+  },
+  "keywords": [
+    "d3",
+    "chart",
+    "graph",
+    "data visualization"
+  ],
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
+    "browserify": "^15.2.0",
+    "copyfiles": "^1.2.0",
+    "eslint": "^4.16.0",
+    "handlebars": "^4.0.11",
+    "ink-docstrap": "^1.3.2",
+    "jsdoc": "^3.5.5",
+    "jsdom": "^11.6.1",
+    "karma": "^2.0.0",
+    "karma-browserify": "^5.1.3",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-spec-reporter": "0.0.32",
+    "karma-tap": "^4.0.0",
+    "marked": "^0.3.12",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.53.3",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "tape": "^4.8.0",
+    "uglify-js": "^3.3.5",
+    "watchify": "^3.10.0"
+  },
+  "dependencies": {
+    "d3": "^4.9.1"
+  }
+}

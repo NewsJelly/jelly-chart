@@ -1,0 +1,1 @@
+`.orient('horizontal')` rotates a vertical bar chart horizontally.

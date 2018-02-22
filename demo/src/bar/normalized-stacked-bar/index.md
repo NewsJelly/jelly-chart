@@ -1,0 +1,1 @@
+If `.normalized(ture)` is set with `.stacekd(true)`, it will generates a normalized stacked bar chart.

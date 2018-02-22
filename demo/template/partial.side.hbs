@@ -1,0 +1,15 @@
+<h2>
+  <a href="../">🤓 Jelly-Chart </a>
+</h2>
+<nav>
+  {{#each group}}
+    <div>
+      <h3>{{key}}</h3>
+      <ul>
+      {{#each values}}
+        <li class="{{#if selected}}selected{{/if}}"><a href="{{path}}">{{title}}</a></li>
+      {{/each}}
+      </ul>
+    </div>
+  {{/each}}
+</nav>

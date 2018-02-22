@@ -1,0 +1,1 @@
+Two `measures`, one for the horizontal position and another for the vertical position, generate a mono scattter chart.

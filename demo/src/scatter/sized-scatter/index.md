@@ -1,0 +1,1 @@
+Third `measure` works for varying size of points.

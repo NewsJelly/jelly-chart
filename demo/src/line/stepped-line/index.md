@@ -1,0 +1,1 @@
+ `.curve('stepped')` generates a stepped line chart.
