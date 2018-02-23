@@ -33,6 +33,7 @@ import nodeName from './nodeName';
 import nodes from './nodes';
 import offset from './offset';
 import parent from './parent';
+import process from './process';
 import rebindOnMethod from './rebindOnMethod';
 import regions from './regions';
 import remove from './remove';
@@ -79,6 +80,7 @@ const _attrs = {
   limitRows: 1000,
   name: null,
   nodeName: className('mark node', true),
+  needCanvas: true,
   margin: {top: 40, right: 40, bottom: 40, left: 40},
   measures: [],
   muteIntensity: 0.3,
@@ -220,6 +222,7 @@ Core.prototype.height = attrFunc('height');
  */
 Core.prototype.label = attrFunc('label');
 Core.prototype.name = attrFunc('name');
+Core.prototype.needCanvas = attrFunc('needCanvas');
 
 /**
  * If muteIntensity is specified, sets muteIntensity of the chart and returns the instance itself. MuteIntensity determines opacity of marks which is muted by {@link Core#mute .mute} method. If muteIntensity is not specified, returns the instance's current width.
@@ -278,6 +281,7 @@ Core.prototype.nodeName = nodeName;
 Core.prototype.nodes = nodes;
 Core.prototype.offset = offset;
 Core.prototype.parent = parent;
+Core.prototype.process = process;
 Core.prototype.tooltip = tooltip;
 Core.prototype.scale = scale;
 Core.prototype.styleFont = styleFont;

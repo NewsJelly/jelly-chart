@@ -32,6 +32,13 @@ class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
+    this.process('munge', _munge, {isPre:true})
+      .process('scale', _scale, {isPre:true})
+      .process('region', _region)
+      .process('facet', _facet)
+      .process('axis', _axis)
+      .process('legend', _legend)
+      .process('tooltip', _tooltip)
   }
   /**
    * @override
@@ -47,19 +54,6 @@ class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin) {
 
   isCount() {
     return this.condition() === conditions[1];
-  }
-
-  renderLayout(keep) { 
-    this.reset(keep);
-    this.renderFrame();
-    _munge.call(this);
-    _scale.call(this, keep);
-    this.renderCanvas();
-    _region.call(this);
-    _facet.call(this);
-    _axis.call(this);
-    _legend.call(this);
-    _tooltip.call(this);
   }
 }
 

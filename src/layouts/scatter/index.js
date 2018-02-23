@@ -35,7 +35,25 @@ class Scatter extends mix(Facet).with(fitLineMixin, brushMixin, zoomMixin, paddi
   constructor() {
     super();
     this.setAttrs(_attrs);
+    this.process('munge', _munge, {isPre: true})
+      .process('scale', _scale, {isPre: true})
+      .process('axis', _axis)
+      .process('fitLine', _fitLine)
+      .process('region', _region)
+      .process('facet', _facet, {allow: function() {return this.isFacet();}})
+      .process('mark', _mark, {allow: function() {return !this.isFacet();}})
+      .process('legend', _legend)
+      .process('tooltip', _tooltip)
+      .process('zoom', _zoom)
   }
+
+  /**
+   * @override
+   */
+  renderCanvas() {
+    return super.renderCanvas(this.size().range[this.isSized() ? 1 : 0]*1.25)
+  }
+
   isColor() {
     return this.condition() === conditions[1] || this.condition() === conditions[3];
   }
@@ -65,24 +83,7 @@ class Scatter extends mix(Facet).with(fitLineMixin, brushMixin, zoomMixin, paddi
     this.demuteLegend(d.parent.data.key);
   }
   
-  renderLayout(keep) { 
-    this.reset(keep);
-    this.renderFrame();
-    _munge.call(this);
-    _scale.call(this, keep);
-    this.renderCanvas(this.size().range[this.isSized() ? 1 : 0]*1.25);
-    _axis.call(this);
-    _fitLine.call(this);
-    _region.call(this);
-     if(this.isFacet()) {
-       _facet.call(this);
-     } else {
-       _mark.call(this); 
-     }
-    _legend.call(this);
-    _tooltip.call(this);
-    _zoom.call(this);
-  }
+  
 }
 
 export default genFunc(Scatter);

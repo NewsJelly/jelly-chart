@@ -25,8 +25,13 @@ class Pie extends mix(Core).with(paddingMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
+    this.process('munge', _munge, {isPre:true})
+      .process('scale', _scale, {isPre: true})
+      .process('mark', _mark)
+      .process('legend', _legend)
+      .process('tooltip', _tooltip);
   }
-
+  
   axis() {
     if(!arguments.length) return [];
     return this;
@@ -50,17 +55,6 @@ class Pie extends mix(Core).with(paddingMixin) {
   
   isCount() {
     return this.condition() === conditions[1];
-  }
-  
-  renderLayout(keep) {
-    this.reset(keep);
-    this.renderFrame();
-    _munge.call(this);
-    _scale.call(this, keep);
-    this.renderCanvas();
-    _mark.call(this); 
-    _legend.call(this);
-    _tooltip.call(this);
   }
 }
 

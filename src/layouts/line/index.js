@@ -58,8 +58,26 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
     this.setAttrs(_attrs);
     this.__execs__.multiTooltipDispatch = dispatch('selectStart', 'selectMove', 'selectEnd', 'multiTooltip');
     this.rebindOnMethod(this.__execs__.multiTooltipDispatch);
+    this.process('munge', _munge, {isPre: true})
+      .process('brushZoom', _brushZoom, {isPre: true, allow: function() {return this.isBrushZoom()}})
+      .process('scale', _scale, {isPre: true, allow: function() {return !this.isBrushZoom()}})
+      .process('axis', _axis, {allow: function() {return !this.isBrushZoom()}})
+      .process('region', _region, {allow: function() {return !this.isBrushZoom()}})
+      .process('facet', _facet, {allow: function() {return !this.isBrushZoom() && this.isFacet()}})
+      .process('mark', _mark, {allow: function() {return !this.isBrushZoom() && !this.isFacet()}})
+      .process('meanLine', _meanLine, {allow: function() {return !this.isBrushZoom()}})
+      .process('fitLine', _fitLine, {allow: function() {return !this.isBrushZoom()}})
+      .process('tooltip', _tooltip, {allow: function() {return !this.isBrushZoom()}})
+      .process('zoom', _zoom, {allow: function() {return !this.isBrushZoom()}})
+      .process('brush', _brush, {allow: function() {return !this.isBrushZoom()}})
+      .process('legend', _legend, {allow: function() {return !this.isBrushZoom()}})
   }
-
+  /**
+   * @override
+   */
+  renderCanvas() {
+    return super.renderCanvas(this.point() ? this.size().range[0]*2 : 0);
+  }
   /**
    * If is true, renders the tooltip showing multiple points on the same horizontal position. If is a string or object, sets sorting order of items by each value. If multiTooltip is not specified, returns the instance's multiTooltip setting.
    * @example
@@ -178,33 +196,6 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
       let mt = this.__execs__.tooltip;
       mt.tick(tick, start);
     }
-  }
-
-  renderLayout(keep) {
-    this.reset(keep);
-    this.renderFrame();
-    _munge.call(this);
-    if (this.isBrushZoom()) {
-      this.noAxisOffset(true); 
-      this.renderCanvas();
-      _brushZoom.call(this);
-      return; 
-    }
-    _scale.call(this, keep);
-    this.renderCanvas(this.point() ? this.size().range[0]*2 : 0);
-    _axis.call(this);
-    _region.call(this);
-    if (this.isFacet()) {
-      _facet.call(this);
-    } else {
-      _mark.call(this);
-    }
-    _meanLine.call(this);
-    _fitLine.call(this);
-    _tooltip.call(this);
-    _zoom.call(this);
-    _brush.call(this);
-    _legend.call(this);
   }
 } 
 /**

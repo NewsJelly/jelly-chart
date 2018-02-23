@@ -26,23 +26,17 @@ class XYHeatmap extends mix(RectLinear).with(paddingMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
+    this.process('munge', _munge, {isPre:true})
+      .process('scale', _scale, {isPre: true})
+      .process('region', _region)
+      .process('axis', _axis)
+      .process('mark', _mark)
+      .process('spectrum', _spectrum)
+      .process('tooltip', _tooltip);
   }
 
   isCount() {
     return this.condition() === conditions[1];
-  }
-  
-  renderLayout() { 
-    this.reset();
-    this.renderFrame();
-    _munge.call(this);
-    _scale.call(this);
-    this.renderCanvas();
-    _region.call(this);
-    _axis.call(this); 
-    _mark.call(this); 
-    _spectrum.call(this);
-    _tooltip.call(this);
   }
 }
 

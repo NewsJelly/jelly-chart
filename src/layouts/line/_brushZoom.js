@@ -3,6 +3,8 @@ import _legend from './_legend';
 import line from './';
 
 function _brushZoom(ratio = 0.75) {
+  this.noAxisOffset(true); 
+  this.renderCanvas();
   const that = this;
   const innerSize = this.innerSize();
   const bigHeight = Math.round(innerSize.height * ratio);

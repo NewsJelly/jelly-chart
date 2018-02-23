@@ -18,6 +18,7 @@ function ordinalDomainFlatten (target, dimensionField) {
 }
 
 function _parCoords(keep) {
+  this.axis('x', false);
   const scale = this.scale();
   const measures = this.measures();
   const munged = this.__execs__.munged;

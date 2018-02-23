@@ -38,10 +38,22 @@ class ParCoords extends mix(RectLinear).with(seriesMixin, brushMixin, paddingMix
     super();
     this.setAttrs(_attrs);
     this.brush(true);
+    this.process('munge', _munge, {isPre: true})
+      .process('scale', _scale, {isPre: true})
+      .process('axis', _axis)
+      .process('region', _region) 
+      .process('mark', _mark, {allow: function() {return this.isParcoords()}})
+      .process('facet', _facet, {allow: function() {return !this.isParcoords()}})
+      .process('legend', _legend)
+      .process('brush', _brush);
   }
 
   isColor() {
     return this.condition() === conditions[1];
+  }
+
+  isParcoords() {
+    return this.shape() === shapes[0];
   }
   
   muteRegions(callback) { 
@@ -97,31 +109,6 @@ class ParCoords extends mix(RectLinear).with(seriesMixin, brushMixin, paddingMix
   demuteFromLegend(legend) {
     this.demuteRegions(legend.key);
   }
-  
-  renderLayout(keep) { 
-    if (this.shape() === shapes[0] && this.axisX()) {
-      let findIndex = this.axis().findIndex(d => d.target === 'x');
-      if (findIndex >= 0) {
-        this.axis().splice(findIndex, 1);
-      }
-    }
-    this.reset(keep);
-    this.renderFrame();
-    _munge.call(this);
-    _scale.call(this, keep);
-    this.renderCanvas();
-    _axis.call(this);
-    if (this.shape !== shapes[0] || this.isColor()) _region.call(this);
-    if (this.shape() === shapes[0]) {
-      _mark.call(this); 
-    } else {
-      _facet.call(this);
-    }
-    
-    _legend.call(this);
-    _brush.call(this);
-  }
-  
 }
 
 function xMeasureName (measure) {

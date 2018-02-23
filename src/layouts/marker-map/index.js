@@ -14,6 +14,7 @@ const conditions = ['normal', 'point'];
 const _attrs = {
   addr: false,
   mapBaseType: 'ROADMAP',// ROADMAP SKYVIEW HYBRID
+  needCanvas: false,
   overlayMapType: null, // OVERLAY TERRAIN TRAFFIC BICYCLE BICYCLE_HYBRID USE_DISTRICT
   size: size,
 };
@@ -28,6 +29,10 @@ class MarkerMap extends Default {
     this.setAttrs(_attrs);
     this.__execs__.dispatch = dispatch('loading', 'end');
     rebindOnMethod(this, this.__execs__.dispatch);
+    this.process('munge', _munge, {isPre: true})
+      .process('scale', _scale, {isPre: true})
+      .process('map', _map)
+      .process('mark', _mark);
   }
   isSized() {
     return this.condition() === conditions[0];

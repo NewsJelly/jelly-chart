@@ -39,6 +39,15 @@ class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
+    this.process('munge', _munge, {isPre:true})
+      .process('scale', _scale,  {isPre:true})
+      .process('axis', _axis)
+      .process('region', _region)
+      .process('facet', _facet, {allow: function() {return this.isFacet()}})
+      .process('mark', _mark, {allow: function() {return !this.isFacet()}})
+      .process('legend', _legend)
+      .process('tooltip', _tooltip)
+      .process('annotation', _annotation);
   }
   measureName() {
     let measures = this.measures();
@@ -47,24 +56,6 @@ class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin) {
     else if (this.aggregated() && measures[0].field === mixedMeasure.field) yField = measures[0].field;
     else yField = measures[0].field + '-' + measures[0].op;
     return yField;
-  }
-
-  renderLayout(keep) { 
-    this.reset(keep);
-    this.renderFrame();
-    _munge.call(this);
-    _scale.call(this, keep); 
-    this.renderCanvas();
-    _axis.call(this);
-    _region.call(this);
-    if(this.isFacet()) {
-      _facet.call(this);
-    } else {
-      _mark.call(this); 
-    }
-    _legend.call(this);
-    _tooltip.call(this);
-    _annotation.call(this);
   }
 
   muteToLegend(d) {

@@ -1,6 +1,6 @@
 import {select} from 'd3';
-function _map (selection) {
-  selection = select(selection);
+function _map() {
+  const selection = select(this.container());
   let frame = selection.select('.frame.layer');
   if (frame.empty()) {
     frame = selection.append('div')

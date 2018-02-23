@@ -28,6 +28,11 @@ class Treemap extends mix(Default).with(shapeMixin, sortMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
+    this.process('munge', _munge, {isPre:true})
+      .process('scale', _scale, {isPre: true})
+      .process('mark', _mark)
+      .process('spectrum', _spectrum)
+      .process('tooltip', _tooltip);
   }
   axis() {
     if(!arguments.length) return [];
@@ -37,18 +42,6 @@ class Treemap extends mix(Default).with(shapeMixin, sortMixin) {
   isCount() {
     return this.condition() === conditions[1];
   }
-  
-  renderLayout() {
-    this.reset();
-    this.renderFrame();
-    _munge.call(this);
-    _scale.call(this);
-    this.renderCanvas();
-    _mark.call(this); 
-    _spectrum.call(this);
-    _tooltip.call(this);
-  }
-  
 }
 
 Treemap.prototype.reverse = attrFunc('reverse');
