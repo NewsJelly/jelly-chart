@@ -3,7 +3,8 @@ import sortMixin from '../sortMixin';
 import Default, {continousColorScheme} from '../core';
 import {attrFunc, genFunc, mix} from '../../modules/util';
 import _munge from './_munge';
-import _scale from './_scale';
+import _domain from './_domain';
+import _range from './_range';
 import _mark from './_mark';
 import _spectrum from './_spectrum';
 import _tooltip from './_tooltip';
@@ -29,7 +30,8 @@ class Treemap extends mix(Default).with(shapeMixin, sortMixin) {
     super();
     this.setAttrs(_attrs);
     this.process('munge', _munge, {isPre:true})
-      .process('scale', _scale, {isPre: true})
+      .process('domain', _domain, {isPre: true})
+      .process('range', _range, {isPre: true})
       .process('mark', _mark)
       .process('spectrum', _spectrum)
       .process('tooltip', _tooltip);

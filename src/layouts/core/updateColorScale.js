@@ -22,7 +22,7 @@ function fillUndefined (range, colors) {
  * @param {*} domain 
  * @param {*} keepLast 
  */
-function updateColorScale(domain, keepLast = true) {
+function updateColorScale(domain, keepLast = true) { //FIXME: update without domain
   const lastScale = this.scale().color;
   if (this.colorDomain() && this.colorDomain().length > 0) {
     let order = this.colorDomain();
@@ -39,7 +39,7 @@ function updateColorScale(domain, keepLast = true) {
     let scale = scaleOrdinal().domain(domain).range(newRange);
     scale._defaultRange = this.color();
     return scale;
-  } else if (keepLast && lastScale && lastScale.unknown && this.color() === lastScale._defaultRange) {
+  } else if (keepLast && lastScale && this.color() === lastScale._defaultRange) {
     let originColors = this.color();
     let lastDomain = this.scale().color.domain();
     let lastRange = this.scale().color.range();

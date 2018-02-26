@@ -1,6 +1,6 @@
 import {extent, scaleLinear} from 'd3';
 
-function _scale() {
+function _domain() {
   const scale = this.scale();
   const field = this.__execs__.field;
 
@@ -10,4 +10,4 @@ function _scale() {
   }
 }
 
-export default _scale;
+export default _domain;

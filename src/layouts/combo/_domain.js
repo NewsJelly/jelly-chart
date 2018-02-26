@@ -1,4 +1,4 @@
-function _scale(keep) {
+function _domain(keep) {
   let yAt = this.axisY();
   if (yAt) { //add the right axis directly
     this.axis({target: 'y', orient: 'right'});
@@ -9,4 +9,4 @@ function _scale(keep) {
 
 
 
-export default _scale;
+export default _domain;

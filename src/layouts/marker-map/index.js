@@ -3,7 +3,7 @@ import Default from '../core';
 import {attrFunc, genFunc, rebindOnMethod} from '../../modules/util';
 import _munge from './_munge';
 import _map from './_map';
-import _scale from './_scale';
+import _domain from './_domain';
 import _mark from './_mark';
 
 const latMeasure = {field: '__--jelly-lat--__'};
@@ -30,19 +30,12 @@ class MarkerMap extends Default {
     this.__execs__.dispatch = dispatch('loading', 'end');
     rebindOnMethod(this, this.__execs__.dispatch);
     this.process('munge', _munge, {isPre: true})
-      .process('scale', _scale, {isPre: true})
+      .process('domain', _domain, {isPre: true})
       .process('map', _map)
       .process('mark', _mark);
   }
   isSized() {
     return this.condition() === conditions[0];
-  }
-  renderLayout() { 
-    this.reset();
-    _munge.call(this);
-    _scale.call(this);
-    _map.call(this, this.container());
-    _mark.call(this); 
   }
 }
 

@@ -13,7 +13,8 @@ import _brush from './_brush';
 import _brushZoom from './_brushZoom';
 import _mark from './_mark';
 import _munge from './_munge';
-import _scale from './_scale';
+import _domain from './_domain';
+import _range from './_range';
 import _axis from './_axis';
 import _meanLine from './_meanLine';
 import _legend from './_legend';
@@ -60,7 +61,8 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
     this.rebindOnMethod(this.__execs__.multiTooltipDispatch);
     this.process('munge', _munge, {isPre: true})
       .process('brushZoom', _brushZoom, {isPre: true, allow: function() {return this.isBrushZoom()}})
-      .process('scale', _scale, {isPre: true, allow: function() {return !this.isBrushZoom()}})
+      .process('domain', _domain, {isPre: true, allow: function() {return !this.isBrushZoom()}})
+      .process('range', _range, {isPre: true, allow: function() {return !this.isBrushZoom()}})
       .process('axis', _axis, {allow: function() {return !this.isBrushZoom()}})
       .process('region', _region, {allow: function() {return !this.isBrushZoom()}})
       .process('facet', _facet, {allow: function() {return !this.isBrushZoom() && this.isFacet()}})

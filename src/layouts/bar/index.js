@@ -5,7 +5,8 @@ import stackMixin from '../stackMixin';
 import {mixedMeasure} from '../../modules/measureField';
 import {attrFunc, genFunc, mix, setMethodFromDefaultObj} from '../../modules/util';
 import _munge from './_munge';
-import _scale from './_scale';
+import _domain from './_domain';
+import _range from './_range';
 import _mark from './_mark';
 import _axis from './_axis';
 import _legend from './_legend';
@@ -40,7 +41,8 @@ class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin) {
     super();
     this.setAttrs(_attrs);
     this.process('munge', _munge, {isPre:true})
-      .process('scale', _scale,  {isPre:true})
+      .process('domain', _domain,  {isPre:true})
+      .process('range', _range,  {isPre:true})
       .process('axis', _axis)
       .process('region', _region)
       .process('facet', _facet, {allow: function() {return this.isFacet()}})

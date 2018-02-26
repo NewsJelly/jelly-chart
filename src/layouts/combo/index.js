@@ -5,7 +5,7 @@ import {mixedMeasure} from '../../modules/measureField';
 import {genFunc, mix} from '../../modules/util';
 import _axis from './_axis';
 import _munge from './_munge';
-import _scale from './_scale';
+import _domain from './_domain';
 import _region from './_region';
 import _legend from './_legend';
 import _facet from './_facet';
@@ -33,7 +33,7 @@ class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin) {
     super();
     this.setAttrs(_attrs);
     this.process('munge', _munge, {isPre:true})
-      .process('scale', _scale, {isPre:true})
+      .process('domain', _domain, {isPre:true})
       .process('region', _region)
       .process('facet', _facet)
       .process('axis', _axis)

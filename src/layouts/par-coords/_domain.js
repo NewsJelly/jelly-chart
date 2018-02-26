@@ -1,5 +1,5 @@
 import {extent, scaleBand, scalePoint} from 'd3';
-import {shapes, xMeasureName, yMeasureName} from './';
+import {xMeasureName, yMeasureName} from './';
 import {continousScale, comparator} from '../../modules/transform';
 import interval from '../../modules/interval';
 
@@ -17,54 +17,49 @@ function ordinalDomainFlatten (target, dimensionField) {
   return domain;
 }
 
-function _parCoords(keep) {
+function parCoords(keep) {
   this.axis('x', false);
   const scale = this.scale();
   const measures = this.measures();
   const munged = this.__execs__.munged;
-  const innerSize = this.innerSize();
   const field = this.__execs__.field;
   if (this.isColor()) {
     let colorDomain = field.region.munged(munged).domain(); 
     scale.color = this.updateColorScale(colorDomain, keep);
   }
-
   scale.x = scalePoint().domain(measures.map(d => d.field))
-    .rangeRound([0,innerSize.width]);
   measures.forEach(m => {
     let domain = extent(this.data(), d => d[m.field]);
     let scaleName = yMeasureName(m);
-    scale[scaleName] = continousScale(domain, null, field[scaleName]).rangeRound([innerSize.height, 0])
+    scale[scaleName] = continousScale(domain, null, field[scaleName])
     this.setCustomDomain(scaleName, domain);
   });
-
+  return this;
 }
 
-function _matrix(keep) {
+function matrix(keep) {
   const scale = this.scale();
   const measures = this.measures();
-  const innerSize = this.innerSize();
   const field = this.__execs__.field;
   if (this.isColor()) {
     let colorDomain = ordinalDomainFlatten(this.data(), field.region);
     scale.color = this.updateColorScale(colorDomain, keep);
   }
-  let regionWidth = Math.min(innerSize.width, innerSize.height);
-  scale.region = scaleBand().domain(measures.map(d=> d.field)).rangeRound([0, regionWidth]).padding(this.regionPadding());
+  scale.region = scaleBand().domain(measures.map(d=> d.field))
   measures.forEach(m => {
     let domain = extent(this.data(), d => d[m.field]);
     let yScaleName = yMeasureName(m);
-    scale[yScaleName] = continousScale(domain).rangeRound([scale.region.bandwidth(), 0]);
+    scale[yScaleName] = continousScale(domain);
     this.setCustomDomain(yScaleName, domain);
     let xScaleName = xMeasureName(m);
-    scale[xScaleName] = continousScale(domain).rangeRound([0, scale.region.bandwidth()]);
+    scale[xScaleName] = continousScale(domain);
     this.setCustomDomain(xScaleName, domain);
   });
 }
 
-function _scale(keep) {
-  if (this.shape() === shapes[0]) _parCoords.call(this, keep);
-  else _matrix.call(this, keep);
+function _domain(keep) {
+  if (this.isParcoords()) parCoords.call(this, keep);
+  else matrix.call(this, keep);
 }
 
-export default _scale;
+export default _domain;

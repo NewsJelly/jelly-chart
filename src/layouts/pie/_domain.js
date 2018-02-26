@@ -1,4 +1,4 @@
-function _scale(keep) {
+function _domain(keep) {
   const scale = this.scale();
   const munged = this.__execs__.munged;
   const field = this.__execs__.field;
@@ -6,4 +6,4 @@ function _scale(keep) {
   scale.color = this.updateColorScale(regionDomain, keep);
 }
 
-export default _scale;
+export default _domain;

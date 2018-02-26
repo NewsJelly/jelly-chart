@@ -6,7 +6,8 @@ import shapeMixin from '../shapeMixin';
 import {genFunc, mix} from '../../modules/util';
 import conditionForMute from '../core/_condtionForMute';
 import _munge from './_munge';
-import _scale from './_scale';
+import _domain from './_domain';
+import _range from './_range';
 import _mark from './_mark';
 import _axis from './_axis';
 import _legend from './_legend';
@@ -39,7 +40,8 @@ class ParCoords extends mix(RectLinear).with(seriesMixin, brushMixin, paddingMix
     this.setAttrs(_attrs);
     this.brush(true);
     this.process('munge', _munge, {isPre: true})
-      .process('scale', _scale, {isPre: true})
+      .process('domain', _domain, {isPre: true})
+      .process('range', _range, {isPre: true})
       .process('axis', _axis)
       .process('region', _region) 
       .process('mark', _mark, {allow: function() {return this.isParcoords()}})
@@ -65,14 +67,14 @@ class ParCoords extends mix(RectLinear).with(seriesMixin, brushMixin, paddingMix
       this.mute(nodes, this.muteIntensity());
     }
     if (!arguments.length) {
-      if (this.shape() === shapes[0]) {
+      if (this.isParcoords()) {
         return this.filterRegions().call(_parCoords);
       } else {  
         return this.regions().selectAll(this.regionName())  
           .call(_matrix);
       }
     } 
-    if (this.shape() === shapes[0]) {
+    if (this.isParcoords()) {
       return this.filterRegions(conditionForMute(callback), true).call(_parCoords);
     } else {
       return this.regions().selectAll(this.regionName()).filter(conditionForMute(callback)).call(_matrix);
@@ -95,7 +97,7 @@ class ParCoords extends mix(RectLinear).with(seriesMixin, brushMixin, paddingMix
           .call(_matrix);
       }
     }
-    if (this.shape() === shapes[0]) {
+    if (this.isParcoords()) {
       return this.filterRegions(conditionForMute(callback), true).call(_parCoords);
     } else {
       return this.regions().selectAll(this.regionName()).filter(conditionForMute(callback)).call(_matrix);
