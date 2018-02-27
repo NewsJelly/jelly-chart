@@ -362,4 +362,9 @@ module.exports = [
     path: 'sort-value-treemap',
     title: 'Sort By Values: Treemap'
   },
+  {
+    category: 'Sort',
+    path: 'sort-value-xyheatmap',
+    title: 'Sort By Values: XY Heatmap'
+  },
 ]
