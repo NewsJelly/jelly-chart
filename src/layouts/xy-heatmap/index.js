@@ -1,6 +1,7 @@
 import {continousColorScheme} from '../core';
 import RectLinear from '../rectLinear/';
 import paddingMixin from '../paddingMixin';
+import sortMixin from '../sortMixin';
 import {attrFunc, genFunc, mix} from '../../modules/util';
 import _munge from './_munge';
 import _domain from './_domain';
@@ -23,7 +24,7 @@ const _attrs = {
  * @augments RectLinear
  * @augments PaddingMixin
  */
-class XYHeatmap extends mix(RectLinear).with(paddingMixin) {
+class XYHeatmap extends mix(RectLinear).with(paddingMixin, sortMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
