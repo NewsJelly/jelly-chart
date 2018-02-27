@@ -16,7 +16,11 @@ function autoResize(autoResize) {
         if (allowResize && that.__execs__.canvas) {
           const rect = that.__execs__.container.node().getBoundingClientRect();
           if ((!lastWidth || lastWidth !== rect.width))  {
-            that.width(rect.width).render(true, ['domain']);
+            const transition = that.transition();
+            that.width(rect.width)
+              .transition({duration: 0, delay:0})
+              .render(true, ['munge', 'domain'])
+              .transition(transition);
             lastWidth = rect.width;
           }
           allowResize = false;
