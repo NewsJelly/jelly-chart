@@ -338,7 +338,28 @@ module.exports = [
   //size
   {
     category: 'Size',
-    path: 'auto-resize',
-    title: 'Resize Automatically'
+    path: 'auto-resize-bar',
+    title: 'Resize Automatically: Bar'
+  },
+  {
+    category: 'Size',
+    path: 'auto-resize-treemap',
+    title: 'Resize Automatically: Treemap'
+  },
+  //sort
+  {
+    category: 'Sort',
+    path: 'sort-value-bar',
+    title: 'Sort By Values: Bar'
+  },
+  {
+    category: 'Sort',
+    path: 'sort-value-pie',
+    title: 'Sort By Values: Pie'
+  },
+  {
+    category: 'Sort',
+    path: 'sort-value-treemap',
+    title: 'Sort By Values: Treemap'
   },
 ]
