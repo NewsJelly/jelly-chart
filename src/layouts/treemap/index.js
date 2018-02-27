@@ -12,6 +12,7 @@ import _tooltip from './_tooltip';
 const shapes = ['treemap', 'pack', 'word'];
 const conditions = ['normal', 'count'];
 const _attrs = {
+  autoResizeSkip: ['domain'], //treemap needs to re-munge beacuase of using .treemap method
   color: continousColorScheme,
   reverse: false,
   shape: shapes[0],

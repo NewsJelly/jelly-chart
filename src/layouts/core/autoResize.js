@@ -19,7 +19,7 @@ function autoResize(autoResize) {
             const transition = that.transition();
             that.width(rect.width)
               .transition({duration: 0, delay:0})
-              .render(true, ['munge', 'domain'])
+              .render(true, that.autoResizeSkip())
               .transition(transition);
             lastWidth = rect.width;
           }

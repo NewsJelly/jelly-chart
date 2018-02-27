@@ -67,6 +67,7 @@ const categoryColorScheme = magicTableColorScheme;
 
 const _attrs = {
   autoResize: false,
+  autoResizeSkip: ['munge', 'domain'],
   aggregated: false,
   color : categoryColorScheme,
   colorDomain: null,
@@ -151,15 +152,8 @@ Core.prototype.font = setMethodFromDefaultObj('font', defaultFont);
  * @return {(transition|Core)}
  */
 Core.prototype.transition = setMethodFromDefaultObj('transition', _attrs.transition);
-
-/**
- * @function
- * @private
- * @param {boolean} [aggregated=false]
- * @return {(aggregated|Core)}
- */
 Core.prototype.aggregated = attrFunc('aggregated');
-
+Core.prototype.autoResizeSkip = attrFunc('autoResizeSkip');
 /**
  * The Core method `.container` sets a selector of a chart holder element or an element itself as its container. Core finds the holder element and renders a chart on it.
  * If container is specified, sets a selector or a element and returns the instance itself. If container is not specified, returns the instance's current container.
