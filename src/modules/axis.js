@@ -229,7 +229,7 @@ function _overflow (selection) {
           let rotated = tick.selectAll('text' + className('rotated', true))
             .classed(className('rotated'), false)
           if(this.transition()) rotated = rotated.transition().duration(180);
-          rotated.attr('transform', '').attr('text-anchor', 'middle');
+          rotated.attr('transform', null).attr('text-anchor', 'middle');
         }
       } 
     }
