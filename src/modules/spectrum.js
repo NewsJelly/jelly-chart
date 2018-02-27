@@ -114,8 +114,9 @@ function _render(selection) {
     .text(d => labelFormat(d));
   let titleText = this.title() || this.field();
   titleText = titleText.localeCompare(countMeasure.field) === 0 ? countMeasureTitle : titleText;
-  let title = area.selectAll('.title')
+  let title = area.selectAll(className('title', true))
     .data([titleText])
+  title.exit().remove();
   title.enter().append('text')
     .merge(title)
     .attr('class', className('title'))
