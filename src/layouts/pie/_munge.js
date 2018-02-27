@@ -21,7 +21,11 @@ function _munge() {
   this.__execs__.munged = this.aggregate(false, true, false, false);
   this.limitKeys();
   const field = this.__execs__.field;
-  const pieGen = pie().value(d => d.value[field.r.valueName()]).padAngle(this.padding()).sortValues(null);
+  const pieGen = pie().value(d => d.value[field.r.valueName()])
+    .padAngle(this.padding())
+  if (this.sortByValue()) {
+    pieGen.sortValues(this.sortByValue() === 'ascending' ? (a,b) => a-b : (a,b) => b-a);
+  }
   const result = pieGen(this.__execs__.munged)
   result.forEach(d => d.key = d.data.key);
   if (field.region.interval()) { 

@@ -1,5 +1,6 @@
 import Core from '../core';
 import paddingMixin from '../paddingMixin';
+import sortMixin from '../sortMixin';
 import {genFunc, mix} from '../../modules/util';
 import _munge from './_munge';
 import _domain from './_domain';
@@ -20,8 +21,9 @@ const _attrs = {
  * @class Pie
  * @augments Core
  * @augments PaddingMixin
+ * @augments SortMixin
  */
-class Pie extends mix(Core).with(paddingMixin) {
+class Pie extends mix(Core).with(paddingMixin, sortMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
