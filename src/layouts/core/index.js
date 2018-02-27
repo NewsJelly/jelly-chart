@@ -3,6 +3,7 @@ import {attrFunc, className, magicTableColorScheme, setMethodFromDefaultObj} fro
 
 import aggregate from './aggregate';
 import aggregateMixed from './aggregateMixed';
+import autoResize from './autoResize';
 import color from './color';
 import colorDomain from './colorDomain';
 import condition from './condition';
@@ -65,6 +66,7 @@ const continousColorScheme = ['#ece7f2','#50C3F7'];
 const categoryColorScheme = magicTableColorScheme;
 
 const _attrs = {
+  autoResize: false,
   aggregated: false,
   color : categoryColorScheme,
   colorDomain: null,
@@ -102,6 +104,7 @@ class Core {
   constructor() {
     this.setAttrs(_attrs);
     this.__execs__ = {
+      autoResize: false,
       axis: {}, //axis settings
       condition: null, 
       canvas: null, 
@@ -251,6 +254,7 @@ Core.prototype.zeroMargin = attrFunc('zeroMargin');
 
 Core.prototype.aggregate = aggregate;
 Core.prototype.aggregateMixed = aggregateMixed;
+Core.prototype.autoResize = autoResize;
 Core.prototype.color = color;
 Core.prototype.colorDomain = colorDomain;
 Core.prototype.condition = condition;

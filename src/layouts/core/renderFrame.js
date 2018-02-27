@@ -27,6 +27,7 @@ function renderFrame() {
   let selector = this.container();
   let container = select(selector);
   if (container.empty()) throw new NotAvailableSelectorError();
+  this.__execs__.container = container;
   if (typeof selector !== 'string') {
     if (container.node().tagName === 'g' || container.node().tagName === 'G') {
       if (container.selectAll(className('hidden-g', true)).empty()) {
@@ -36,7 +37,7 @@ function renderFrame() {
       }
       return ;  
     }
-  } 
+  }
   let svg;
   if (!this.__execs__.canvas) {
     svg = container.append('div')
@@ -47,6 +48,9 @@ function renderFrame() {
     svg.call(setSvg, this);
   } else {
     svg = select(this.__execs__.canvas.node().parentNode);
+  }
+  if (this.autoResize()) {
+    this.width(this.__execs__.container.node().getBoundingClientRect().width);
   }
   container.select(className('frame', true))
     .style('width', this.width() + 'px')

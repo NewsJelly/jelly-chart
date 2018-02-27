@@ -22,16 +22,19 @@ function run(process, keep) {
  * @memberOf Core#
  * @function
  * @param {boolean} [keep=false] If is true, not reset existing scales.
+ * @param {String[]} [skip=[]] If skip includes an process, the process will be ignored.
  * @return {Core}
  */
-function render(keep = true) {
+function render(keep = true, skip = []) {
   const process = {
     pre: [],
     post: []
   };
   this.process().forEach(p => {
-    if (p.isPre) process.pre.push(p);
-    else process.post.push(p);
+    if (skip.indexOf(p.type) < 0) {
+      if (p.isPre) process.pre.push(p);
+      else process.post.push(p);
+    }
   })
 
   this.reset(keep);
@@ -60,6 +63,7 @@ function render(keep = true) {
   if (this.isFacet && this.isFacet()) { //when is facet, get dispatch from regions.
     node.call(bindOn, dispatch);
   }
+
   return this;
 }
 
