@@ -335,4 +335,10 @@ module.exports = [
     path: 'show-tooltip',
     title: 'Show a Tooltip over a Node'
   },
+  //size
+  {
+    category: 'Size',
+    path: 'auto-resize',
+    title: 'Resize Automatically'
+  },
 ]
