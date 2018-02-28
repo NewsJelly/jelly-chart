@@ -17,11 +17,11 @@
   "scripts": {
     "demo:dev": "copyfiles -f demo/style/*.css gh-pages/style && node demo/demo dev",
     "demo": "rimraf gh-pages && copyfiles -f demo/style/*.css gh-pages/style && node demo/main && node demo/demo",
-    "pretest": "rollup -c rollup.node.js",
+    "pretest": "rollup -c rollup.node.js && npm run demo:dev",
     "test": "karma start karma.conf.js --single-run && eslint src",
     "start": "http-server -c-1 | rollup -c --watch",
     "build": "rimraf dist && rollup -c && uglifyjs dist/jelly.js --source-map -m -o dist/jelly.min.js",
-    "prepublish" : "npm run test && npm run build",
+    "prepublish": "npm run test && npm run build",
     "jsdoc": "rimraf doc && mkdir doc && jsdoc -c .jsdoc.json"
   },
   "keywords": [
@@ -45,6 +45,7 @@
     "karma": "^2.0.0",
     "karma-browserify": "^5.1.3",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-html": "^1.0.5",
     "karma-spec-reporter": "0.0.32",
     "karma-tap": "^4.0.0",
     "marked": "^0.3.12",

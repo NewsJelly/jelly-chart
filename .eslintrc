@@ -12,6 +12,7 @@
         "d3": true,
         "daum": true,
         "jelly": true,
+        "karmaHTML": true,
         "console" : true
     },
     "env": {

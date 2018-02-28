@@ -81,6 +81,7 @@ a {
 
 .containers {
   margin: 0 auto;
+  height: 480px;
 }
 
 footer {
