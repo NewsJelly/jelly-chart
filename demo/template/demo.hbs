@@ -47,9 +47,16 @@
       <footer>
         <p>© Newsjelly Corp.</p>
       </footer>
-    </div>
     </section>
+    </div>
   </div>
+  {{#if dev}} 
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      {{code}}
+    });
+  </script>
+  {{else}}
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       setTimeout(function() {
@@ -57,6 +64,7 @@
       }, 200);
     });
   </script>
+  {{/if}}
 </body>
 
 </html>

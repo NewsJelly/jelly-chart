@@ -22,11 +22,14 @@ const dev = process.argv.length > 2 && process.argv[2] === 'dev';
 
 async function generate() {
   try {
-    const main = await readFile(path.resolve(__dirname, 'template/demo.hbs'));
+    const demo = await readFile(path.resolve(__dirname, 'template/demo.hbs'));
+    const demoIndex = await readFile(path.resolve(__dirname, 'template/demo.index.hbs'));
     const sidebar = await readFile(path.resolve(__dirname, 'template/partial.side.hbs'));
-    const template = handlebars.compile(main.toString());    
+    const template = handlebars.compile(demo.toString());    
     handlebars.registerPartial('sidebar', sidebar.toString());
     const group = nest().key(d => d.category).entries(list);
+    await writeFile(path.resolve(__dirname, distDir, 'index.html'), handlebars.compile(demoIndex.toString())({group:group}));
+
     let lastL;
     for (let l of list) {
       let categoryPath = l.category.split(' ').join('-');
