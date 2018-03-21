@@ -10,8 +10,9 @@ jelly.bar()
     {category:'Red', name: 'C', value: 40},
     {category:'Red', name: 'D', value: 10}
   ])
-  .dimensions(['name'])
+  .dimensions(['category', {field: 'name', order: 'asecending'}])
   .measures([{field: 'value', op: 'sum'}])
-  .sortByValue('ascending')
+  .sortByValue('descending')
   .axis('x').axis('y')
+  .legend(true)
   .render();
