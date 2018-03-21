@@ -5,7 +5,7 @@ import {orders} from './index';
  * @memberOf SortMixin#
  * @function
  * @example 
- * bar.sort('ascending') //sort bars in ascending order.
+ * bar.sortByValue('ascending') //sort bars in ascending order.
  * @param {boolean|string} [sortByValue=false] (false|natural|ascending|descending)
  * @return {sortByValue|SortMixin}
  */
