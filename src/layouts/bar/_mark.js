@@ -15,6 +15,7 @@ function _mark() {
   const field = this.__execs__.field;
   const diffColor = this.showDiff();
   const isShowDiff = !nested && diffColor;
+  const isNestedAndSortByValue = this.isNestedAndSortByValue();
   
   let __local = function (selection, monoColor = false) {
     let _fill = d => {
@@ -35,6 +36,9 @@ function _mark() {
         w = nested ? scale.region.bandwidth() : scale.x.width;
         h = Math.abs(scale.y(d.data.value[yField + '-start']  ) - scale.y(d.data.value[yField + '-end']));
       } else {
+        if (isNestedAndSortByValue) {
+          scale.x.domain(d.parent.domain);
+        }
         x =  scale.x(d.data.key);
         y =  (vertical ? upward: !upward) ? scale.y(yValue) : (hasZeroPoint ? scale.y(0) : scale.y.range()[0]);
         w = scale.x.bandwidth();

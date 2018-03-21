@@ -98,6 +98,10 @@ class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin) {
   isVertical() {
     return this.orient() === orients[0];
   }
+
+  isNestedAndSortByValue() {
+    return this.isNested() && this.sortByValue() !== 'natural';
+  }
 } 
 
 /**

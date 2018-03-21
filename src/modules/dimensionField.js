@@ -16,30 +16,66 @@ class DimensionField extends Field {
     setAttrs(this, attrs);
     this.setInit(dimension, ['interval', 'max', 'order']);
   }
-  domain(sortByValue = false, accessor) {
+  domain(sortByValue = false, accessor = null, multipleDomain = false) {
     const munged = this.munged();
     const level = this.level();
     const order = this.order();
-    let domain = [];
+    const needMultipleDomain = sortByValue !== 'natural' && multipleDomain;
     let curLevel = 0;
-    function _keys(values, curLevel) {
+    let duplicateDomain = [];
+    function _fill(nodes, setDomain, curLevel) {
       if (curLevel === level) {
-        return values.map(accessor ? accessor : d => {return {key: d.data.key, value: d.value};});
+        const residual = setDomain.filter(d => !nodes.find(n => n === d));
+        return nodes.concat(residual);
       } else {
-        return merge(values.map(d => _keys(d.children, curLevel + 1)));
+        return nodes.map(d => { 
+          d.values = _fill(d.values, setDomain, curLevel + 1)
+          return d;
+        })
       }
     }
-    domain = _keys(munged, curLevel);
-    let newDomain = [];
-    domain.forEach(d => {
-      if (newDomain.findIndex(n => n === d) < 0) {
-        newDomain.push(d);
+    function _keys(nodes, curLevel) {
+      if (curLevel === level) {
+        const domain = nodes.map(accessor ? accessor : d => {return {key: d.data.key, value: d.value};});
+        if (needMultipleDomain) {
+          duplicateDomain = duplicateDomain.concat(domain);
+          return _domain(domain, false);
+        } else {
+          return domain;
+        }
+      } else {
+        if (needMultipleDomain) {
+          return nodes.map(d => {
+           return {key: d.data.key, values: _keys(d.children, curLevel + 1)}
+          })
+        } else {
+          return merge(nodes.map(d => _keys(d.children, curLevel + 1)));
+        }
       }
-    })
-    domain = newDomain;
-    if ((!sortByValue || sortByValue === 'natural') && order && order !== 'natural') domain.sort(comparator(order, [], true, d => d.key)); 
-    if (sortByValue && sortByValue !== 'natural')  domain.sort(comparator(sortByValue, [], true, d => d.value)); 
-    return domain.map(d => d.key);
+    }
+    function _domain(domain, duplicate = true) {
+      if (duplicate) domain = _set(domain);
+      if ((!sortByValue || sortByValue === 'natural') && order && order !== 'natural') domain.sort(comparator(order, [], true, d => d.key)); 
+      if (sortByValue && sortByValue !== 'natural') domain.sort(comparator(sortByValue, [], true, d => d.value)); 
+      return domain.map(d => d.key);
+    }
+
+    function _set(domain) {
+      let newDomain = [];
+      domain.forEach(d => {
+        if (!newDomain.find(n => n.key === d.key)) newDomain.push(d);
+      })
+      return newDomain;
+    }
+    let domain = _keys(munged, curLevel);
+    if (needMultipleDomain) {
+      const domainSet = _set(duplicateDomain).map(d => d.key);
+      curLevel = 0;
+      _fill(domain, domainSet, curLevel);
+    } else {
+      domain = _domain(domain);
+    }
+    return domain;
   }
 
   isInterval() {

@@ -7,7 +7,7 @@ function _domain(keep) { //set scales and domains
   const stacked = this.stacked();
   const aggregated = this.aggregated();
   const field = this.__execs__.field;
-  
+  const isNestedAndSortByValue = this.isNestedAndSortByValue();
   let yDomain, xDomain;
   let regionDomain;
   if (!(keep && scale.x && scale.y)) {
@@ -18,7 +18,6 @@ function _domain(keep) { //set scales and domains
   if (nested) {
     regionDomain = field.region.level(0).munged(munged).domain();
     scale.region = scaleBand().domain(regionDomain).padding(this.regionPadding());
-    
   }
   if (this.isFacet()) {
     scale.color = this.updateColorScale(regionDomain, keep);
@@ -26,14 +25,17 @@ function _domain(keep) { //set scales and domains
   } 
   
   const level = 1;
-  xDomain = field.x.level(level).munged(munged).domain(this.sortByValue());
-  yDomain = field.y.level(level).munged(munged).aggregated(aggregated).domain(0, stacked);
-
+  xDomain = field.x.level(level)
+    .munged(munged)
+    .domain(!isNestedAndSortByValue && this.sortByValue());
+  yDomain = field.y.level(level)
+    .munged(munged)
+    .aggregated(aggregated)
+    .domain(0, stacked);
   if (nested || (!nested && (this.mono() === false || stacked))) { //nested
     scale.color = this.updateColorScale(xDomain, keep); //FIXME: need to update current colors
   }
 
-  // bar-chart 의 경우 시작점을 0으로 맞춤
   if (yDomain[0] > 0) yDomain[0] = 0;
   else if (yDomain[1] < 0) yDomain[1] = 0;
 
@@ -41,11 +43,13 @@ function _domain(keep) { //set scales and domains
     if (yDomain[0] === 0) yDomain[1] *= 1.25;
     else if (yDomain[1] === 0) yDomain[0] *= 1.25;
   }
-
-  if(stacked) {
+  if (isNestedAndSortByValue) {
+    xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
+    munged.forEach(d => d.domain = xDomain.find(x => x.key === d.data.key).values);
+  } else if(stacked) {
     if (!nested) {
       scale.x.domain([field.x.field()]);
-    }
+    } 
   } else { //not stacked
     scale.x.domain(xDomain);
   }
