@@ -21,7 +21,7 @@ function thickness(axisSetting, scale, isHorizontal = true, isOrdinal = true) {
   let max = -1;
   let isOver = false;
   let innerSize = this.innerSize();
-  let step = isHorizontal ? (innerSize.width / ticks.length * 0.9) : 0;
+  let step = isHorizontal ? (innerSize.width / ticks.length ) : 0;
   let tick = hidden.selectAll(className('tick', true))
       .data(tickFormat ? ticks.map(tickFormat) : ticks)
   tick = tick.enter().append('text')
@@ -34,7 +34,7 @@ function thickness(axisSetting, scale, isHorizontal = true, isOrdinal = true) {
     if (w > max) max = w;
     if (w > step) isOver = true;
   });
-  max = max * (isHorizontal ? 0.8 : 1) + offsetThickness * (isHorizontal ?  1.5 : 1);
+  max = max+ offsetThickness;
   
   if (axisSetting.tickPadding) max += axisSetting.tickPadding;
   if (axisSetting.showTitle) max += offsetThickness;
