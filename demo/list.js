@@ -367,4 +367,19 @@ module.exports = [
     path: 'sort-value-xyheatmap',
     title: 'Sort By Values: XY Heatmap'
   },
+  {
+    category: 'Data Stream',
+    path: 'stream-bar',
+    title: 'Data Stream: Bar'
+  },
+  {
+    category: 'Data Stream',
+    path: 'stream-line',
+    title: 'Data Stream: Line'
+  },
+  {
+    category: 'Data Stream',
+    path: 'stream-scatter',
+    title: 'Data Stream: Scatter'
+  },
 ]
