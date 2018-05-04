@@ -134,7 +134,7 @@ function continousScale(domain, type = 'linear', field) {
   }
   scale._scaleType = type;
   scale._field = field;
-  return scale.domain(domain);
+  return scale;
 }
 
 export {

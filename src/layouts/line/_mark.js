@@ -22,7 +22,9 @@ function _mark(zoomed = false) {
   const curve = this.curve() === curves[0] ? curveLinear : (this.curve() === curves[1] ? curveStep : curveCatmullRom);
   const scaleBandMode = this.scaleBandMode();
   const multiTooltip = this.multiTooltip();
-  const xValue = d => scale.x(field.x.interval() ? new Date(d.data.key) : d.data.key) + (scaleBandMode ? scale.x.bandwidth()/2 : 0);
+  const stream = this.stream();
+  const xKey = d => field.x.interval() ? new Date(d.data.key) : d.data.key;
+  const xValue = d => scale.x( xKey(d)) + (scaleBandMode ? scale.x.bandwidth()/2 : 0);
   const yValueFunc = (s) => {
     return d => {
       return stacked ? s(d.data.value[yField + '-end']) : s(d.data.value[yField])
@@ -44,9 +46,24 @@ function _mark(zoomed = false) {
       let f = field.x.isInterval() ? timeFormat(field.x.format()) : null; 
       return f ? f(key) : key;
     }
+
     selection.each(function(d, i, arr) {
       d.value = stacked ? d.data.value[yField + '-end'] : d.data.value[yField];
       d.x = xValue(d);
+      if (isNaN(d.x) && scale.x._defaultDomain) {
+        d.x = that.tempPosForOrdinalScale(xKey(d), scale.x);
+      }
+      if (stream) {
+        const curX = xKey(d);
+        if (scale.x.invert) {
+          const dist = that.distDomain(scale.x);
+          if (curX > scale.x._lastDomain[scale.x._lastDomain.length-1]) {
+            d.x0 = d.x + dist;
+          }
+        } else {
+          d.x0 = that.tempPosForOrdinalScale(xKey(d), scale.x);
+        }
+      }
       d.y = yValueFunc(individualScale ? d.parent.scale : scale.y)(d);
       d.anchor = i === 0 ? 'start' : (i === arr.length-1 ? 'end' : 'middle'); 
       d.text = labelFormat(d.value);
@@ -83,21 +100,30 @@ function _mark(zoomed = false) {
       })
     }
   }
-  let __series = function (selection, area = false) {
-    let c = d => nested ? scale.color(d.data.key) : color[0];
+  let __series = function (selection, area = false, stream = false) {
+    const c = d => nested ? scale.color(d.data.key) : color[0];
+    const dist = stream && that.distDomain(scale.x);
+    selection.each(function(d) {
+      let target =  d.children;
+      let thisSelect = select(this);
+      if (stream) {
+        thisSelect
+          .attr('d', (area ? areaGenFunc : lineGenFunc)(individualScale ? d.scale : scale.y)(target))
+          .attr('transform', `translate(${dist},0)`)
+          .transition(trans)
+            .attr('transform', `translate(0,0)`)
+      } else {
+        thisSelect.transition(trans)
+          .attr('d', (area ? areaGenFunc : lineGenFunc)(individualScale ? d.scale : scale.y)(target));
+      }
+      
+    })
     if (area) {
-      selection.each(function(d) {
-        let target =  d.children;
-        select(this).transition(trans)
-          .attr('d', areaGenFunc(individualScale ? d.scale : scale.y)(target));
-      }).attr('fill', c).attr('stroke', 'none')
+      selection
+        .attr('fill', c).attr('stroke', 'none')
     } else {
-      selection.each(function(d) {
-        let target = d.children;
-        select(this).transition(trans)
-          .attr('d', lineGenFunc(individualScale ? d.scale : scale.y)(target));
-      }).attr('stroke', c)
-      .attr('stroke-width', size.range[0] + 'px')
+      selection.attr('stroke', c)
+        .attr('stroke-width', size.range[0] + 'px')
     }
   }
   let __pointInit = function (selection) {
@@ -107,8 +133,8 @@ function _mark(zoomed = false) {
       .style('fill', '#fff')
       .attr('opacity',  showPoint ? 1 : 0)
       .style('cursor', 'pointer')
-      .attr('cx', d => d.x)
-      .attr('cy', max(scale.y.range()))
+      .attr('cx', d => d.x0 || d.x)
+      .attr('cy', d => stream ? d.y : max(scale.y.range()))
   }
   let __point = function (selection) {
     selection
@@ -122,9 +148,10 @@ function _mark(zoomed = false) {
   let __labelInit = function (selection) {
     selection.each(function(d) {
       let selection = select(this);
-      selection.attr('x', d.x )
-        .attr('y', max(scale.y.range()))
+      selection.attr('x', d => d.x0 || d.x)
+        .attr('y', d => stream ? d.y : max(scale.y.range()))
         .attr('stroke', 'none')
+        .style('visibility', label ? 'visible' : 'hidden')
         .text(d.text)
       that.styleFont(selection);
     })
@@ -151,13 +178,13 @@ function _mark(zoomed = false) {
     }
     let ___append = function(selection, area) {
       let path = selection.selectAll('path' + className((area ? 'area' : 'line'), true))
-      .data(d => [d])
+      .data(d => [d], (d,i) => d.data ? d.data.key : i)
       path.exit().remove();
       path.enter().append('path')
         .attr('class', className((area ? 'area' : 'line')))
         .call(__seriesInit, area)
-        .merge(path, area)
-        .call(__series, area)
+        .merge(path)
+        .call(__series, area, stream)
         .style('pointer-events', 'none');
     }
     if(isArea) {

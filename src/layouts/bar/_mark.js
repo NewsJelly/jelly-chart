@@ -17,7 +17,7 @@ function _mark() {
   const isShowDiff = !nested && diffColor;
   const isNestedAndSortByValue = this.isNestedAndSortByValue();
   
-  let __local = function (selection, monoColor = false) {
+  let __local = function (selection, monoColor = false, stream = false) {
     let _fill = d => {
       if(monoColor) return color[0];
       else return scale.color(d.data.key);
@@ -26,6 +26,7 @@ function _mark() {
       let f = field.x.interval() && field.x.format() ? timeFormat(field.x.format()) : null; 
       return f ? f(key) : key;
     }
+    
     selection.each(function(d) { //local에 저장
       let x,y,w,h;
       let yValue = d.value//d.data.value[yField];
@@ -40,6 +41,12 @@ function _mark() {
           scale.x.domain(d.parent.domain);
         }
         x =  scale.x(d.data.key);
+        if (isNaN(x) && scale.x._defaultDomain) {
+          x = that.tempPosForOrdinalScale(d.data.key, scale.x)
+        } 
+        if (stream) {
+          d.x0 = that.tempPosForOrdinalScale(d.data.key, scale.x);
+        }
         y =  (vertical ? upward: !upward) ? scale.y(yValue) : (hasZeroPoint ? scale.y(0) : scale.y.range()[0]);
         w = scale.x.bandwidth();
         h = Math.abs((hasZeroPoint ?  scale.y(0): scale.y.range()[0]) - scale.y(yValue));
@@ -62,14 +69,14 @@ function _mark() {
           if (select(this).classed(className('diff'))) return 'none';
           else return d.color;
         }); 
-      if(vertical) {
-        selection.attr('x', d.x)
+      if(vertical) { 
+        selection.attr('x', d.x0 || d.x)
           .attr('y', d.upward ? d.y + d.h : d.y)
           .attr('width', d.w )
           .attr('height', 0);
       } else {
         selection.attr('x', d.upward ? d.x : d.x + d.w)
-          .attr('y', d.y)
+          .attr('y', d.x0 || d.y)
           .attr('width', 0)
           .attr('height', d.h);
       }
@@ -80,12 +87,12 @@ function _mark() {
       let selection = select(this);
       selection.style('pointer-events', 'none').text(d.text);
       if (vertical) {
-        selection.attr('x', d.x + d.w/2).style('text-anchor', 'middle')
+        selection.attr('x', (d.x0 || d.x) + d.w/2).style('text-anchor', 'middle')
         if (stacked) selection.attr('y', d.y + d.h).attr('dy', '1em');
         else if(d.upward) selection.attr('y', d.y + d.h).attr('dy', '-.25em');
         else selection.attr('y', d.y).attr('dy', '1em');
       } else {
-        selection.attr('y', d.y + d.h/2).attr('dy', '.35em');
+        selection.attr('y', (d.x0 || d.y) + d.h/2).attr('dy', '.35em');
         if (stacked) selection.attr('x', d.x + d.w/2).attr('text-anchor', 'middle');
         else if(d.upward) selection.attr('x', d.x).attr('dx', '.5em');
         else selection.attr('x', d.x + d.w).attr('text-anchor', 'end').attr('dx', '-.1em')
@@ -129,7 +136,7 @@ function _mark() {
   bar.exit().remove();
   let barEnter = bar.enter().append('g')
     .attr('class', this.nodeName(true))
-    .call(__local, nested ? false : this.mono()); 
+    .call(__local, nested ? false : this.mono(), this.stream()); 
   barEnter.append('rect')
     .attr('class', className('bar'))
     .call(__barInit, vertical); 

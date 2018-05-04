@@ -14,7 +14,8 @@ function individualDomain (target, measureField, padding = 0) {
 }
 
 
-function _domain(keep) {
+function _domain() {
+  const keep = this.keep();
   const scale = this.scale();
   const munged = this.__execs__.munged;
   const nested = this.isNested();
@@ -24,7 +25,7 @@ function _domain(keep) {
   const level = 1;
   const isMixed = this.isMixed();
   const individualScale = this.isIndividualScale();
-
+  const viewInterval = this.viewInterval();
   let yDomain, xDomain;
   let regionDomain;
   
@@ -51,18 +52,26 @@ function _domain(keep) {
       break;
     } 
   }
-  if (this.scaleBandMode()) {
-    scale.x = scaleBand().padding(this.padding());
-  } else if (field.x.interval() || isNumberDomain) { 
-    if (field.x.order() === 'natural') {
-      if (xDomain[0] instanceof Date) xDomain = extent(xDomain); 
-      else xDomain = extent(xDomain.map(d => +d)); 
+  
+    if (this.scaleBandMode()) {
+      if (!keep) scale.x = scaleBand().padding(this.padding());
+    } else if (field.x.interval() || isNumberDomain) { 
+      if (field.x.order() === 'natural') {
+        if (xDomain[0] instanceof Date) xDomain = extent(xDomain); 
+        else xDomain = extent(xDomain.map(d => +d)); 
+      } else {
+        xDomain = [xDomain[0], xDomain[xDomain.length-1]]
+      }
+      if (!keep) scale.x = continousScale(xDomain, null, field.x);
     } else {
-      xDomain = [xDomain[0], xDomain[xDomain.length-1]]
+      if (!keep) scale.x = scalePoint().padding(this.padding());
     }
-    scale.x = continousScale(xDomain, null, field.x);
-  } else {
-    scale.x = scalePoint().padding(this.padding());
+  
+  
+  if (!keep && viewInterval) {
+    xDomain = this.limitViewInterval(scale.x, xDomain);
+  } else if (keep && this.stream()) {
+    xDomain = this.limitViewInterval(scale.x, xDomain, true);
   }
   scale.x.domain(xDomain);
   this.setCustomDomain('y', yDomain);

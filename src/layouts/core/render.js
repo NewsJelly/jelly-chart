@@ -8,12 +8,12 @@ function bindOn(node, dispatch) {
   })
   return node;
 }
-function run(process, keep) {
+function run(process) {
   process.forEach(p => {
     if (p.allow) {
       if (p.allow.call(this)) p.call.call(this);
     } else {
-      p.call.call(this, keep);
+      p.call.call(this);
     }
   })
 }
@@ -25,7 +25,7 @@ function run(process, keep) {
  * @param {String[]} [skip=[]] If skip includes an process, the process will be ignored.
  * @return {Core}
  */
-function render(keep = true, skip = []) {
+function render(keep = false, skip = []) {
   const process = {
     pre: [],
     post: []
@@ -38,10 +38,11 @@ function render(keep = true, skip = []) {
   })
 
   this.reset(keep);
+  this.keep(keep);
   if (this.needCanvas()) this.renderFrame();
-  run.call(this, process.pre, keep);
+  run.call(this, process.pre);
   if (this.needCanvas()) this.renderCanvas();
-  run.call(this, process.post, keep);
+  run.call(this, process.post);
 
   if (!this.__execs__.canvas) return;
 

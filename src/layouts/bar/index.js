@@ -2,6 +2,7 @@ import Facet from '../facet/';
 import paddingMixin from '../paddingMixin';
 import sortMixin from '../sortMixin/';
 import stackMixin from '../stackMixin';
+import streamMixin from '../StreamMixin';
 import {mixedMeasure} from '../../modules/measureField';
 import {attrFunc, genFunc, mix, setMethodFromDefaultObj} from '../../modules/util';
 import _munge from './_munge';
@@ -36,7 +37,7 @@ const _attrs = {
  * @augments PaddingMixin
  * @todo write examples
  */
-class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin) {
+class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin, streamMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);

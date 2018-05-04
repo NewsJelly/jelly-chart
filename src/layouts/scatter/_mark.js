@@ -13,6 +13,7 @@ function _mark(zoomed = false) {
   const field = this.__execs__.field;
   const aggregated = this.aggregated();
   const nested = this.isColor();
+  const stream = this.stream();
   
   const xValue = d => scale.x(d.data[field.x.field()]);
   const yValue = d => scale.y(d.data[field.y.field()]);
@@ -24,6 +25,13 @@ function _mark(zoomed = false) {
   let __local = function (selection) {
     selection.each(function(d) {
       d.x = xValue(d);
+      if (stream) {
+        const curX = d.data[field.x.field()];
+        const dist = that.distDomain(scale.x);
+          if (curX > scale.x._lastDomain[scale.x._lastDomain.length-1]) {
+            d.x0 = d.x + dist;
+          }
+      }
       d.y = yValue(d);
       d.color = colorValue.call(this);
       d.r = rValue(d);
@@ -71,7 +79,8 @@ function _mark(zoomed = false) {
     point.exit().remove();
     let pointEnter = point.enter().append('g')
       .attr('class', that.nodeName(true) + ' point')
-      .call(__local);
+      .call(__local)
+      .attr('transform', d => `translate(${[d.x0 || d.x, d.y]})`);
     pointEnter.append('circle')
       .call(__pointInit);
     pointEnter.append('text')
@@ -86,7 +95,7 @@ function _mark(zoomed = false) {
     point.each(function(d) {
       let selection =  select(this);
       if (!zoomed) selection = selection.transition(trans);
-      selection.attr('transform', 'translate(' + [d.x, d.y] +')')
+      selection.attr('transform', `translate(${[d.x, d.y]})`)
         .style('fill',  d.color)
     })
     that.__execs__.nodes = point;

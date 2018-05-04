@@ -1,6 +1,7 @@
 import {scaleBand, scaleLinear} from 'd3';
 
-function _domain(keep) { //set scales and domains
+function _domain() { //set scales and domains
+  const keep = this.keep();
   const scale = this.scale();
   const munged = this.__execs__.munged;
   const nested = this.isNested();
@@ -8,6 +9,7 @@ function _domain(keep) { //set scales and domains
   const aggregated = this.aggregated();
   const field = this.__execs__.field;
   const isNestedAndSortByValue = this.isNestedAndSortByValue();
+  const viewInterval = this.viewInterval();
   let yDomain, xDomain;
   let regionDomain;
   if (!(keep && scale.x && scale.y)) {
@@ -46,11 +48,16 @@ function _domain(keep) { //set scales and domains
   if (isNestedAndSortByValue) {
     xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
     munged.forEach(d => d.domain = xDomain.find(x => x.key === d.data.key).values);
-  } else if(stacked) {
+  } else if (stacked) {
     if (!nested) {
       scale.x.domain([field.x.field()]);
     } 
   } else { //not stacked
+    if (!keep && viewInterval) {
+      xDomain = this.limitViewInterval(scale.x, xDomain);
+    } else if (keep && this.stream()) { // if uses stream  and keeps the existing scale;
+      xDomain = this.limitViewInterval(scale.x, xDomain, true);
+    }
     scale.x.domain(xDomain);
   }
   this.setCustomDomain('y', yDomain);

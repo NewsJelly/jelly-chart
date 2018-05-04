@@ -77,6 +77,7 @@ const _attrs = {
   dimensions: [],
   font: defaultFont,
   height: 480,
+  keep: false,
   label: null,
   legend: null,
   limitKeys : 200,
@@ -207,7 +208,7 @@ Core.prototype.data = attrFunc('data');
  * @return {(height|Core)}
  */
 Core.prototype.height = attrFunc('height');
-
+Core.prototype.keep = attrFunc('keep');
 /**
  * If label is specified as true, sets the chart to show labels on its marks and returns the instance itself. If label is not specified, returns the instance's current height.
  * @function

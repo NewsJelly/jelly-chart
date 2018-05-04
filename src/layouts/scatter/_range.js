@@ -31,7 +31,7 @@ function _range() {
   }
 
   this.thickness(yAt, scale.y, false, false);
-  this.thickness(xAt, scale.x, true, false);
+  if(!this.stream()) this.thickness(xAt, scale.x, true, false);
   
   const innerSize = this.innerSize();
   scale.x.rangeRound([0, innerSize.width]);

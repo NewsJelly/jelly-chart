@@ -27,7 +27,7 @@ function _munge() {
   this.condition(conditionFunc); 
   const field = this.__execs__.field;
   const mixed = this.isMixed();
-
+  
   if (this.aggregated()) {
     this.__execs__.munged = [this.data()];
   } else if (mixed) { 

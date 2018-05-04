@@ -3,6 +3,7 @@ import zoomMixin from '../zoomMixin';
 import brushMixin from '../brushMixin';
 import fitLineMixin from '../fitLineMixin';
 import paddingMixin from '../paddingMixin';
+import streamMixin from '../streamMixin';
 import {genFunc, mix} from '../../modules/util';
 import _munge from './_munge';
 import _domain from './_domain';
@@ -31,8 +32,9 @@ const _attrs = {
  * @augments BrushMixin
  * @augments ZoomMixin
  * @augments PaddingMixin
+ * @augments StreamMixin
  */
-class Scatter extends mix(Facet).with(fitLineMixin, brushMixin, zoomMixin, paddingMixin) {
+class Scatter extends mix(Facet).with(fitLineMixin, brushMixin, zoomMixin, paddingMixin, streamMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);

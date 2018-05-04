@@ -7,6 +7,7 @@ import zoomMixin from '../zoomMixin';
 import paddingMixin from '../paddingMixin';
 import shapeMixin from '../shapeMixin';
 import stackMixin from '../stackMixin';
+import streamMixin from '../StreamMixin';
 import {mixedMeasure} from '../../modules/measureField';
 import {attrFunc, genFunc, mix} from '../../modules/util';
 import _brush from './_brush';
@@ -52,8 +53,9 @@ const _attrs = {
  * @augments ZoomMixin
  * @augments PaddingMixin
  * @augments ShapeMixin
+ * @augments StreamMixin
  */
-class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin) {
+class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin, streamMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
