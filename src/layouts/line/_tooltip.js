@@ -24,6 +24,7 @@ function _single(fromMulti = false) {
 
 function _multi() { //multi-tooltip 
   const canvas = this.__execs__.canvas;
+  const field = this.__execs__.field;
   let multiTooltipG = canvas.select(className('multi-tooltip-g', true));
   if (multiTooltipG.empty()) multiTooltipG = canvas.append('g').attr('class', className('multi-tooltip-g'));
   let tooltipObj = _single.call(this, true);
@@ -33,8 +34,9 @@ function _multi() { //multi-tooltip
     .dy(this.size().range[0])
     .color(this.color()[0])
     .tooltip(tooltipObj)
-    .sortByValue(this.multiTooltip().sortByValue);
-
+    .sortByValue(this.multiTooltip().sortByValue)
+    .keyFormat(field.x.format());
+  
   multiTooltipObj.render(multiTooltipG.node());
   this.__execs__.tooltip = multiTooltipObj;
 

@@ -20,6 +20,7 @@ const _attrs = {
   nodeName: className('mark node', true), 
   tooltip: null,
   target: null,
+  keyFormat: null,
   valueFormat: null,
   width: null,
   sortByValue: {type:'natural'},
@@ -167,6 +168,10 @@ function _show(selection, tick) {
   });
   _sortByValue(values, this.sortByValue())
   values = values.map(d => {return {name: d.parent.data.key || d.data.key, value: d.text}})
+  if (this.keyFormat()) {
+    const f = this.keyFormat();
+    values.forEach(d => d.name = f(d.name));
+  }
   y = mean(y);
   y = Math.round(y);
   if (x && y) {
