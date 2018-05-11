@@ -5,16 +5,17 @@ import stackMixin from '../stackMixin';
 import streamMixin from '../StreamMixin';
 import {mixedMeasure} from '../../modules/measureField';
 import {attrFunc, genFunc, mix, setMethodFromDefaultObj} from '../../modules/util';
-import _munge from './_munge';
-import _domain from './_domain';
-import _range from './_range';
-import _mark from './_mark';
-import _axis from './_axis';
-import _legend from './_legend';
-import _region from './_region';
-import _facet from './_facet';
-import _tooltip from './_tooltip';
 import _annotation from './_annotation';
+import _axis from './_axis';
+import _domain from './_domain';
+import _facet from './_facet';
+import _legend from './_legend';
+import _mark from './_mark';
+import _munge from './_munge';
+import _padding from './_panning';
+import _range from './_range';
+import _region from './_region';
+import _tooltip from './_tooltip';
 
 const orients  = ['vertical', 'horizontal'];
 const conditions = ['normal', 'count', 'mixed'];
@@ -50,6 +51,7 @@ class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin, streamMix
       .process('mark', _mark, {allow: function() {return !this.isFacet()}})
       .process('legend', _legend)
       .process('tooltip', _tooltip)
+      .process('padding', _padding)
       .process('annotation', _annotation);
   }
   measureName() {

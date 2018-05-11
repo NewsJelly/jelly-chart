@@ -5,15 +5,16 @@ import fitLineMixin from '../fitLineMixin';
 import paddingMixin from '../paddingMixin';
 import streamMixin from '../streamMixin';
 import {genFunc, mix} from '../../modules/util';
-import _munge from './_munge';
-import _domain from './_domain';
-import _range from './_range';
-import _mark from './_mark';
 import _axis from './_axis';
-import _legend from './_legend';
-import _region from './_region';
+import _domain from './_domain';
 import _facet from './_facet';
 import _fitLine from './_fitLine';
+import _legend from './_legend';
+import _range from './_range';
+import _mark from './_mark';
+import _munge from './_munge';
+import _panning from './_panning';
+import _region from './_region';
 import _tooltip from './_tooltip';
 import _zoom from './_zoom';
 
@@ -48,6 +49,7 @@ class Scatter extends mix(Facet).with(fitLineMixin, brushMixin, zoomMixin, paddi
       .process('mark', _mark, {allow: function() {return !this.isFacet();}})
       .process('legend', _legend)
       .process('tooltip', _tooltip)
+      .process('panning', _panning)
       .process('zoom', _zoom)
   }
 

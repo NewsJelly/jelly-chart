@@ -14,6 +14,7 @@ import _brush from './_brush';
 import _brushZoom from './_brushZoom';
 import _mark from './_mark';
 import _munge from './_munge';
+import _panning from './_panning';
 import _domain from './_domain';
 import _range from './_range';
 import _axis from './_axis';
@@ -72,6 +73,7 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
       .process('meanLine', _meanLine, {allow: function() {return !this.isBrushZoom()}})
       .process('fitLine', _fitLine, {allow: function() {return !this.isBrushZoom()}})
       .process('tooltip', _tooltip, {allow: function() {return !this.isBrushZoom()}})
+      .process('panning', _panning, {allow: function() {return !this.isBrushZoom()}})
       .process('zoom', _zoom, {allow: function() {return !this.isBrushZoom()}})
       .process('brush', _brush, {allow: function() {return !this.isBrushZoom()}})
       .process('legend', _legend, {allow: function() {return !this.isBrushZoom()}})

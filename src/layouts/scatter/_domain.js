@@ -23,9 +23,10 @@ function _domain() {
   const data = aggregated ? this.data().children : this.data();
   let xDomain = extent(data, d => (aggregated ? d.data : d)[field.x.field()]);
   let yDomain = extent(data, d => (aggregated ? d.data : d)[field.y.field()]);
-  
-  scale.x = continousScale(xDomain, undefined, field.x);
-  scale.y = continousScale(yDomain, undefined, field.y);
+  if (!keep) {
+    scale.x = continousScale(xDomain, undefined, field.x);
+    scale.y = continousScale(yDomain, undefined, field.y);
+  }
 
   if (this.isSized()) {
     rDomain = extent(data, d => d[field.radius.field()]);
@@ -33,11 +34,14 @@ function _domain() {
   }
   if (!keep && viewInterval) {
     xDomain = this.limitViewInterval(scale.x, xDomain);
+    scale.x.domain(xDomain);
   } else if (keep && this.stream()) {
     xDomain = this.limitViewInterval(scale.x, xDomain, true);
+    scale.x.domain(xDomain);
+  } else {
+    this.setCustomDomain('x', xDomain);
   }
 
-  this.setCustomDomain('x', xDomain);
   this.setCustomDomain('y', yDomain);
 
   return this;

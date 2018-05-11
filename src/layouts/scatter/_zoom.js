@@ -1,12 +1,10 @@
-import {zoom, select} from 'd3';
+import {zoom} from 'd3';
 
 import _mark from './_mark';
 import _brushZoom from './_brushZoom';
 import _tooltip from './_tooltip';
-import {className} from '../../modules/util';
 
 function normal() {
-  const parent = this.parent();  
   const zoomExtent = this.zoomExtent(this.isColor(), true);
   const zoomGen = zoom()
     .scaleExtent(zoomExtent)
@@ -15,8 +13,7 @@ function normal() {
 
   this.zoomGen(zoomGen).zoomed(() => {
     _mark.call(this, true); //re-render mark
-    select((parent ? parent : this).__execs__.canvas.node().parentNode.parentNode)
-      .selectAll(className('tooltip', true)).remove(); //FIXME: currently, remove existing tooltip
+    this.resetTooltip();
     _tooltip.call(this); //re-render tooltip
   }, true);
 }
