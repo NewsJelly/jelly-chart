@@ -19,7 +19,7 @@ var bar = jelly.bar()
   var initChar = 69;
   var timer = setInterval(function() {
     initChar += 1;
-    if (initChar > 90) {
+    if (initChar > 72) {
       clearInterval(timer);
     } else {
       bar.stream([
@@ -28,5 +28,4 @@ var bar = jelly.bar()
       ])
         .render(true);
     }
-    
   }, 1400);

@@ -382,4 +382,9 @@ module.exports = [
     path: 'stream-scatter',
     title: 'Data Stream: Scatter'
   },
+  {
+    category: 'Data Stream',
+    path: 'stream-line-time',
+    title: 'Data Stream: Line with Time Interval'
+  },
 ]

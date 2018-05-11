@@ -15,10 +15,10 @@ var scatter = jelly.scatter().container('#jelly-container')
 
 var lastValue = 50;
 var timer = setInterval(function() {
-  lastValue += 5;
+  lastValue += 10;
   scatter.stream([
     {c:'AAA', x: lastValue, y: Math.random() * 50},
     {c:'BBB', x: lastValue, y: Math.random() * 50}
   ]).render(true);
   if (lastValue > 100) clearInterval(timer);
-}, 1400);
+}, 800);

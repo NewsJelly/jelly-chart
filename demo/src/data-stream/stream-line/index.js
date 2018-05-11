@@ -23,6 +23,6 @@ var timer = setInterval(function() {
     {category:'AAA', x: lastValue, y: Math.random() * 100},
     {category:'BBB', x: lastValue, y: Math.random() * 100}
   ]).render(true);
-  if (lastValue > 50000) clearInterval(timer);
+  if (lastValue > 5000) clearInterval(timer);
 }, 1400);
 
