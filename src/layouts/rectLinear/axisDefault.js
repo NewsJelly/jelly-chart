@@ -30,6 +30,7 @@ function axisDefault(scale, axisSetting) {
     .target(axisSetting.target)
     .field(axisSetting.field)
     .orient(axisSetting.orient)
+    .tickFormatSub(axisSetting.tickFormatSub)
     .tickFormat(axisSetting.tickFormat)
     .title(axisTitle ? axisTitle.title : axisSetting.title)
     .titleOrient(axisSetting.titleOrient)

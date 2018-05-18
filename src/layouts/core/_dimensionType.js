@@ -1,6 +1,21 @@
 import {format, timeFormat} from 'd3';
 
 const dimensionMax = 100;
+function setFormat(f) {
+  if (f && typeof f === 'string') {
+    try {
+      return timeFormat(f);
+    } catch (e) {
+      try {
+        return format(f);
+      } catch (e) {
+        throw e;
+      }
+    } 
+  } else {
+    return null;
+  }
+}
 function _dimensionType(dimension) {
   if (typeof dimension === 'string') {
     return {field: dimension, order: 'natural', max: dimensionMax};
@@ -8,18 +23,8 @@ function _dimensionType(dimension) {
     dimension = Object.assign({}, dimension);
     if (!dimension.max) dimension.max = dimensionMax;
     if (!dimension.order) dimension.order = 'natural';
-    if (dimension.format && typeof dimension.format === 'string') {
-      try {
-        dimension.format = timeFormat(dimension.format);
-      } catch (e) {
-        try {
-          dimension.format = format(dimension.format);
-        } catch (e) {
-          throw e;
-        }
-      } 
-      
-    }
+    dimension.format = setFormat(dimension.format);
+    dimension.formatSub = setFormat(dimension.formatSub);
     return dimension;
   }
 }

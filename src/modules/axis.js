@@ -1,4 +1,4 @@
-import {select, axisTop, axisRight, axisBottom, axisLeft, format, timeFormat, max, min, set, transition} from 'd3';
+import {select, axisTop, axisRight, axisBottom, axisLeft, format, timeFormat, max, min, set, transition, zip} from 'd3';
 import {className, labelFormat, setMethodsFromAttrs, getUniqueId, zeroPoint} from './util';
 import {countMeasure, countMeasureTitle} from './measureField';
 import interval from '../modules/interval';
@@ -44,6 +44,7 @@ const _attrs = {
   thickness: 40,
   target: targets[0],
   tickFormat: null,
+  tickFormatSub: null,
   title: '',
   titleOrient: null,
   ticks: null,
@@ -237,15 +238,15 @@ function tickFormatForContinious(domain) {
 }
 
 function _format() { //apply before rendering
-  let axis = this.__execs__.axis;
-  let tickFormat = this.tickFormat();
-  let scale = this.scale();
+  const axis = this.__execs__.axis;
+  const tickFormat = this.tickFormat();
+  const scale = this.scale();
   if (tickFormat) { 
-    if (typeof tickFormat === 'function')  axis.tickFormat(d => {
+    if (typeof tickFormat === 'function')  axis.tickFormat(function(d){
       if (typeof d === 'string' && isNaN(d)) return d;
       return tickFormat(d);
     });
-    else if (scale._scaleType === 'time') axis.tickFormat(timeFormat(tickFormat));
+    else if (scale.domain()[0] instanceof Date || scale._scaleType === 'time') axis.tickFormat(timeFormat(tickFormat));
     else axis.tickFormat(format(tickFormat));
   } else if (this.autoTickFormat()) {
     if (scale.invert && scale.domain()[0] instanceof Date) { return; }
@@ -279,8 +280,8 @@ function _preStyle(selection) { //TODO : tickSize and font-style
   if (this.ticks()) {
     axis.ticks(this.ticks());
     axis._tickNumber = this.ticks();
-  } else if (scale.invert) {
-    if (scale._scaleType === 'time' || scale.domain()[0] instanceof Date) { //scale's type is time
+  } else if (scale.invert) { 
+    if (scale._scaleType === 'time' || scale.domain()[0] instanceof Date) { //scale's type is time 
       let intervalType = interval[this.interval()];
       if (intervalType && !this.autoTickFormat() && this.tickFormat()) { //user interval
         axis.ticks(intervalType);
@@ -314,9 +315,10 @@ function _render(selection, zoomed) {
   }
     
   if(this.transition() && !zoomed) {
-    selection.transition(this.__execs__.transition)
-      .attr('transform', 'translate(' +[this.x(), this.y()] + ')')
-      .call(axis)
+    selection.transition(this.__execs__.transition).attr('transform', 'translate(' +[this.x(), this.y()] + ')')
+      .call((selection) => {
+        axis(selection);
+      })
       .on('end', () => {
         _overflow.call(this, selection);
       })
@@ -327,14 +329,58 @@ function _render(selection, zoomed) {
   }
 }
 
+function _renderSubFormat(selection) {
+  const scale = this.scale();
+  if (this.showTicks() && this.tickFormatSub() && scale.invert) {
+    const sf = this.tickFormatSub();
+    const transition = this.__execs__.transition;
+    const updateFunc = (selection) => selection.attr('x', d => scale(d[0]))
+      .attr('y', this.thickness())
+      .attr('dy', '-3em');
+
+    const existing = [];
+    const ticks = scale.ticks(scale._tickNumber);
+    const tickFormats = ticks.map(scale.tickFormat(scale._tickNumber, sf))
+      .map(d => {
+        if (existing.indexOf(d) < 0 ) {
+          existing.push(d);
+          return d;
+        } else {
+          return '';
+        }
+      });
+    const tickData = zip(ticks, tickFormats).filter(d => d[1] !== '');
+    let subTick = selection.selectAll('.tick-sub-text')
+      .data(tickData, d => d[1]);
+    subTick.exit().transition(transition)
+      .attr('opacity', 0)
+      .remove();
+
+    subTick = subTick.enter().append('text')
+      .attr('class', 'tick-sub-text')
+      .text(d => d[1])
+      .attr('opacity', 0)
+      .call(updateFunc)
+      .merge(subTick)
+    
+    subTick.transition(transition)
+      .call(updateFunc)
+      .attr('opacity', 1);
+    
+  } else {
+    selection.selectAll('.tick-sub-text').remove();
+  }
+}
 function _style(selection) {
-  let tick = selection.selectAll('.tick');
+  const tick = selection.selectAll('.tick');
   tick.select('line').style('stroke', this.color());
   tick.select('text').style('fill', this.color());
   selection.select('.domain').style('stroke', domainColor)
     .style('shape-rendering', 'crispEdges')
     .style('stroke-width', '1px')
     .style('visibility', this.showDomain() ? 'visible' : 'hidden'); //showDomain
+  selection.selectAll('.tick-sub-text')
+    .style('fill', this.color());
 }
 
 function _title(selection) {
@@ -447,6 +493,7 @@ function render(selection, zoomed = false) {
   _format.call(this);
   _preStyle.call(this, selection);
   _render.call(this, selection, zoomed);
+  _renderSubFormat.call(this, selection);
   _style.call(this, selection);
   _grid.call(this, selection, zoomed);
   _zero.call(this,selection, zoomed);

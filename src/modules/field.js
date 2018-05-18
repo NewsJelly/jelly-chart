@@ -6,6 +6,7 @@ const attrs = {
   munged: null, //nested data
   target: null, //x|y|region
   format: null, //string|number|date|mixed
+  formatSub: null, //string|number|date|mixed
   field: null, //fieldname
 }
 
@@ -13,7 +14,7 @@ class Field {
   constructor(field) {
     setAttrs(this, attrs);
     this.__execs__ = {};
-    this.setInit(field, ['field', 'format', 'customDomain']);
+    this.setInit(field, ['field', 'format', 'formatSub', 'customDomain']);
   }
   setInit(source, attrNames = []) {
     if (source) {
@@ -29,11 +30,12 @@ class Field {
       if (at !== this.__execs__.axis) this.__execs__.axis = at;
       at.field = this.mixed ? this.concatFields() : this.field();
       at.tickFormat = this.format();
+      at.tickFormatSub = this.formatSub();
     }
     return this;
   }
   toObject() {
-    return {field: this.field(), format: this.format(), customDomain: this.customDomain()}
+    return {field: this.field(), format: this.format(), formatSub: this.formatSub(), customDomain: this.customDomain()}
   }
 }
 setMethodsFromAttrs(Field, attrs);
