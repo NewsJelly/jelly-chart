@@ -117,15 +117,6 @@ function _grid (selection, zoomed) {
 }
 
 function _overflow (selection) {
-  /* overflow 시나리오
-  ordinal 한 경우 -> 
-    -> 일단 클리핑
-    -> 가장 긴 녀석을 기준으로 5도 단위로 각도 변화 시키기-> 90도 까지 
-
-  continous 한 경우 -> 
-    -> 5도 단위로 각도 변화 시키기-> 90도 까지
-  */
-  
   const scale = this.scale();
   const orient = this.orient();
   let tickStepSize = (() => {
@@ -289,7 +280,7 @@ function _preStyle(selection) { //TODO : tickSize and font-style
     axis.ticks(this.ticks());
     axis._tickNumber = this.ticks();
   } else if (scale.invert) {
-    if (scale._scaleType === 'time') { //scale's type is time
+    if (scale._scaleType === 'time' || scale.domain()[0] instanceof Date) { //scale's type is time
       let intervalType = interval[this.interval()];
       if (intervalType && !this.autoTickFormat() && this.tickFormat()) { //user interval
         axis.ticks(intervalType);
