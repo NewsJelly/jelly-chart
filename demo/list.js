@@ -387,4 +387,9 @@ module.exports = [
     path: 'stream-line-time',
     title: 'Data Stream: Line with Time Interval'
   },
+  {
+    category: 'Data Stream',
+    path: 'stream-line-time-format',
+    title: 'Data Stream: Line with Tick Format'
+  },
 ]
