@@ -7,7 +7,7 @@ import zoomMixin from '../zoomMixin';
 import paddingMixin from '../paddingMixin';
 import shapeMixin from '../shapeMixin';
 import stackMixin from '../stackMixin';
-import streamMixin from '../StreamMixin';
+import streamMixin from '../streamMixin';
 import {mixedMeasure} from '../../modules/measureField';
 import {attrFunc, genFunc, mix} from '../../modules/util';
 import _brush from './_brush';
