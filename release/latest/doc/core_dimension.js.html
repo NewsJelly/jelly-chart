@@ -47,14 +47,7 @@
 			<li class="dropdown">
 				<a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#autoResize">autoResize</a></li>
+					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="StreamMixin.html">StreamMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
 				</ul>
 			</li>
 			
@@ -107,6 +100,7 @@
  * @param {string} [dimension.order=natural] chooses comparator types among natural, ascending and descending, sorting nodes in selected order. 
  * @param {number} [dimension.max=100] maximum number of nodes
  * @param {string} [dimension.format=undefined] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
+ * @param {string} [dimension.formatSub=undefined] a sub-time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}, which used sub-ticks on it's axis.
  * @param {string} [dimension.interval=undefined] If the dimension has Date type values, set an {@link https://github.com/d3/d3-time#intervals interval} which is a conventional unit of time to grouped its value.
  * @return {Core}
  */

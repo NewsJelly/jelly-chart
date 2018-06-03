@@ -47,14 +47,7 @@
 			<li class="dropdown">
 				<a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#autoResize">autoResize</a></li>
+					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="StreamMixin.html">StreamMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
 				</ul>
 			</li>
 			
@@ -95,18 +88,20 @@
 import paddingMixin from '../paddingMixin';
 import sortMixin from '../sortMixin/';
 import stackMixin from '../stackMixin';
+import streamMixin from '../streamMixin';
 import {mixedMeasure} from '../../modules/measureField';
 import {attrFunc, genFunc, mix, setMethodFromDefaultObj} from '../../modules/util';
-import _munge from './_munge';
-import _domain from './_domain';
-import _range from './_range';
-import _mark from './_mark';
-import _axis from './_axis';
-import _legend from './_legend';
-import _region from './_region';
-import _facet from './_facet';
-import _tooltip from './_tooltip';
 import _annotation from './_annotation';
+import _axis from './_axis';
+import _domain from './_domain';
+import _facet from './_facet';
+import _legend from './_legend';
+import _mark from './_mark';
+import _munge from './_munge';
+import _padding from './_panning';
+import _range from './_range';
+import _region from './_region';
+import _tooltip from './_tooltip';
 
 const orients  = ['vertical', 'horizontal'];
 const conditions = ['normal', 'count', 'mixed'];
@@ -127,9 +122,10 @@ const _attrs = {
  * @augments Facet
  * @augments SortMixin
  * @augments PaddingMixin
+ * @augments StreamMixin
  * @todo write examples
  */
-class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin) {
+class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin, streamMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
@@ -142,6 +138,7 @@ class Bar extends mix(Facet).with(sortMixin, paddingMixin, stackMixin) {
       .process('mark', _mark, {allow: function() {return !this.isFacet()}})
       .process('legend', _legend)
       .process('tooltip', _tooltip)
+      .process('padding', _padding)
       .process('annotation', _annotation);
   }
   measureName() {

@@ -469,7 +469,7 @@ function continousScale(domain) {
   }
   scale._scaleType = type;
   scale._field = field;
-  return scale.domain(domain);
+  return scale;
 }
 
 function dimension(dim, nested) {
@@ -590,6 +590,7 @@ var attrs$1 = {
   munged: null, //nested data
   target: null, //x|y|region
   format: null, //string|number|date|mixed
+  formatSub: null, //string|number|date|mixed
   field: null //fieldname
 };
 
@@ -599,7 +600,7 @@ var Field = function () {
 
     setAttrs(this, attrs$1);
     this.__execs__ = {};
-    this.setInit(field, ['field', 'format', 'customDomain']);
+    this.setInit(field, ['field', 'format', 'formatSub', 'customDomain']);
   }
 
   createClass(Field, [{
@@ -624,13 +625,14 @@ var Field = function () {
         if (at !== this.__execs__.axis) this.__execs__.axis = at;
         at.field = this.mixed ? this.concatFields() : this.field();
         at.tickFormat = this.format();
+        at.tickFormatSub = this.formatSub();
       }
       return this;
     }
   }, {
     key: 'toObject',
     value: function toObject() {
-      return { field: this.field(), format: this.format(), customDomain: this.customDomain() };
+      return { field: this.field(), format: this.format(), formatSub: this.formatSub(), customDomain: this.customDomain() };
     }
   }]);
   return Field;
@@ -810,6 +812,7 @@ function aggregateMixed() {
 
 var allowThreshold = 20;
 /**
+ * @memberOf Core#
  * If autoResize is true, it will ignore current width setting and change the chart's width according to the containers's width. If autoResize is not specified, returns the current autoResize setting. 
  * @return {autoResize|Core}
  * @param {boolean} [autoResize=false] If is true, resizes the chart's width according to the containers's width
@@ -1027,6 +1030,21 @@ function demuteRegions (exceptionFilter) {
 }
 
 var dimensionMax = 100;
+function setFormat(f) {
+  if (f && typeof f === 'string') {
+    try {
+      return d3.timeFormat(f);
+    } catch (e) {
+      try {
+        return d3.format(f);
+      } catch (e) {
+        throw e;
+      }
+    }
+  } else {
+    return null;
+  }
+}
 function _dimensionType(dimension) {
   if (typeof dimension === 'string') {
     return { field: dimension, order: 'natural', max: dimensionMax };
@@ -1034,17 +1052,8 @@ function _dimensionType(dimension) {
     dimension = Object.assign({}, dimension);
     if (!dimension.max) dimension.max = dimensionMax;
     if (!dimension.order) dimension.order = 'natural';
-    if (dimension.format && typeof dimension.format === 'string') {
-      try {
-        dimension.format = d3.timeFormat(dimension.format);
-      } catch (e) {
-        try {
-          dimension.format = d3.format(dimension.format);
-        } catch (e) {
-          throw e;
-        }
-      }
-    }
+    dimension.format = setFormat(dimension.format);
+    dimension.formatSub = setFormat(dimension.formatSub);
     return dimension;
   }
 }
@@ -1063,6 +1072,7 @@ function _dimensionType(dimension) {
  * @param {string} [dimension.order=natural] chooses comparator types among natural, ascending and descending, sorting nodes in selected order. 
  * @param {number} [dimension.max=100] maximum number of nodes
  * @param {string} [dimension.format=undefined] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
+ * @param {string} [dimension.formatSub=undefined] a sub-time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}, which used sub-ticks on it's axis.
  * @param {string} [dimension.interval=undefined] If the dimension has Date type values, set an {@link https://github.com/d3/d3-time#intervals interval} which is a conventional unit of time to grouped its value.
  * @return {Core}
  */
@@ -1587,14 +1597,14 @@ function bindOn(node, dispatch$$1) {
   });
   return node;
 }
-function run(process, keep) {
+function run(process) {
   var _this = this;
 
   process.forEach(function (p) {
     if (p.allow) {
       if (p.allow.call(_this)) p.call.call(_this);
     } else {
-      p.call.call(_this, keep);
+      p.call.call(_this);
     }
   });
 }
@@ -1609,7 +1619,7 @@ function run(process, keep) {
 function render() {
   var _this2 = this;
 
-  var keep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+  var keep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
   var skip = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   var process = {
@@ -1623,10 +1633,11 @@ function render() {
   });
 
   this.reset(keep);
+  this.keep(keep);
   if (this.needCanvas()) this.renderFrame();
-  run.call(this, process.pre, keep);
+  run.call(this, process.pre);
   if (this.needCanvas()) this.renderCanvas();
-  run.call(this, process.post, keep);
+  run.call(this, process.post);
 
   if (!this.__execs__.canvas) return;
 
@@ -1647,6 +1658,10 @@ function render() {
   if (this.isFacet && this.isFacet()) {
     //when is facet, get dispatch from regions.
     node.call(bindOn, dispatch$$1);
+  }
+
+  if (this.stream && this.stream() && keep) {
+    this.stream(null);
   }
 
   return this;
@@ -2654,6 +2669,12 @@ function reset() {
   return this;
 }
 
+function resetTooltip() {
+  var parent = this.parent();
+  d3.select((parent ? parent : this).__execs__.canvas.node().parentNode.parentNode).selectAll(className('tooltip', true)).remove(); //remove existing tooltip
+  return this;
+}
+
 /**
  * If size is specified, sets the size range and it direction and returns the instance itself. Each chart type apply size settings differently. If size is not specified, returns the instance's current transition and use the default size setting.
  * 
@@ -2927,6 +2948,7 @@ var _attrs$3 = {
   dimensions: [],
   font: defaultFont,
   height: 480,
+  keep: false,
   label: null,
   legend: null,
   limitKeys: 200,
@@ -3058,7 +3080,7 @@ Core.prototype.data = attrFunc('data');
  * @return {(height|Core)}
  */
 Core.prototype.height = attrFunc('height');
-
+Core.prototype.keep = attrFunc('keep');
 /**
  * If label is specified as true, sets the chart to show labels on its marks and returns the instance itself. If label is not specified, returns the instance's current height.
  * @function
@@ -3145,6 +3167,7 @@ Core.prototype.renderRegion = renderRegion;
 Core.prototype.renderSpectrum = renderSpectrum;
 Core.prototype.renderTooltip = renderTooltip;
 Core.prototype.reset = reset;
+Core.prototype.resetTooltip = resetTooltip;
 Core.prototype.size = size;
 Core.prototype.setAttrs = setAttrs$1;
 Core.prototype.setCustomDomain = setCustomDomain;
@@ -3192,6 +3215,7 @@ var _attrs$7 = {
   thickness: 40,
   target: targets[0],
   tickFormat: null,
+  tickFormatSub: null,
   title: '',
   titleOrient: null,
   ticks: null,
@@ -3262,14 +3286,6 @@ function _grid(selection, zoomed) {
 
 function _overflow$1(selection) {
   var _this = this;
-
-  /* overflow 시나리오
-  ordinal 한 경우 -> 
-    -> 일단 클리핑
-    -> 가장 긴 녀석을 기준으로 5도 단위로 각도 변화 시키기-> 90도 까지 
-   continous 한 경우 -> 
-    -> 5도 단위로 각도 변화 시키기-> 90도 까지
-  */
 
   var scale = this.scale();
   var orient = this.orient();
@@ -3395,7 +3411,7 @@ function _format() {
     if (typeof tickFormat === 'function') axis.tickFormat(function (d) {
       if (typeof d === 'string' && isNaN(d)) return d;
       return tickFormat(d);
-    });else if (scale._scaleType === 'time') axis.tickFormat(d3.timeFormat(tickFormat));else axis.tickFormat(d3.format(tickFormat));
+    });else if (scale.domain()[0] instanceof Date || scale._scaleType === 'time') axis.tickFormat(d3.timeFormat(tickFormat));else axis.tickFormat(d3.format(tickFormat));
   } else if (this.autoTickFormat()) {
     if (scale.invert && scale.domain()[0] instanceof Date) {
       return;
@@ -3434,8 +3450,8 @@ function _preStyle(selection) {
     axis.ticks(this.ticks());
     axis._tickNumber = this.ticks();
   } else if (scale.invert) {
-    if (scale._scaleType === 'time') {
-      //scale's type is time
+    if (scale._scaleType === 'time' || scale.domain()[0] instanceof Date) {
+      //scale's type is time 
       var intervalType = interval[this.interval()];
       if (intervalType && !this.autoTickFormat() && this.tickFormat()) {
         //user interval
@@ -3473,7 +3489,9 @@ function _render$3(selection, zoomed) {
   }
 
   if (this.transition() && !zoomed) {
-    selection.transition(this.__execs__.transition).attr('transform', 'translate(' + [this.x(), this.y()] + ')').call(axis).on('end', function () {
+    selection.transition(this.__execs__.transition).attr('transform', 'translate(' + [this.x(), this.y()] + ')').call(function (selection) {
+      axis(selection);
+    }).on('end', function () {
       _overflow$1.call(_this2, selection);
     });
   } else {
@@ -3482,11 +3500,52 @@ function _render$3(selection, zoomed) {
   }
 }
 
+function _renderSubFormat(selection) {
+  var _this3 = this;
+
+  var scale = this.scale();
+  if (this.showTicks() && this.tickFormatSub() && scale.invert) {
+    var sf = this.tickFormatSub();
+    var _transition = this.__execs__.transition;
+    var updateFunc = function updateFunc(selection) {
+      return selection.attr('x', function (d) {
+        return scale(d[0]);
+      }).attr('y', _this3.thickness()).attr('dy', '-3em');
+    };
+
+    var existing = [];
+    var ticks = scale.ticks(scale._tickNumber);
+    var tickFormats = ticks.map(scale.tickFormat(scale._tickNumber, sf)).map(function (d) {
+      if (existing.indexOf(d) < 0) {
+        existing.push(d);
+        return d;
+      } else {
+        return '';
+      }
+    });
+    var tickData = d3.zip(ticks, tickFormats).filter(function (d) {
+      return d[1] !== '';
+    });
+    var subTick = selection.selectAll('.tick-sub-text').data(tickData, function (d) {
+      return d[1];
+    });
+    subTick.exit().transition(_transition).attr('opacity', 0).remove();
+
+    subTick = subTick.enter().append('text').attr('class', 'tick-sub-text').text(function (d) {
+      return d[1];
+    }).attr('opacity', 0).call(updateFunc).merge(subTick);
+
+    subTick.transition(_transition).call(updateFunc).attr('opacity', 1);
+  } else {
+    selection.selectAll('.tick-sub-text').remove();
+  }
+}
 function _style$2(selection) {
   var tick = selection.selectAll('.tick');
   tick.select('line').style('stroke', this.color());
   tick.select('text').style('fill', this.color());
   selection.select('.domain').style('stroke', domainColor).style('shape-rendering', 'crispEdges').style('stroke-width', '1px').style('visibility', this.showDomain() ? 'visible' : 'hidden'); //showDomain
+  selection.selectAll('.tick-sub-text').style('fill', this.color());
 }
 
 function _title(selection) {
@@ -3586,6 +3645,7 @@ function render$5(selection) {
   _format.call(this);
   _preStyle.call(this, selection);
   _render$3.call(this, selection, zoomed);
+  _renderSubFormat.call(this, selection);
   _style$2.call(this, selection);
   _grid.call(this, selection, zoomed);
   _zero.call(this, selection, zoomed);
@@ -3714,7 +3774,7 @@ function axisDefault(scale, axisSetting) {
   });
   if (axisTitle.length > 0) axisTitle = axisTitle[0];else axisTitle = null;
   var curAxis = _axis();
-  curAxis.scale(scale).target(axisSetting.target).field(axisSetting.field).orient(axisSetting.orient).tickFormat(axisSetting.tickFormat).title(axisTitle ? axisTitle.title : axisSetting.title).titleOrient(axisSetting.titleOrient).autoTickFormat(axisSetting.autoTickFormat).transition(this.transition());
+  curAxis.scale(scale).target(axisSetting.target).field(axisSetting.field).orient(axisSetting.orient).tickFormatSub(axisSetting.tickFormatSub).tickFormat(axisSetting.tickFormat).title(axisTitle ? axisTitle.title : axisSetting.title).titleOrient(axisSetting.titleOrient).autoTickFormat(axisSetting.autoTickFormat).transition(this.transition());
   if (scale._field) {
     var field = scale._field;
     if (field.interval && field.interval()) curAxis.interval(field.interval());
@@ -3861,7 +3921,7 @@ function thickness(axisSetting, scale) {
   var max$$1 = -1;
   var isOver = false;
   var innerSize = this.innerSize();
-  var step = isHorizontal ? innerSize.width / ticks.length * 0.9 : 0;
+  var step = isHorizontal ? innerSize.width / ticks.length : 0;
   var tick = hidden.selectAll(className('tick', true)).data(tickFormat ? ticks.map(tickFormat) : ticks);
   tick = tick.enter().append('text').attr('class', className('tick')).merge(tick).text(function (d) {
     return d;
@@ -3872,7 +3932,7 @@ function thickness(axisSetting, scale) {
     if (w > max$$1) max$$1 = w;
     if (w > step) isOver = true;
   });
-  max$$1 = max$$1 * (isHorizontal ? 0.8 : 1) + offsetThickness * (isHorizontal ? 1.5 : 1);
+  max$$1 = max$$1 + offsetThickness;
 
   if (axisSetting.tickPadding) max$$1 += axisSetting.tickPadding;
   if (axisSetting.showTitle) max$$1 += offsetThickness;
@@ -4212,6 +4272,751 @@ var stackMixin = function stackMixin(Base) {
   return StackMixin;
 };
 
+function distDomain(scale) {
+  return scale(scale.domain()[0]) - scale(scale._lastDomain[0]);
+}
+
+function limitViewInterval(scale, domain) {
+  var isKeep = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+  var viewInterval = this.viewInterval();
+  var intervalUnit = viewInterval ? viewInterval.unit : domain.length;
+  var intervalMultiple = viewInterval ? viewInterval.multiple : 1;
+  var intervalType = typeof intervalUnit === 'undefined' ? 'undefined' : _typeof(intervalUnit);
+  scale._defaultDomain = domain;
+  if (isKeep) scale._lastDomain = scale.domain();
+  if (scale.invert) {
+    if (intervalType === 'string' && domain[0] instanceof Date) {
+      if (isKeep) {
+        domain = [interval[intervalUnit].offset(domain[domain.length - 1], -1 * intervalMultiple), domain[domain.length - 1]];
+      } else {
+        domain = [domain[0], interval[intervalUnit].offset(domain[0], 1 * intervalMultiple)];
+      }
+    } else if (intervalType === 'number') {
+      if (isKeep) {
+        domain = [domain[domain.length - 1] - intervalUnit * intervalMultiple, domain[domain.length - 1]];
+      } else {
+        domain = [domain[0], domain[0] + intervalUnit * intervalMultiple];
+      }
+    }
+  } else {
+    if (intervalType === 'number') {
+      if (isKeep) {
+        var dist = domain.length - intervalUnit * intervalMultiple;
+        domain = domain.slice(dist, dist + intervalUnit * intervalMultiple);
+      } else {
+        domain = domain.slice(0, intervalUnit * intervalMultiple);
+      }
+    }
+  }
+  return domain;
+}
+
+/**
+ * If stream is an object or an array of objects, appends the stream to existing data. If stream is specified, during re-rendering, it will keeps the domain interval limited by {@link StreamMixin#viewInterval viewInterval}. When re-renders chart, should use .render(true).
+ * If stream is not specified, returns the existing stream.
+ * @memberOf StreamMixin#
+ * @function
+ * @example
+ * stream.stream({category:'A', sales: 100})
+ *  .render(true);
+ * 
+ * stream.stream([
+ *  {category: 'D', sales: 100}, 
+ *  {category: 'E', sales: 200}
+ * ]).render(true);
+ * @param {object|Object[]} [stream=null] 
+ * @return {zoom|ZoomMixin}
+ */
+function stream(stream) {
+  if (!arguments.length) return this.__execs__.stream;
+  if (stream) {
+    if (!Array.isArray(stream)) stream = [stream];
+    this.data(this.data().concat(stream));
+  }
+  this.__execs__.stream = stream;
+  return this;
+}
+
+function getDistPerPixel(scale) {
+  var to = +scale.invert(scale.range()[0] + 1);
+  var from = +scale.invert(scale.range()[0]);
+  return to - from;
+}
+
+function streamPanning(scale, renderFunc) {
+  var _this = this;
+
+  var streamPanning = this.__execs__.streamPanning;
+  if (!streamPanning) {
+    streamPanning = d3.drag();
+    var field = this.__execs__.field;
+    var axisObj = this.__execs__.axis;
+    var axisX = axisObj && axisObj.x ? axisObj.x[field.x.field()] : null;
+    var canvas = this.__execs__.canvas;
+    var markProcCall = this.process().find(function (p) {
+      return p.type === 'mark';
+    }).call;
+    var tooltipProcCall = this.process().find(function (p) {
+      return p.type === 'tooltip';
+    }).call;
+    var isContinous = 'invert' in scale;
+    var renderFuncDefault = function renderFuncDefault(domain) {
+      var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      scale._lastDomain = domain;
+      scale.domain(domain);
+      var transition$$1 = _this.transition();
+      _this.transition({ duration: duration, delay: 0 });
+      if (renderFunc) renderFunc();
+      markProcCall.call(_this);
+      _this.resetTooltip();
+      tooltipProcCall.call(_this);
+      axisX.render(null, true);
+      _this.transition(transition$$1);
+    };
+    this.__execs__.streamPanning = streamPanning;
+    if (isContinous) {
+      var isTime = scale.domain()[0] instanceof Date;
+      streamPanning.on('drag.streamPanning', function () {
+        var curDomain = scale.domain();
+        var distPerPixel = getDistPerPixel(scale);
+        var defaultDomain = scale._defaultDomain;
+        var dx = d3.event.dx * -1;
+        var dist = distPerPixel * dx;
+        var updateCondition = dx > 0 && +curDomain[curDomain.length - 1] + dist <= +defaultDomain[defaultDomain.length - 1] || dx < 0 && +curDomain[0] + dist >= +defaultDomain[0];
+        if (updateCondition) {
+          renderFuncDefault(curDomain.map(function (d) {
+            return isTime ? new Date(+d + dist) : d + dist;
+          }));
+        }
+      });
+    } else {
+      var accumDx = 0;
+      streamPanning.on('start.streamPanning end.streamPanning', function () {
+        accumDx = 0;
+      }).on('drag.streamPanning', function () {
+        var step = scale.step();
+        accumDx += d3.event.dx;
+        var absAccumDx = Math.abs(accumDx);
+        if (absAccumDx >= scale.step()) {
+          var curDomain = scale.domain();
+          var defaultDomain = scale._defaultDomain;
+          var initIndex = defaultDomain.findIndex(function (d) {
+            return d === curDomain[0];
+          });
+          var dist = Math.floor(absAccumDx / step);
+          dist *= accumDx > 0 ? -1 : 1;
+          var updateCondition = dist > 0 && initIndex + curDomain.length + dist < defaultDomain.length || dist < 0 && initIndex + dist >= 0;
+          if (updateCondition) {
+            renderFuncDefault(defaultDomain.slice(initIndex + dist, initIndex + curDomain.length + dist), 400);
+          }
+          accumDx = 0;
+        }
+      });
+    }
+
+    canvas.call(streamPanning);
+  }
+  return this;
+}
+
+function tempPosForOrdinalScale(key, scale) {
+  var initIndex = scale._defaultDomain.findIndex(function (x) {
+    return x === scale.domain()[0];
+  });
+  var curIndex = scale._defaultDomain.findIndex(function (x) {
+    return x === key;
+  });
+  var dist = curIndex - initIndex;
+  if (dist >= 0) {
+    dist = dist - scale.domain().length;
+    return scale.range()[1] + dist * scale.step();
+  } else {
+    return scale.range()[0] + dist * scale.step();
+  }
+}
+
+/**
+ * If unit is number or string, limit the key domain's length or distance within the interval. If the key domain's scale is ordnial, the length of domain will be the same to unit. Also, if the scale is continous, the distance of domain will be fixed as much as unit. If unit is string, it must be a time interval. When multiple exists, it will multiply the unit.
+ * If unit is not specified, returns the existing viewInterval. 
+ * @memberOf StreamMixin#
+ * @function
+ * @example
+ * stream.viewInterval(1000)
+ * stream.viewInterval('month', 3)
+ * @param {number|string} [unit=null] 
+ * @param {number} [multiple=1]
+ * @return {zoom|ZoomMixin}
+ */
+function viewInterval(unit) {
+  var multiple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+  if (!arguments.length) return this.__execs__.viewInterval;
+  var type = typeof unit === 'undefined' ? 'undefined' : _typeof(unit);
+  if (type === 'number') {
+    if (viewInterval <= 0) unit = null;
+  } else if (type === 'string') {
+    //d3-time interval
+    if (!Object.keys(interval).includes(unit)) {
+      unit = null;
+    }
+  }
+  if (unit) this.__execs__.viewInterval = { unit: unit, multiple: multiple };else this.__execs__.viewInterval = null;
+  return this;
+}
+
+var _attrs$11 = {
+  viewInterval: null,
+  stream: null
+};
+
+var streamMixin = function streamMixin(Base) {
+  /**
+   * @mixin StreamMixin
+   */
+  var StreamMixin = function (_Base) {
+    inherits(StreamMixin, _Base);
+
+    function StreamMixin() {
+      classCallCheck(this, StreamMixin);
+
+      var _this = possibleConstructorReturn(this, (StreamMixin.__proto__ || Object.getPrototypeOf(StreamMixin)).call(this));
+
+      _this.setAttrs(_attrs$11);
+      _this.__execs__.viewInterval = null;
+      _this.__execs__.stream = null;
+      _this.__execs__.streamPanning = null;
+      _this.__execs__.streamPanningDispatch = d3.dispatch('streamPanning');
+      _this.rebindOnMethod(_this.__execs__.streamPanningDispatch);
+      return _this;
+    }
+
+    return StreamMixin;
+  }(Base);
+  StreamMixin.prototype.distDomain = distDomain;
+  StreamMixin.prototype.limitViewInterval = limitViewInterval;
+  StreamMixin.prototype.stream = stream;
+  StreamMixin.prototype.streamPanning = streamPanning;
+  StreamMixin.prototype.tempPosForOrdinalScale = tempPosForOrdinalScale;
+  StreamMixin.prototype.viewInterval = viewInterval;
+
+  return StreamMixin;
+};
+
+function translate(selection, innerSize) {
+  var isVertical = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  var isInit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+  selection.attr('transform', function (d) {
+    if (isVertical) {
+      if (isInit) return 'translate(' + [innerSize.width, innerSize.height] + ')';
+      return 'translate(' + [innerSize.width, d.y - 0.5] + ')';
+    } else {
+      if (isInit) return 'translate(' + [0, 0] + ')';
+      return 'translate(' + [d.w + 0.5, 0] + ')';
+    }
+  });
+}
+function line$1(selection, innerSize) {
+  var isVertical = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+  if (isVertical) {
+    selection.attr('x1', -innerSize.width);
+  } else {
+    selection.attr('y2', innerSize.height);
+  }
+}
+
+function _annotation() {
+  if (!this.annotation() || this.isFacet() || this.stacked()) return;
+  var annotation = this.annotation();
+  var that = this;
+  var canvas = this.__execs__.canvas;
+  var trans = d3.transition().duration(this.transition().duration).delay(this.transition().delay);
+  var innerSize = this.innerSize();
+  var isVertical = this.isVertical();
+  var isShowDiff = this.showDiff() && !this.isNested();
+
+  if (canvas.select('.annotation-g').empty()) canvas.append('g').attr('class', 'annotation-g');
+  var g = canvas.select('.annotation-g');
+  var anno = g.selectAll('.annotation').data(this.nodes().data());
+  anno.exit().remove();
+  var annoEnter = anno.enter().append('g').attr('class', 'annotation').call(translate, innerSize, isVertical, true).style('pointer-events', 'none');
+  annoEnter.append('text').style('fill', annotation.color);
+  annoEnter.append('line').style('stroke', annotation.color).style('shape-rendering', 'crispEdges').call(line$1, innerSize, isVertical);
+  anno = annoEnter.merge(anno).transition(trans).call(translate, innerSize, isVertical);
+  if (isShowDiff) {
+    anno.style('visibility', function (d, i, arr) {
+      if (d.diff) {
+        if (d.diff.value < 0) return 'visible';else if (i < anno.size() - 1 && d3.select(arr[i + 1]).datum().diff.value > 0) return 'visible'; //when not last one, but next one is  diff > 0
+        if (d.neighbor.diff.value > 0) return 'visible';
+      }
+      return 'hidden';
+    });
+  }
+
+  anno.select('text').text(function (d) {
+    return d.key;
+  }).style('visibility', annotation.showLabel ? 'visible' : 'hidden').style('fill', annotation.color).each(function () {
+    that.styleFont(this);
+  });
+  anno.select('line').transition(trans).style('stroke', annotation.color).call(line$1, innerSize, isVertical);
+}
+
+function _axis$1() {
+  var that = this;
+  var scale = this.__execs__.scale;
+  var nested = this.isNested();
+  var grid = this.grid();
+  var innerSize = this.innerSize();
+  var fieldObj = this.__execs__.field;
+  var isVertical = this.isVertical();
+
+  var _axisScaleX = function _axisScaleX(axisToggle) {
+    var targetField = nested ? fieldObj.region : isVertical ? fieldObj.x : fieldObj.y;
+    var targetScale = nested ? scale.region : isVertical ? scale.x : scale.y;
+    targetField.axis(axisToggle);
+    var curAxis = that.axisDefault(targetScale, axisToggle);
+    if (axisToggle.orient === 'bottom') {
+      curAxis.y(isVertical ? scale.y.range()[0] : scale.x.range()[1]);
+    }
+    return curAxis;
+  };
+
+  var _axisScaleY = function _axisScaleY(axisToggle) {
+    var targetField = isVertical ? fieldObj.y : fieldObj.x;
+    var targetScale = isVertical ? scale.y : scale.x;
+    targetField.axis(axisToggle);
+    var curAxis = that.axisDefault(targetScale, axisToggle);
+    curAxis.grid(grid).gridSize(axisToggle.orient === 'bottom' || axisToggle.orient === 'top' ? innerSize.height : innerSize.width);
+    if (axisToggle.orient === 'right') curAxis.x((nested ? scale.region : scale.x).range()[1]);
+    return curAxis;
+  };
+
+  var xAt = this.axisX();
+  var yAt = this.axisY();
+  if (this.isFacet()) {
+    this.axisFacet(false);
+  } else {
+    if (xAt) _axisScaleX(xAt);
+    if (yAt) _axisScaleY(yAt);
+  }
+
+  this.renderAxis();
+}
+
+function _domain() {
+  //set scales and domains
+  var keep = this.keep();
+  var scale = this.scale();
+  var munged = this.__execs__.munged;
+  var nested = this.isNested();
+  var stacked = this.stacked();
+  var aggregated = this.aggregated();
+  var field = this.__execs__.field;
+  var isNestedAndSortByValue = this.isNestedAndSortByValue();
+  var viewInterval = this.viewInterval();
+  var yDomain = void 0,
+      xDomain = void 0;
+  var regionDomain = void 0;
+  if (!(keep && scale.x && scale.y)) {
+    scale.x = d3.scaleBand().padding(this.padding());
+    scale.y = d3.scaleLinear();
+  }
+
+  if (nested) {
+    regionDomain = field.region.level(0).munged(munged).domain();
+    scale.region = d3.scaleBand().domain(regionDomain).padding(this.regionPadding());
+  }
+  if (this.isFacet()) {
+    scale.color = this.updateColorScale(regionDomain, keep);
+    return this;
+  }
+
+  var level = 1;
+  xDomain = field.x.level(level).munged(munged).domain(!isNestedAndSortByValue && this.sortByValue());
+  yDomain = field.y.level(level).munged(munged).aggregated(aggregated).domain(0, stacked);
+  if (nested || !nested && (this.mono() === false || stacked)) {
+    //nested
+    scale.color = this.updateColorScale(xDomain, keep); //FIXME: need to update current colors
+  }
+
+  if (yDomain[0] > 0) yDomain[0] = 0;else if (yDomain[1] < 0) yDomain[1] = 0;
+
+  if (this.showDiff() && !nested) {
+    if (yDomain[0] === 0) yDomain[1] *= 1.25;else if (yDomain[1] === 0) yDomain[0] *= 1.25;
+  }
+  if (isNestedAndSortByValue) {
+    xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
+    munged.forEach(function (d) {
+      return d.domain = xDomain.find(function (x) {
+        return x.key === d.data.key;
+      }).values;
+    });
+  } else if (stacked) {
+    if (!nested) {
+      scale.x.domain([field.x.field()]);
+    }
+  } else {
+    //not stacked
+    if (!keep && viewInterval) {
+      xDomain = this.limitViewInterval(scale.x, xDomain);
+    } else if (keep && this.stream()) {
+      // if uses stream  and keeps the existing scale;
+      xDomain = this.limitViewInterval(scale.x, xDomain, true);
+    }
+    scale.x.domain(xDomain);
+  }
+  this.setCustomDomain('y', yDomain);
+  return this;
+}
+
+function _facet() {
+  var _this = this;
+
+  var parent = this;
+  var scale = this.__execs__.scale;
+  var facet = this.facet();
+  var canvas = this.__execs__.canvas;
+  var mono = this.mono();
+  var innerSize = this.innerSize();
+  var dimensions = [this.dimensions()[0]];
+  var measures = this.isMixed() ? [mixedMeasure] : this.measures();
+  var width = void 0,
+      height = void 0;
+  var settings = ['axisTitles', 'normalized', 'padding', 'orient', 'font', 'label', 'grid', 'tooltip'].map(function (d) {
+    return { key: d, value: _this[d]() };
+  });
+  var hasX = this.axisX();
+  var hasY = this.axisY();
+  var _smallbar = function _smallbar(d) {
+    var smallBar = bar().container(this).data(d).dimensions(dimensions).measures(measures).width(width).height(height).legend(false).zeroMargin(true) //remove margin
+    .aggregated(true).parent(parent);
+    settings.forEach(function (d) {
+      smallBar[d.key](d.value);
+    });
+
+    if (!mono) smallBar.color(scale.color(d.data.key));
+    if (facet.orient === 'vertical') {
+      if (hasX) smallBar.axis({ target: 'x', orient: 'bottom' }); //, showTitle: i === arr.length-1});
+      if (hasY) smallBar.axis({ target: 'y', orient: 'left' });
+    } else {
+      if (hasX) smallBar.axis({ target: 'x', orient: 'bottom' });
+      if (hasY) smallBar.axis({ target: 'y', orient: 'left' }); //showTitle: i === 0});
+    }
+    smallBar.render();
+  };
+  if (facet.orient === 'horizontal') {
+    width = scale.region.bandwidth();
+    height = innerSize.height;
+  } else {
+    width = innerSize.width;
+    height = scale.region.bandwidth();
+  }
+
+  canvas.selectAll(this.regionName() + '.facet').each(_smallbar);
+}
+
+function _legend$1() {
+  var field = this.__execs__.field;
+  if (this.mono() && (!field.region || this.isFacet())) {
+    //mono + dimensions  => no legend
+    return;
+  }
+  this.renderLegend('x');
+}
+
+function _mark() {
+  var that = this;
+  var canvas = this.__execs__.canvas;
+  var nested = this.isNested.call(this);
+  var scale = this.__execs__.scale;
+  var stacked = this.stacked();
+  var vertical = this.isVertical();
+  var color = this.color();
+  var trans = d3.transition().duration(this.transition().duration).delay(this.transition().delay);
+  var yField = this.measureName();
+  var hasZeroPoint = zeroPoint(scale.y.domain());
+  var label = this.label();
+  var field = this.__execs__.field;
+  var diffColor = this.showDiff();
+  var isShowDiff = !nested && diffColor;
+  var isNestedAndSortByValue = this.isNestedAndSortByValue();
+
+  var __local = function __local(selection) {
+    var monoColor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var stream = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    var _fill = function _fill(d) {
+      if (monoColor) return color[0];else return scale.color(d.data.key);
+    };
+    var tFormat = function tFormat(key) {
+      var f = field.x.interval() && field.x.format() ? d3.timeFormat(field.x.format()) : null;
+      return f ? f(key) : key;
+    };
+
+    selection.each(function (d) {
+      //local에 저장
+      var x = void 0,
+          y = void 0,
+          w = void 0,
+          h = void 0;
+      var yValue = d.value; //d.data.value[yField];
+      var upward = yValue >= 0;
+      if (stacked) {
+        x = 0;
+        y = (vertical ? upward : !upward) ? scale.y(d.data.value[yField + '-end']) : scale.y(d.data.value[yField + '-start']);
+        w = nested ? scale.region.bandwidth() : scale.x.width;
+        h = Math.abs(scale.y(d.data.value[yField + '-start']) - scale.y(d.data.value[yField + '-end']));
+      } else {
+        if (isNestedAndSortByValue) {
+          scale.x.domain(d.parent.domain);
+        }
+        x = scale.x(d.data.key);
+        if (isNaN(x) && scale.x._defaultDomain) {
+          x = that.tempPosForOrdinalScale(d.data.key, scale.x);
+        }
+        if (stream) {
+          d.x0 = that.tempPosForOrdinalScale(d.data.key, scale.x);
+        }
+        y = (vertical ? upward : !upward) ? scale.y(yValue) : hasZeroPoint ? scale.y(0) : scale.y.range()[0];
+        w = scale.x.bandwidth();
+        h = Math.abs((hasZeroPoint ? scale.y(0) : scale.y.range()[0]) - scale.y(yValue));
+      }
+      var result = vertical ? { x: x, y: y + (upward ? 0 : 0.5), w: w, h: h, upward: upward } : { x: y + (upward ? 0.5 : 0), y: x, w: h, h: w, upward: upward };
+      result.key = tFormat(d.data.key);
+      result.color = _fill(d);
+      result.text = labelFormat(yValue);
+      //result.value = yValue;
+      for (var k in result) {
+        if (result.hasOwnProperty(k)) d[k] = result[k];
+      }
+    });
+  };
+  var __barInit = function __barInit(selection) {
+    var vertical = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    selection.each(function (d) {
+      var selection = d3.select(this);
+      selection.style('cursor', 'pointer').style('fill', function (d) {
+        if (d3.select(this).classed(className('diff'))) return 'none';else return d.color;
+      });
+      if (vertical) {
+        selection.attr('x', d.x0 || d.x).attr('y', d.upward ? d.y + d.h : d.y).attr('width', d.w).attr('height', 0);
+      } else {
+        selection.attr('x', d.upward ? d.x : d.x + d.w).attr('y', d.x0 || d.y).attr('width', 0).attr('height', d.h);
+      }
+    });
+  };
+  var __labelInit = function __labelInit(selection) {
+    var vertical = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    selection.each(function (d) {
+      var selection = d3.select(this);
+      selection.style('pointer-events', 'none').text(d.text);
+      if (vertical) {
+        selection.attr('x', (d.x0 || d.x) + d.w / 2).style('text-anchor', 'middle');
+        if (stacked) selection.attr('y', d.y + d.h).attr('dy', '1em');else if (d.upward) selection.attr('y', d.y + d.h).attr('dy', '-.25em');else selection.attr('y', d.y).attr('dy', '1em');
+      } else {
+        selection.attr('y', (d.x0 || d.y) + d.h / 2).attr('dy', '.35em');
+        if (stacked) selection.attr('x', d.x + d.w / 2).attr('text-anchor', 'middle');else if (d.upward) selection.attr('x', d.x).attr('dx', '.5em');else selection.attr('x', d.x + d.w).attr('text-anchor', 'end').attr('dx', '-.1em');
+      }
+      that.styleFont(selection);
+    });
+  };
+  var __bar = function __bar(selection) {
+    selection.transition(trans).attr('x', function (d) {
+      return d.x;
+    }).attr('y', function (d) {
+      return d.y;
+    }).attr('width', function (d) {
+      return d.w;
+    }).attr('height', function (d) {
+      return d.h;
+    }).style('fill', function (d) {
+      if (d3.select(this).classed(className('diff'))) return 'none';else return d.color;
+    });
+  };
+  var __label = function __label(selection) {
+    var vertical = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    selection.each(function (d) {
+      var selection = d3.select(this);
+      if (vertical) {
+        selection.transition(trans).attr('y', d.upward ? d.y : d.y + d.h);
+      } else {
+        if (stacked) selection.transition(trans).attr('x', d.x + d.w / 2).attr('text-anchor', 'middle');else selection.transition(trans).attr('x', d.upward ? d.x + d.w : d.x);
+      }
+      selection.text(d.text).style('fill', stacked ? '#fff' : d.color).style('visibility', label && (!diffColor || diffColor && selection.classed(className('diff'))) ? 'visible' : 'hidden');
+    });
+  };
+
+  var bar = void 0;
+  var region = canvas.selectAll(this.regionName());
+  bar = region.selectAll(this.nodeName()).data(function (d) {
+    var target = d.children;
+    return stacked ? target.slice().reverse() : target;
+  }, function (d) {
+    return d.data.key;
+  });
+  bar.exit().remove();
+  var barEnter = bar.enter().append('g').attr('class', this.nodeName(true)).call(__local, nested ? false : this.mono(), this.stream());
+  barEnter.append('rect').attr('class', className('bar')).call(__barInit, vertical);
+  barEnter.append('text').attr('class', className('bar')).call(__labelInit, vertical);
+  if (nested && stacked) {
+    barEnter.append('path').style('fill', function (d) {
+      return d.color;
+    }).style('visibility', 'hidden').attr('opacity', '0.5');
+  }
+  bar.call(__local, nested ? false : this.mono());
+  bar = barEnter.merge(bar);
+  bar.select('rect' + className('bar', true)).call(__bar, vertical);
+  bar.select('text' + className('bar', true)).call(__label, vertical);
+
+  if (isShowDiff) {
+    var last = void 0;
+    var strokeWidth = 1;
+    var halfStrokeWidth = strokeWidth / 2;
+    barEnter.append('rect').attr('class', className('diff')).attr('stroke-dasharray', '5, 3').attr('stroke-width', strokeWidth);
+    barEnter.append('text').attr('class', className('diff'));
+    bar.each(function (d, i, arr) {
+      if (i > 0) {
+        d.neighbor = last;
+        var diff = { value: d.value - last.value, upward: d.upward };
+        if (vertical) {
+          diff.x = d.x;diff.w = d.w;
+          if (diff.value > 0) {
+            diff.y = d.y;
+            diff.h = last.y - d.y;
+          } else {
+            diff.y = last.y;
+            diff.h = d.y - last.y;
+          }
+        } else {
+          diff.y = d.y;diff.h = d.h;
+          if (diff.value > 0) {
+            diff.x = last.w;
+            diff.w = d.w - last.w;
+          } else {
+            diff.x = d.w;
+            diff.w = last.w - d.w;
+          }
+        }
+        diff.x += halfStrokeWidth;diff.y += halfStrokeWidth;
+        diff.h -= strokeWidth;diff.w -= strokeWidth;
+        diff.w = Math.max(strokeWidth * 2, diff.w);
+        diff.h = Math.max(strokeWidth * 2, diff.h);
+        diff.text = labelFormat(diff.value, true);
+        d3.select(this).select('text' + className('bar', true)).each(function (d) {
+          var selection = d3.select(this).transition(trans);
+          if (diff.value < 0) {
+            if (vertical) {
+              selection.attr('y', (d.upward ? d.y : d.y + d.h) - diff.h);
+            } else {
+              selection.attr('x', (d.upward ? d.x + d.w : d.x) + diff.w);
+            }
+          }
+        });
+        d3.select(this).select('rect' + className('bar', true)).transition(trans).style('fill', function (d) {
+          return d.color = diffColor[(diff.value > 0 ? 'inc' : 'dec') + 'Fill'];
+        });
+        d3.select(this).select('rect' + className('diff', true)).datum(diff).attr('x', vertical ? diff.x + halfStrokeWidth : 0).attr('y', vertical ? d.upward ? d.y + d.h : d.y : diff.y + halfStrokeWidth).attr('width', vertical ? d.w - strokeWidth : 0).attr('height', vertical ? 0 : d.h - strokeWidth).call(__bar).style('stroke', diffColor[(diff.value > 0 ? 'inc' : 'dec') + 'Stroke']);
+        d3.select(this).select('text' + className('diff', true)).datum(diff).call(__labelInit, vertical).call(__label, vertical).style('fill', diffColor[(diff.value > 0 ? 'inc' : 'dec') + 'Fill']);
+        d.diff = diff;
+      } else {
+        d.neighbor = d3.select(arr[i + 1]).datum();
+        d3.select(this).select('rect' + className('bar', true)).transition(trans).style(diffColor.neuFill);
+        d3.select(this).select('rect' + className('diff', true)).remove();
+      }
+      last = d;
+    });
+  }
+
+  if (nested && stacked) {
+    //show diff of stacked
+    var pathLocal = d3.local();
+    region.each(function (r, i, arr) {
+      var neighbor = d3.select(i < arr.length - 1 ? arr[i + 1] : arr[i - 1]).datum();
+      var nds = neighbor.children;
+      d3.select(this).selectAll(that.nodeName()).each(function (d) {
+        var nd = nds.find(function (nd) {
+          return nd.data.key === d.data.key;
+        });
+        d.neighbor = nd; //save neighbor data
+      });
+    });
+    region.filter(function (d, i, arr) {
+      return i < arr.length - 1;
+    }).selectAll(that.nodeName()).select('path').style('fill', function (d) {
+      return d.color;
+    }).each(function (d) {
+      d.diff = { value: d.neighbor.value - d.value };
+      var parent = d.parent;
+      var neighbor = d.neighbor;
+      var neighborParent = neighbor.parent;
+      var points = [];
+      if (vertical) {
+        //push in clockwise order
+        points.push([d.x + d.w, d.y]);
+        points.push([neighborParent.x + neighbor.x - parent.x, neighborParent.y - parent.y + neighbor.y]);
+        points.push([points[1][0], points[1][1] + neighbor.h]);
+        points.push([points[0][0], points[0][1] + d.h]);
+      } else {
+        points.push([d.x, d.y + d.h]);
+        points.push([points[0][0] + d.w, points[0][1]]);
+        points.push([neighborParent.x + neighbor.x + neighbor.w - parent.x, points[0][1] + neighborParent.y + neighbor.y - parent.y - d.y - d.h]);
+        points.push([points[2][0] - neighbor.w, points[2][1]]);
+      }
+      var source = vertical ? [points[0], points[3]] : [points[0], points[1]];
+      source = 'M' + source[0] + 'L' + (vertical ? source[0] : source[1]) + 'L' + source[1] + 'L' + (vertical ? source[1] : source[0]) + 'z';
+      var target = points.map(function (point, i) {
+        return (i === 0 ? 'M' : 'L') + point;
+      }).join('') + 'z';
+      pathLocal.set(this, { source: source, target: target });
+    });
+
+    bar.on('mouseenter.stacked', function (d) {
+      bar.filter(function (t) {
+        return t.data.key !== d.data.key;
+      }).selectAll('rect' + className('bar', true)).transition().style('fill', '#b2c0d1');
+      var neighbor = region.selectAll(that.nodeName()).filter(function (t) {
+        return t.data.key === d.data.key;
+      });
+      if (!label) {
+        d3.select(this).select('text' + className('bar', true)).style('visibility', 'visible');
+        neighbor.select('text' + className('bar', true)).style('visibility', 'visible');
+      }
+      neighbor.select('path').style('visibility', 'visible').attr('d', function () {
+        var path = pathLocal.get(this);
+        if (path) return path.source;
+      }).interrupt().transition(trans).attr('d', function () {
+        var path = pathLocal.get(this);
+        if (path) return path.target;
+      });
+    }).on('mouseleave.stacked', function (d) {
+      bar.filter(function (t) {
+        return t.data.key !== d.data.key;
+      }).selectAll('rect' + className('bar', true)).transition().style('fill', function (d) {
+        return d.color;
+      });
+      var neighbor = region.selectAll(that.nodeName()).filter(function (t) {
+        return t.data.key === d.data.key;
+      });
+      if (!label) {
+        d3.select(this).select('text' + className('bar', true)).style('visibility', 'hidden');
+        neighbor.select('text' + className('bar', true)).style('visibility', 'hidden');
+      }
+      neighbor.select('path').interrupt().transition(trans).attr('d', function () {
+        var path = pathLocal.get(this);
+        if (path) return path.source;
+      }).on('end', function () {
+        d3.select(this).style('visibility', 'hidden');
+      });
+    });
+  }
+}
+
 var attrs$2 = {
   interval: null,
   max: 100,
@@ -4404,62 +5209,10 @@ function _munge() {
   }
 }
 
-function _domain(keep) {
-  //set scales and domains
-  var scale = this.scale();
-  var munged = this.__execs__.munged;
-  var nested = this.isNested();
-  var stacked = this.stacked();
-  var aggregated = this.aggregated();
-  var field = this.__execs__.field;
-  var isNestedAndSortByValue = this.isNestedAndSortByValue();
-  var yDomain = void 0,
-      xDomain = void 0;
-  var regionDomain = void 0;
-  if (!(keep && scale.x && scale.y)) {
-    scale.x = d3.scaleBand().padding(this.padding());
-    scale.y = d3.scaleLinear();
+function _panning() {
+  if (this.stream()) {
+    this.streamPanning(this.__execs__.scale.x);
   }
-
-  if (nested) {
-    regionDomain = field.region.level(0).munged(munged).domain();
-    scale.region = d3.scaleBand().domain(regionDomain).padding(this.regionPadding());
-  }
-  if (this.isFacet()) {
-    scale.color = this.updateColorScale(regionDomain, keep);
-    return this;
-  }
-
-  var level = 1;
-  xDomain = field.x.level(level).munged(munged).domain(!isNestedAndSortByValue && this.sortByValue());
-  yDomain = field.y.level(level).munged(munged).aggregated(aggregated).domain(0, stacked);
-  if (nested || !nested && (this.mono() === false || stacked)) {
-    //nested
-    scale.color = this.updateColorScale(xDomain, keep); //FIXME: need to update current colors
-  }
-
-  if (yDomain[0] > 0) yDomain[0] = 0;else if (yDomain[1] < 0) yDomain[1] = 0;
-
-  if (this.showDiff() && !nested) {
-    if (yDomain[0] === 0) yDomain[1] *= 1.25;else if (yDomain[1] === 0) yDomain[0] *= 1.25;
-  }
-  if (isNestedAndSortByValue) {
-    xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
-    munged.forEach(function (d) {
-      return d.domain = xDomain.find(function (x) {
-        return x.key === d.data.key;
-      }).values;
-    });
-  } else if (stacked) {
-    if (!nested) {
-      scale.x.domain([field.x.field()]);
-    }
-  } else {
-    //not stacked
-    scale.x.domain(xDomain);
-  }
-  this.setCustomDomain('y', yDomain);
-  return this;
 }
 
 function _range() {
@@ -4527,339 +5280,6 @@ function _range() {
   return this;
 }
 
-function _mark() {
-  var that = this;
-  var canvas = this.__execs__.canvas;
-  var nested = this.isNested.call(this);
-  var scale = this.__execs__.scale;
-  var stacked = this.stacked();
-  var vertical = this.isVertical();
-  var color = this.color();
-  var trans = d3.transition().duration(this.transition().duration).delay(this.transition().delay);
-  var yField = this.measureName();
-  var hasZeroPoint = zeroPoint(scale.y.domain());
-  var label = this.label();
-  var field = this.__execs__.field;
-  var diffColor = this.showDiff();
-  var isShowDiff = !nested && diffColor;
-  var isNestedAndSortByValue = this.isNestedAndSortByValue();
-
-  var __local = function __local(selection) {
-    var monoColor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-    var _fill = function _fill(d) {
-      if (monoColor) return color[0];else return scale.color(d.data.key);
-    };
-    var tFormat = function tFormat(key) {
-      var f = field.x.interval() && field.x.format() ? d3.timeFormat(field.x.format()) : null;
-      return f ? f(key) : key;
-    };
-    selection.each(function (d) {
-      //local에 저장
-      var x = void 0,
-          y = void 0,
-          w = void 0,
-          h = void 0;
-      var yValue = d.value; //d.data.value[yField];
-      var upward = yValue >= 0;
-      if (stacked) {
-        x = 0;
-        y = (vertical ? upward : !upward) ? scale.y(d.data.value[yField + '-end']) : scale.y(d.data.value[yField + '-start']);
-        w = nested ? scale.region.bandwidth() : scale.x.width;
-        h = Math.abs(scale.y(d.data.value[yField + '-start']) - scale.y(d.data.value[yField + '-end']));
-      } else {
-        if (isNestedAndSortByValue) {
-          scale.x.domain(d.parent.domain);
-        }
-        x = scale.x(d.data.key);
-        y = (vertical ? upward : !upward) ? scale.y(yValue) : hasZeroPoint ? scale.y(0) : scale.y.range()[0];
-        w = scale.x.bandwidth();
-        h = Math.abs((hasZeroPoint ? scale.y(0) : scale.y.range()[0]) - scale.y(yValue));
-      }
-      var result = vertical ? { x: x, y: y + (upward ? 0 : 0.5), w: w, h: h, upward: upward } : { x: y + (upward ? 0.5 : 0), y: x, w: h, h: w, upward: upward };
-      result.key = tFormat(d.data.key);
-      result.color = _fill(d);
-      result.text = labelFormat(yValue);
-      //result.value = yValue;
-      for (var k in result) {
-        if (result.hasOwnProperty(k)) d[k] = result[k];
-      }
-    });
-  };
-  var __barInit = function __barInit(selection) {
-    var vertical = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-    selection.each(function (d) {
-      var selection = d3.select(this);
-      selection.style('cursor', 'pointer').style('fill', function (d) {
-        if (d3.select(this).classed(className('diff'))) return 'none';else return d.color;
-      });
-      if (vertical) {
-        selection.attr('x', d.x).attr('y', d.upward ? d.y + d.h : d.y).attr('width', d.w).attr('height', 0);
-      } else {
-        selection.attr('x', d.upward ? d.x : d.x + d.w).attr('y', d.y).attr('width', 0).attr('height', d.h);
-      }
-    });
-  };
-  var __labelInit = function __labelInit(selection) {
-    var vertical = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-    selection.each(function (d) {
-      var selection = d3.select(this);
-      selection.style('pointer-events', 'none').text(d.text);
-      if (vertical) {
-        selection.attr('x', d.x + d.w / 2).style('text-anchor', 'middle');
-        if (stacked) selection.attr('y', d.y + d.h).attr('dy', '1em');else if (d.upward) selection.attr('y', d.y + d.h).attr('dy', '-.25em');else selection.attr('y', d.y).attr('dy', '1em');
-      } else {
-        selection.attr('y', d.y + d.h / 2).attr('dy', '.35em');
-        if (stacked) selection.attr('x', d.x + d.w / 2).attr('text-anchor', 'middle');else if (d.upward) selection.attr('x', d.x).attr('dx', '.5em');else selection.attr('x', d.x + d.w).attr('text-anchor', 'end').attr('dx', '-.1em');
-      }
-      that.styleFont(selection);
-    });
-  };
-  var __bar = function __bar(selection) {
-    selection.transition(trans).attr('x', function (d) {
-      return d.x;
-    }).attr('y', function (d) {
-      return d.y;
-    }).attr('width', function (d) {
-      return d.w;
-    }).attr('height', function (d) {
-      return d.h;
-    }).style('fill', function (d) {
-      if (d3.select(this).classed(className('diff'))) return 'none';else return d.color;
-    });
-  };
-  var __label = function __label(selection) {
-    var vertical = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-    selection.each(function (d) {
-      var selection = d3.select(this);
-      if (vertical) {
-        selection.transition(trans).attr('y', d.upward ? d.y : d.y + d.h);
-      } else {
-        if (stacked) selection.transition(trans).attr('x', d.x + d.w / 2).attr('text-anchor', 'middle');else selection.transition(trans).attr('x', d.upward ? d.x + d.w : d.x);
-      }
-      selection.text(d.text).style('fill', stacked ? '#fff' : d.color).style('visibility', label && (!diffColor || diffColor && selection.classed(className('diff'))) ? 'visible' : 'hidden');
-    });
-  };
-
-  var bar = void 0;
-  var region = canvas.selectAll(this.regionName());
-  bar = region.selectAll(this.nodeName()).data(function (d) {
-    var target = d.children;
-    return stacked ? target.slice().reverse() : target;
-  }, function (d) {
-    return d.data.key;
-  });
-  bar.exit().remove();
-  var barEnter = bar.enter().append('g').attr('class', this.nodeName(true)).call(__local, nested ? false : this.mono());
-  barEnter.append('rect').attr('class', className('bar')).call(__barInit, vertical);
-  barEnter.append('text').attr('class', className('bar')).call(__labelInit, vertical);
-  if (nested && stacked) {
-    barEnter.append('path').style('fill', function (d) {
-      return d.color;
-    }).style('visibility', 'hidden').attr('opacity', '0.5');
-  }
-  bar.call(__local, nested ? false : this.mono());
-  bar = barEnter.merge(bar);
-  bar.select('rect' + className('bar', true)).call(__bar, vertical);
-  bar.select('text' + className('bar', true)).call(__label, vertical);
-
-  if (isShowDiff) {
-    var last = void 0;
-    var strokeWidth = 1;
-    var halfStrokeWidth = strokeWidth / 2;
-    barEnter.append('rect').attr('class', className('diff')).attr('stroke-dasharray', '5, 3').attr('stroke-width', strokeWidth);
-    barEnter.append('text').attr('class', className('diff'));
-    bar.each(function (d, i, arr) {
-      if (i > 0) {
-        d.neighbor = last;
-        var diff = { value: d.value - last.value, upward: d.upward };
-        if (vertical) {
-          diff.x = d.x;diff.w = d.w;
-          if (diff.value > 0) {
-            diff.y = d.y;
-            diff.h = last.y - d.y;
-          } else {
-            diff.y = last.y;
-            diff.h = d.y - last.y;
-          }
-        } else {
-          diff.y = d.y;diff.h = d.h;
-          if (diff.value > 0) {
-            diff.x = last.w;
-            diff.w = d.w - last.w;
-          } else {
-            diff.x = d.w;
-            diff.w = last.w - d.w;
-          }
-        }
-        diff.x += halfStrokeWidth;diff.y += halfStrokeWidth;
-        diff.h -= strokeWidth;diff.w -= strokeWidth;
-        diff.w = Math.max(strokeWidth * 2, diff.w);
-        diff.h = Math.max(strokeWidth * 2, diff.h);
-        diff.text = labelFormat(diff.value, true);
-        d3.select(this).select('text' + className('bar', true)).each(function (d) {
-          var selection = d3.select(this).transition(trans);
-          if (diff.value < 0) {
-            if (vertical) {
-              selection.attr('y', (d.upward ? d.y : d.y + d.h) - diff.h);
-            } else {
-              selection.attr('x', (d.upward ? d.x + d.w : d.x) + diff.w);
-            }
-          }
-        });
-        d3.select(this).select('rect' + className('bar', true)).transition(trans).style('fill', function (d) {
-          return d.color = diffColor[(diff.value > 0 ? 'inc' : 'dec') + 'Fill'];
-        });
-        d3.select(this).select('rect' + className('diff', true)).datum(diff).attr('x', vertical ? diff.x + halfStrokeWidth : 0).attr('y', vertical ? d.upward ? d.y + d.h : d.y : diff.y + halfStrokeWidth).attr('width', vertical ? d.w - strokeWidth : 0).attr('height', vertical ? 0 : d.h - strokeWidth).call(__bar).style('stroke', diffColor[(diff.value > 0 ? 'inc' : 'dec') + 'Stroke']);
-        d3.select(this).select('text' + className('diff', true)).datum(diff).call(__labelInit, vertical).call(__label, vertical).style('fill', diffColor[(diff.value > 0 ? 'inc' : 'dec') + 'Fill']);
-        d.diff = diff;
-      } else {
-        d.neighbor = d3.select(arr[i + 1]).datum();
-        d3.select(this).select('rect' + className('bar', true)).transition(trans).style(diffColor.neuFill);
-        d3.select(this).select('rect' + className('diff', true)).remove();
-      }
-      last = d;
-    });
-  }
-
-  if (nested && stacked) {
-    //show diff of stacked
-    var pathLocal = d3.local();
-    region.each(function (r, i, arr) {
-      var neighbor = d3.select(i < arr.length - 1 ? arr[i + 1] : arr[i - 1]).datum();
-      var nds = neighbor.children;
-      d3.select(this).selectAll(that.nodeName()).each(function (d) {
-        var nd = nds.find(function (nd) {
-          return nd.data.key === d.data.key;
-        });
-        d.neighbor = nd; //save neighbor data
-      });
-    });
-    region.filter(function (d, i, arr) {
-      return i < arr.length - 1;
-    }).selectAll(that.nodeName()).select('path').style('fill', function (d) {
-      return d.color;
-    }).each(function (d) {
-      d.diff = { value: d.neighbor.value - d.value };
-      var parent = d.parent;
-      var neighbor = d.neighbor;
-      var neighborParent = neighbor.parent;
-      var points = [];
-      if (vertical) {
-        //push in clockwise order
-        points.push([d.x + d.w, d.y]);
-        points.push([neighborParent.x + neighbor.x - parent.x, neighborParent.y - parent.y + neighbor.y]);
-        points.push([points[1][0], points[1][1] + neighbor.h]);
-        points.push([points[0][0], points[0][1] + d.h]);
-      } else {
-        points.push([d.x, d.y + d.h]);
-        points.push([points[0][0] + d.w, points[0][1]]);
-        points.push([neighborParent.x + neighbor.x + neighbor.w - parent.x, points[0][1] + neighborParent.y + neighbor.y - parent.y - d.y - d.h]);
-        points.push([points[2][0] - neighbor.w, points[2][1]]);
-      }
-      var source = vertical ? [points[0], points[3]] : [points[0], points[1]];
-      source = 'M' + source[0] + 'L' + (vertical ? source[0] : source[1]) + 'L' + source[1] + 'L' + (vertical ? source[1] : source[0]) + 'z';
-      var target = points.map(function (point, i) {
-        return (i === 0 ? 'M' : 'L') + point;
-      }).join('') + 'z';
-      pathLocal.set(this, { source: source, target: target });
-    });
-
-    bar.on('mouseenter.stacked', function (d) {
-      bar.filter(function (t) {
-        return t.data.key !== d.data.key;
-      }).selectAll('rect' + className('bar', true)).transition().style('fill', '#b2c0d1');
-      var neighbor = region.selectAll(that.nodeName()).filter(function (t) {
-        return t.data.key === d.data.key;
-      });
-      if (!label) {
-        d3.select(this).select('text' + className('bar', true)).style('visibility', 'visible');
-        neighbor.select('text' + className('bar', true)).style('visibility', 'visible');
-      }
-      neighbor.select('path').style('visibility', 'visible').attr('d', function () {
-        var path = pathLocal.get(this);
-        if (path) return path.source;
-      }).interrupt().transition(trans).attr('d', function () {
-        var path = pathLocal.get(this);
-        if (path) return path.target;
-      });
-    }).on('mouseleave.stacked', function (d) {
-      bar.filter(function (t) {
-        return t.data.key !== d.data.key;
-      }).selectAll('rect' + className('bar', true)).transition().style('fill', function (d) {
-        return d.color;
-      });
-      var neighbor = region.selectAll(that.nodeName()).filter(function (t) {
-        return t.data.key === d.data.key;
-      });
-      if (!label) {
-        d3.select(this).select('text' + className('bar', true)).style('visibility', 'hidden');
-        neighbor.select('text' + className('bar', true)).style('visibility', 'hidden');
-      }
-      neighbor.select('path').interrupt().transition(trans).attr('d', function () {
-        var path = pathLocal.get(this);
-        if (path) return path.source;
-      }).on('end', function () {
-        d3.select(this).style('visibility', 'hidden');
-      });
-    });
-  }
-}
-
-function _axis$1() {
-  var that = this;
-  var scale = this.__execs__.scale;
-  var nested = this.isNested();
-  var grid = this.grid();
-  var innerSize = this.innerSize();
-  var fieldObj = this.__execs__.field;
-  var isVertical = this.isVertical();
-
-  var _axisScaleX = function _axisScaleX(axisToggle) {
-    var targetField = nested ? fieldObj.region : isVertical ? fieldObj.x : fieldObj.y;
-    var targetScale = nested ? scale.region : isVertical ? scale.x : scale.y;
-    targetField.axis(axisToggle);
-    var curAxis = that.axisDefault(targetScale, axisToggle);
-    if (axisToggle.orient === 'bottom') {
-      curAxis.y(isVertical ? scale.y.range()[0] : scale.x.range()[1]);
-    }
-    return curAxis;
-  };
-
-  var _axisScaleY = function _axisScaleY(axisToggle) {
-    var targetField = isVertical ? fieldObj.y : fieldObj.x;
-    var targetScale = isVertical ? scale.y : scale.x;
-    targetField.axis(axisToggle);
-    var curAxis = that.axisDefault(targetScale, axisToggle);
-    curAxis.grid(grid).gridSize(axisToggle.orient === 'bottom' || axisToggle.orient === 'top' ? innerSize.height : innerSize.width);
-    if (axisToggle.orient === 'right') curAxis.x((nested ? scale.region : scale.x).range()[1]);
-    return curAxis;
-  };
-
-  var xAt = this.axisX();
-  var yAt = this.axisY();
-  if (this.isFacet()) {
-    this.axisFacet(false);
-  } else {
-    if (xAt) _axisScaleX(xAt);
-    if (yAt) _axisScaleY(yAt);
-  }
-
-  this.renderAxis();
-}
-
-function _legend$1() {
-  var field = this.__execs__.field;
-  if (this.mono() && (!field.region || this.isFacet())) {
-    //mono + dimensions  => no legend
-    return;
-  }
-  this.renderLegend('x');
-}
-
 function _region() {
   var aggregated = this.aggregated();
   var nested = this.isNested.call(this);
@@ -4884,52 +5304,6 @@ function _region() {
   this.renderRegion(__regionLocal, function (d) {
     return d;
   }, isFacet);
-}
-
-function _facet() {
-  var _this = this;
-
-  var parent = this;
-  var scale = this.__execs__.scale;
-  var facet = this.facet();
-  var canvas = this.__execs__.canvas;
-  var mono = this.mono();
-  var innerSize = this.innerSize();
-  var dimensions = [this.dimensions()[0]];
-  var measures = this.isMixed() ? [mixedMeasure] : this.measures();
-  var width = void 0,
-      height = void 0;
-  var settings = ['axisTitles', 'normalized', 'padding', 'orient', 'font', 'label', 'grid', 'tooltip'].map(function (d) {
-    return { key: d, value: _this[d]() };
-  });
-  var hasX = this.axisX();
-  var hasY = this.axisY();
-  var _smallbar = function _smallbar(d) {
-    var smallBar = bar().container(this).data(d).dimensions(dimensions).measures(measures).width(width).height(height).legend(false).zeroMargin(true) //remove margin
-    .aggregated(true).parent(parent);
-    settings.forEach(function (d) {
-      smallBar[d.key](d.value);
-    });
-
-    if (!mono) smallBar.color(scale.color(d.data.key));
-    if (facet.orient === 'vertical') {
-      if (hasX) smallBar.axis({ target: 'x', orient: 'bottom' }); //, showTitle: i === arr.length-1});
-      if (hasY) smallBar.axis({ target: 'y', orient: 'left' });
-    } else {
-      if (hasX) smallBar.axis({ target: 'x', orient: 'bottom' });
-      if (hasY) smallBar.axis({ target: 'y', orient: 'left' }); //showTitle: i === 0});
-    }
-    smallBar.render();
-  };
-  if (facet.orient === 'horizontal') {
-    width = scale.region.bandwidth();
-    height = innerSize.height;
-  } else {
-    width = innerSize.width;
-    height = scale.region.bandwidth();
-  }
-
-  canvas.selectAll(this.regionName() + '.facet').each(_smallbar);
 }
 
 function _tooltip$1() {
@@ -4994,66 +5368,6 @@ function _tooltip$1() {
   this.renderTooltip(toggle);
 }
 
-function translate(selection, innerSize) {
-  var isVertical = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-  var isInit = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-
-  selection.attr('transform', function (d) {
-    if (isVertical) {
-      if (isInit) return 'translate(' + [innerSize.width, innerSize.height] + ')';
-      return 'translate(' + [innerSize.width, d.y - 0.5] + ')';
-    } else {
-      if (isInit) return 'translate(' + [0, 0] + ')';
-      return 'translate(' + [d.w + 0.5, 0] + ')';
-    }
-  });
-}
-function line$1(selection, innerSize) {
-  var isVertical = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
-  if (isVertical) {
-    selection.attr('x1', -innerSize.width);
-  } else {
-    selection.attr('y2', innerSize.height);
-  }
-}
-
-function _annotation() {
-  if (!this.annotation() || this.isFacet() || this.stacked()) return;
-  var annotation = this.annotation();
-  var that = this;
-  var canvas = this.__execs__.canvas;
-  var trans = d3.transition().duration(this.transition().duration).delay(this.transition().delay);
-  var innerSize = this.innerSize();
-  var isVertical = this.isVertical();
-  var isShowDiff = this.showDiff() && !this.isNested();
-
-  if (canvas.select('.annotation-g').empty()) canvas.append('g').attr('class', 'annotation-g');
-  var g = canvas.select('.annotation-g');
-  var anno = g.selectAll('.annotation').data(this.nodes().data());
-  anno.exit().remove();
-  var annoEnter = anno.enter().append('g').attr('class', 'annotation').call(translate, innerSize, isVertical, true).style('pointer-events', 'none');
-  annoEnter.append('text').style('fill', annotation.color);
-  annoEnter.append('line').style('stroke', annotation.color).style('shape-rendering', 'crispEdges').call(line$1, innerSize, isVertical);
-  anno = annoEnter.merge(anno).transition(trans).call(translate, innerSize, isVertical);
-  if (isShowDiff) {
-    anno.style('visibility', function (d, i, arr) {
-      if (d.diff) {
-        if (d.diff.value < 0) return 'visible';else if (i < anno.size() - 1 && d3.select(arr[i + 1]).datum().diff.value > 0) return 'visible'; //when not last one, but next one is  diff > 0
-        if (d.neighbor.diff.value > 0) return 'visible';
-      }
-      return 'hidden';
-    });
-  }
-
-  anno.select('text').text(function (d) {
-    return d.key;
-  }).style('visibility', annotation.showLabel ? 'visible' : 'hidden').style('fill', annotation.color).each(function () {
-    that.styleFont(this);
-  });
-  anno.select('line').transition(trans).style('stroke', annotation.color).call(line$1, innerSize, isVertical);
-}
-
 var orients = ['vertical', 'horizontal'];
 var conditions = ['normal', 'count', 'mixed'];
 var _attrs = {
@@ -5073,6 +5387,7 @@ var _attrs = {
  * @augments Facet
  * @augments SortMixin
  * @augments PaddingMixin
+ * @augments StreamMixin
  * @todo write examples
  */
 
@@ -5089,7 +5404,7 @@ var Bar = function (_mix$with) {
         return this.isFacet();
       } }).process('mark', _mark, { allow: function allow() {
         return !this.isFacet();
-      } }).process('legend', _legend$1).process('tooltip', _tooltip$1).process('annotation', _annotation);
+      } }).process('legend', _legend$1).process('tooltip', _tooltip$1).process('padding', _panning).process('annotation', _annotation);
     return _this;
   }
 
@@ -5156,7 +5471,7 @@ var Bar = function (_mix$with) {
     }
   }]);
   return Bar;
-}(mix(Facet).with(sortMixin, paddingMixin, stackMixin));
+}(mix(Facet).with(sortMixin, paddingMixin, stackMixin, streamMixin));
 
 /**
  * If annotation is specified, sets the annotation settings and returns the instance itself. This annotation feature only works in the mono-bar condition and shows differences between bars. If annotation value is true or the it's showLable property is true, shows the label. If annotation is not specified, returns the instance's current annotation setting.
@@ -5229,7 +5544,7 @@ function brushMove(group, selection) {
   return this;
 }
 
-var _attrs$12 = {
+var _attrs$13 = {
   brush: false,
   brushGen: null
 };
@@ -5246,7 +5561,7 @@ var brushMixin = function brushMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (BrushMixin.__proto__ || Object.getPrototypeOf(BrushMixin)).call(this));
 
-      _this.setAttrs(_attrs$12);
+      _this.setAttrs(_attrs$13);
       _this.__execs__.brush = null;
       _this.__execs__.brushDispatch = d3.dispatch('brushStart', 'brushed', 'brushEnd');
       _this.rebindOnMethod(_this.__execs__.brushDispatch);
@@ -5276,7 +5591,7 @@ var brushMixin = function brushMixin(Base) {
   return BrushMixin;
 };
 
-var _attrs$13 = {
+var _attrs$14 = {
   fitLine: false
 };
 
@@ -5293,7 +5608,7 @@ var fitLineMixin = function fitLineMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (FitLineMixin.__proto__ || Object.getPrototypeOf(FitLineMixin)).call(this));
 
-      _this.setAttrs(_attrs$13);
+      _this.setAttrs(_attrs$14);
       return _this;
     }
 
@@ -5323,7 +5638,7 @@ function seriesName(_val) {
 }
 
 var curves = ['linear', 'stepped', 'curved'];
-var _attrs$14 = {
+var _attrs$15 = {
   curve: curves[0],
   point: false,
   pointRatio: 3,
@@ -5342,7 +5657,7 @@ var seriesMixin = function seriesMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (SeriesMixin.__proto__ || Object.getPrototypeOf(SeriesMixin)).call(this));
 
-      _this.setAttrs(_attrs$14);
+      _this.setAttrs(_attrs$15);
       return _this;
     }
 
@@ -5496,7 +5811,7 @@ function zoomTransform(group, transform) {
   return this;
 }
 
-var _attrs$15 = {
+var _attrs$16 = {
   zoom: false,
   zoomGen: null
 };
@@ -5513,7 +5828,7 @@ var zoomMixin = function zoomMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (ZoomMixin.__proto__ || Object.getPrototypeOf(ZoomMixin)).call(this));
 
-      _this.setAttrs(_attrs$15);
+      _this.setAttrs(_attrs$16);
       _this.__execs__.zoom = null;
       _this.__execs__.zoomDispatch = d3.dispatch('zoom');
       _this.rebindOnMethod(_this.__execs__.zoomDispatch);
@@ -5529,7 +5844,7 @@ var zoomMixin = function zoomMixin(Base) {
   ZoomMixin.prototype.zoomGen = zoomGen;
   ZoomMixin.prototype.zoomTransform = zoomTransform;
   ZoomMixin.prototype.isBrushZoom = isBrushZoom;
-  setMethodsFromAttrs(ZoomMixin, _attrs$15);
+  setMethodsFromAttrs(ZoomMixin, _attrs$16);
   return ZoomMixin;
 };
 
@@ -5537,7 +5852,7 @@ function isBrushZoom() {
   return this.__attrs__.zoom && this.__attrs__.zoom === 'brush';
 }
 
-var _attrs$16 = {
+var _attrs$17 = {
   shape: null
 };
 
@@ -5553,7 +5868,7 @@ var shapeMixin = function shapeMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (ShapeMixin.__proto__ || Object.getPrototypeOf(ShapeMixin)).call(this));
 
-      _this.setAttrs(_attrs$16);
+      _this.setAttrs(_attrs$17);
       return _this;
     }
 
@@ -5679,8 +5994,12 @@ function _mark$2() {
   var curve = this.curve() === curves[0] ? d3.curveLinear : this.curve() === curves[1] ? d3.curveStep : d3.curveCatmullRom;
   var scaleBandMode = this.scaleBandMode();
   var multiTooltip = this.multiTooltip();
+  var stream = this.stream();
+  var xKey = function xKey(d) {
+    return field.x.interval() ? new Date(d.data.key) : d.data.key;
+  };
   var xValue = function xValue(d) {
-    return scale.x(field.x.interval() ? new Date(d.data.key) : d.data.key) + (scaleBandMode ? scale.x.bandwidth() / 2 : 0);
+    return scale.x(xKey(d)) + (scaleBandMode ? scale.x.bandwidth() / 2 : 0);
   };
   var yValueFunc = function yValueFunc(s) {
     return function (d) {
@@ -5702,9 +6021,24 @@ function _mark$2() {
       var f = field.x.isInterval() ? d3.timeFormat(field.x.format()) : null;
       return f ? f(key) : key;
     };
+
     selection.each(function (d, i, arr) {
       d.value = stacked ? d.data.value[yField + '-end'] : d.data.value[yField];
       d.x = xValue(d);
+      if (isNaN(d.x) && scale.x._defaultDomain) {
+        d.x = that.tempPosForOrdinalScale(xKey(d), scale.x);
+      }
+      if (stream) {
+        var curX = xKey(d);
+        if (scale.x.invert) {
+          var dist = that.distDomain(scale.x);
+          if (curX > scale.x._lastDomain[scale.x._lastDomain.length - 1]) {
+            d.x0 = d.x + dist;
+          }
+        } else {
+          d.x0 = that.tempPosForOrdinalScale(xKey(d), scale.x);
+        }
+      }
       d.y = yValueFunc(individualScale ? d.parent.scale : scale.y)(d);
       d.anchor = i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle';
       d.text = labelFormat(d.value);
@@ -5742,26 +6076,33 @@ function _mark$2() {
   };
   var __series = function __series(selection) {
     var area$$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var stream = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
     var c = function c(d) {
       return nested ? scale.color(d.data.key) : color[0];
     };
+    var dist = stream && that.distDomain(scale.x);
+    selection.each(function (d) {
+      var target = d.children;
+      var thisSelect = d3.select(this);
+      if (stream) {
+        thisSelect.attr('d', (area$$1 ? areaGenFunc : lineGenFunc)(individualScale ? d.scale : scale.y)(target)).attr('transform', 'translate(' + dist + ',0)').transition(trans).attr('transform', 'translate(0,0)');
+      } else {
+        thisSelect.transition(trans).attr('d', (area$$1 ? areaGenFunc : lineGenFunc)(individualScale ? d.scale : scale.y)(target));
+      }
+    });
     if (area$$1) {
-      selection.each(function (d) {
-        var target = d.children;
-        d3.select(this).transition(trans).attr('d', areaGenFunc(individualScale ? d.scale : scale.y)(target));
-      }).attr('fill', c).attr('stroke', 'none');
+      selection.attr('fill', c).attr('stroke', 'none');
     } else {
-      selection.each(function (d) {
-        var target = d.children;
-        d3.select(this).transition(trans).attr('d', lineGenFunc(individualScale ? d.scale : scale.y)(target));
-      }).attr('stroke', c).attr('stroke-width', size.range[0] + 'px');
+      selection.attr('stroke', c).attr('stroke-width', size.range[0] + 'px');
     }
   };
   var __pointInit = function __pointInit(selection) {
     selection.attr('r', (size.range[0] - size.range[0] / 4) * pointRatio).attr('stroke-width', size.range[0] / 4 * pointRatio).style('fill', '#fff').attr('opacity', showPoint ? 1 : 0).style('cursor', 'pointer').attr('cx', function (d) {
-      return d.x;
-    }).attr('cy', d3.max(scale.y.range()));
+      return d.x0 || d.x;
+    }).attr('cy', function (d) {
+      return stream ? d.y : d3.max(scale.y.range());
+    });
   };
   var __point = function __point(selection) {
     selection.transition(trans).attr('r', (size.range[0] - size.range[0] / 4) * pointRatio).attr('stroke-width', size.range[0] / 4 * pointRatio).attr('opacity', showPoint ? 1 : 0).attr('cx', function (d) {
@@ -5773,7 +6114,11 @@ function _mark$2() {
   var __labelInit = function __labelInit(selection) {
     selection.each(function (d) {
       var selection = d3.select(this);
-      selection.attr('x', d.x).attr('y', d3.max(scale.y.range())).attr('stroke', 'none').text(d.text);
+      selection.attr('x', function (d) {
+        return d.x0 || d.x;
+      }).attr('y', function (d) {
+        return stream ? d.y : d3.max(scale.y.range());
+      }).attr('stroke', 'none').style('visibility', label ? 'visible' : 'hidden').text(d.text);
       that.styleFont(selection);
     });
   };
@@ -5793,9 +6138,11 @@ function _mark$2() {
     var ___append = function ___append(selection, area$$1) {
       var path = selection.selectAll('path' + className(area$$1 ? 'area' : 'line', true)).data(function (d) {
         return [d];
+      }, function (d, i) {
+        return d.data ? d.data.key : i;
       });
       path.exit().remove();
-      path.enter().append('path').attr('class', className(area$$1 ? 'area' : 'line')).call(__seriesInit, area$$1).merge(path, area$$1).call(__series, area$$1).style('pointer-events', 'none');
+      path.enter().append('path').attr('class', className(area$$1 ? 'area' : 'line')).call(__seriesInit, area$$1).merge(path).call(__series, area$$1, stream).style('pointer-events', 'none');
     };
     if (isArea) {
       series.call(___append, true);
@@ -5891,6 +6238,12 @@ function _munge$2() {
   }
 }
 
+function _panning$1() {
+  if (this.stream()) {
+    this.streamPanning(this.__execs__.scale.x);
+  }
+}
+
 function individualDomain(target, measureField) {
   var padding = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
@@ -5905,9 +6258,10 @@ function individualDomain(target, measureField) {
   return [domain[0] - dist, domain[1] + dist];
 }
 
-function _domain$2(keep) {
+function _domain$2() {
   var _this = this;
 
+  var keep = this.keep();
   var scale = this.scale();
   var munged = this.__execs__.munged;
   var nested = this.isNested();
@@ -5917,7 +6271,7 @@ function _domain$2(keep) {
   var level = 1;
   var isMixed = this.isMixed();
   var individualScale = this.isIndividualScale();
-
+  var viewInterval = this.viewInterval();
   var yDomain = void 0,
       xDomain = void 0;
   var regionDomain = void 0;
@@ -5943,10 +6297,13 @@ function _domain$2(keep) {
     if (isNaN(d)) {
       isNumberDomain = false;
       break;
+    } else if (typeof d === 'string') {
+      xDomain[i] = +d;
     }
   }
+
   if (this.scaleBandMode()) {
-    scale.x = d3.scaleBand().padding(this.padding());
+    if (!keep) scale.x = d3.scaleBand().padding(this.padding());
   } else if (field.x.interval() || isNumberDomain) {
     if (field.x.order() === 'natural') {
       if (xDomain[0] instanceof Date) xDomain = d3.extent(xDomain);else xDomain = d3.extent(xDomain.map(function (d) {
@@ -5955,9 +6312,15 @@ function _domain$2(keep) {
     } else {
       xDomain = [xDomain[0], xDomain[xDomain.length - 1]];
     }
-    scale.x = continousScale(xDomain, null, field.x);
+    if (!keep) scale.x = continousScale(xDomain, null, field.x);
   } else {
-    scale.x = d3.scalePoint().padding(this.padding());
+    if (!keep) scale.x = d3.scalePoint().padding(this.padding());
+  }
+
+  if (!keep && viewInterval) {
+    xDomain = this.limitViewInterval(scale.x, xDomain);
+  } else if (keep && this.stream()) {
+    xDomain = this.limitViewInterval(scale.x, xDomain, true);
   }
   scale.x.domain(xDomain);
   this.setCustomDomain('y', yDomain);
@@ -6298,7 +6661,7 @@ var defaultFont$5 = {
 };
 var pointOriginColor = '#fff';
 var baseColor = '#b0bec5';
-var _attrs$17 = {
+var _attrs$18 = {
   anchor: { x: 'left', y: 'top' },
   color: baseColor,
   dx: 0,
@@ -6308,6 +6671,7 @@ var _attrs$17 = {
   nodeName: className('mark node', true),
   tooltip: null,
   target: null,
+  keyFormat: null,
   valueFormat: null,
   width: null,
   sortByValue: { type: 'natural' },
@@ -6318,7 +6682,7 @@ var _attrs$17 = {
 var MultiTooltip = function MultiTooltip() {
   classCallCheck(this, MultiTooltip);
 
-  this.__attrs__ = JSON.parse(JSON.stringify(_attrs$17));
+  this.__attrs__ = JSON.parse(JSON.stringify(_attrs$18));
   this.__execs__ = { tooltip: null, domain: null, dispatch: d3.dispatch('start', 'move', 'end') };
   this.valueFormat(labelFormat);
   rebindOnMethod(this, this.__execs__.dispatch);
@@ -6452,6 +6816,12 @@ function _show(selection, tick) {
   values = values.map(function (d) {
     return { name: d.parent.data.key || d.data.key, value: d.text };
   });
+  if (this.keyFormat()) {
+    var f = this.keyFormat();
+    values.forEach(function (d) {
+      return d.name = f(d.name);
+    });
+  }
   y = d3.mean(y);
   y = Math.round(y);
   if (x && y) {
@@ -6510,7 +6880,7 @@ MultiTooltip.prototype.hide = hide$2;
 MultiTooltip.prototype.render = render$6;
 MultiTooltip.prototype.tick = tick;
 
-setMethodsFromAttrs(MultiTooltip, _attrs$17);
+setMethodsFromAttrs(MultiTooltip, _attrs$18);
 
 function _single() {
   var fromMulti = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -6538,10 +6908,11 @@ function _single() {
 function _multi() {
   //multi-tooltip 
   var canvas = this.__execs__.canvas;
+  var field = this.__execs__.field;
   var multiTooltipG = canvas.select(className('multi-tooltip-g', true));
   if (multiTooltipG.empty()) multiTooltipG = canvas.append('g').attr('class', className('multi-tooltip-g'));
   var tooltipObj = _single.call(this, true);
-  var multiTooltipObj = _multiTooltip().target(this).dx(this.size().range[0]).dy(this.size().range[0]).color(this.color()[0]).tooltip(tooltipObj).sortByValue(this.multiTooltip().sortByValue);
+  var multiTooltipObj = _multiTooltip().target(this).dx(this.size().range[0]).dy(this.size().range[0]).color(this.color()[0]).tooltip(tooltipObj).sortByValue(this.multiTooltip().sortByValue).keyFormat(field.x.format());
 
   multiTooltipObj.render(multiTooltipG.node());
   this.__execs__.tooltip = multiTooltipObj;
@@ -6577,12 +6948,15 @@ function normal() {
   canvas.call(zoomGen);
   this.zoomGen(zoomGen).zoomed(function () {
     _mark$2.call(_this, true); //reset marks
-    d3.select((parent ? parent : _this).__execs__.canvas.node().parentNode.parentNode).selectAll(className('tooltip', true)).remove(); //remove existing tooltip
+    _this.resetTooltip();
     _tooltip$3.call(_this); //reset tooltips
   });
 }
 
 function _zoom() {
+  if (this.stream()) {
+    this.streamPanning(this.__execs__.scale.x);
+  }
   if (!this.zoom()) return;
   if (this.zoom() === 'normal') normal.call(this);
 }
@@ -6590,7 +6964,7 @@ function _zoom() {
 var size$2 = { range: [2, 2], scale: 'linear', reverse: false };
 var shapes = ['line', 'area'];
 var conditions$1 = ['normal', 'count', 'mixed'];
-var _attrs$11 = {
+var _attrs$12 = {
   meanLine: false,
   multiTooltip: false,
   padding: 0,
@@ -6614,6 +6988,7 @@ var _attrs$11 = {
  * @augments ZoomMixin
  * @augments PaddingMixin
  * @augments ShapeMixin
+ * @augments StreamMixin
  */
 
 var Line = function (_mix$with) {
@@ -6624,7 +6999,7 @@ var Line = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Line.__proto__ || Object.getPrototypeOf(Line)).call(this));
 
-    _this.setAttrs(_attrs$11);
+    _this.setAttrs(_attrs$12);
     _this.__execs__.multiTooltipDispatch = d3.dispatch('selectStart', 'selectMove', 'selectEnd', 'multiTooltip');
     _this.rebindOnMethod(_this.__execs__.multiTooltipDispatch);
     _this.process('munge', _munge$2, { isPre: true }).process('brushZoom', _brushZoom, { isPre: true, allow: function allow() {
@@ -6646,6 +7021,8 @@ var Line = function (_mix$with) {
       } }).process('fitLine', _fitLine, { allow: function allow() {
         return !this.isBrushZoom();
       } }).process('tooltip', _tooltip$3, { allow: function allow() {
+        return !this.isBrushZoom();
+      } }).process('panning', _panning$1, { allow: function allow() {
         return !this.isBrushZoom();
       } }).process('zoom', _zoom, { allow: function allow() {
         return !this.isBrushZoom();
@@ -6806,7 +7183,7 @@ var Line = function (_mix$with) {
     }
   }]);
   return Line;
-}(mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin));
+}(mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin, streamMixin));
 /**
  * If meanLine is specified sets the meanLine setting and returns the Line instance itself. If meanLine is true renders a mean-line on each series. If meanLine is not specified, returns the current meanLine setting.
  * @function
@@ -6830,211 +7207,6 @@ Line.prototype.scaleBandMode = attrFunc('scaleBandMode');
 Line.prototype.individualScale = attrFunc('individualScale');
 
 var line$2 = genFunc(Line);
-
-function _munge$4() {
-  var conditionFunc = function conditionFunc(dimensions, measures) {
-    var field = this.__execs__.field;
-    if (measures.length < 2) throw new ConditionException();
-    field.x = measureField(measures[0]);
-    field.y = measureField(measures[1]);
-    if (dimensions.length === 0 && measures.length === 2) return conditions$2[0];else if (dimensions.length === 1 && measures.length === 2) {
-      field.region = dimensionField(dimensions[0]);
-      return conditions$2[1];
-    } else if (dimensions.length === 0 && measures.length === 3) {
-      field.radius = measureField(measures[2]);
-      return conditions$2[2];
-    } else if (dimensions.length == 1 && measures.length === 3) {
-      field.radius = measureField(measures[2]);
-      field.region = dimensionField(dimensions[0]);
-      return conditions$2[3];
-    } else throw new ConditionException();
-  };
-  this.condition(conditionFunc);
-  this.limitRows();
-  if (this.aggregated()) {
-    this.__execs__.munged = [this.data()];
-  } else if (this.isColor()) {
-    this.__execs__.munged = this.aggregate(false, false).map(function (d) {
-      d.key = d.data.key;
-      return d;
-    });
-  } else {
-    this.__execs__.munged = [this.data().map(function (d) {
-      return { data: d };
-    })];
-  }
-}
-
-function _domain$5(keep) {
-  var scale = this.scale();
-  var munged = this.__execs__.munged;
-  var field = this.__execs__.field;
-  var aggregated = this.aggregated();
-
-  var regionDomain = void 0,
-      rDomain = void 0;
-
-  if (this.isColor()) {
-    regionDomain = field.region.munged(munged).domain();
-    scale.color = this.updateColorScale(regionDomain, keep);
-  }
-  if (this.isFacet()) {
-    scale.region = d3.scaleBand().domain(regionDomain).padding(this.regionPadding());
-    return;
-  }
-
-  var data = aggregated ? this.data().children : this.data();
-  var xDomain = d3.extent(data, function (d) {
-    return (aggregated ? d.data : d)[field.x.field()];
-  });
-  var yDomain = d3.extent(data, function (d) {
-    return (aggregated ? d.data : d)[field.y.field()];
-  });
-
-  scale.x = continousScale(xDomain, undefined, field.x);
-  scale.y = continousScale(yDomain, undefined, field.y);
-
-  if (this.isSized()) {
-    rDomain = d3.extent(data, function (d) {
-      return d[field.radius.field()];
-    });
-    scale.r = d3.scaleLinear().domain(rDomain);
-  }
-
-  this.setCustomDomain('x', xDomain);
-  this.setCustomDomain('y', yDomain);
-
-  return this;
-}
-
-function _range$4() {
-  var scale = this.scale();
-  var facet = this.facet();
-  var xAt = this.axisX();
-  var yAt = this.axisY();
-
-  if (this.isFacet()) {
-    scale.region.padding(this.regionPadding());
-    if (facet.orient === 'horizontal' && xAt) {
-      xAt.orient = 'top';
-      xAt.showDomain = false;
-      this.thickness(xAt, scale.region, true, true);
-      if (yAt) yAt.thickness = 0;
-    } else if (facet.orient === 'vertical' && yAt) {
-      yAt.orient = 'right';
-      yAt.showDomain = false;
-      this.thickness(yAt, scale.region, false, true);
-      if (xAt) xAt.thickness = 0;
-    }
-    var _innerSize = this.innerSize();
-    if (facet.orient === 'vertical') {
-      scale.region.rangeRound([0, _innerSize.height]);
-    } else {
-      scale.region.rangeRound([0, _innerSize.width]);
-    }
-    return;
-  }
-
-  if (this.isSized()) {
-    scale.r.range(this.size().range);
-  }
-
-  this.thickness(yAt, scale.y, false, false);
-  this.thickness(xAt, scale.x, true, false);
-
-  var innerSize = this.innerSize();
-  scale.x.rangeRound([0, innerSize.width]);
-  scale.y.rangeRound([innerSize.height, 0]); //reverse
-}
-
-function _mark$4() {
-  var _this = this;
-
-  var zoomed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-  var that = this;
-  var canvas = this.__execs__.canvas;
-  var scale = this.__execs__.scale;
-  var color = this.color();
-  var size = this.size();
-  var label = this.label();
-  var trans = d3.transition().duration(this.transition().duration).delay(this.transition().delay);
-  var field = this.__execs__.field;
-  var aggregated = this.aggregated();
-  var nested = this.isColor();
-
-  var xValue = function xValue(d) {
-    return scale.x(d.data[field.x.field()]);
-  };
-  var yValue = function yValue(d) {
-    return scale.y(d.data[field.y.field()]);
-  };
-  var rValue = function rValue(d) {
-    return _this.isSized() ? scale.r(d.data[field.radius.field()]) : size.range[0];
-  };
-  var colorValue = function colorValue() {
-    var d = d3.select(this.parentNode).datum();
-    return nested ? scale.color(d.data.key) : color[0];
-  };
-  var __local = function __local(selection) {
-    selection.each(function (d) {
-      d.x = xValue(d);
-      d.y = yValue(d);
-      d.color = colorValue.call(this);
-      d.r = rValue(d);
-      d.text = labelFormat(d.x) + ', ' + labelFormat(d.y);
-    });
-  };
-
-  var __pointInit = function __pointInit(selection) {
-    selection.attr('r', 0).attr('stroke', function (d) {
-      return d.color;
-    }).attr('stroke-width', '1px').attr('fill-opacity', 0.5).style('cursor', 'pointer');
-  };
-  var __point = function __point(selection) {
-    selection.transition(trans).attr('r', function (d) {
-      return d.r;
-    }).attr('stroke', function (d) {
-      return d.color;
-    });
-  };
-  var __labelInit = function __labelInit(selection) {
-    selection.each(function (d) {
-      var selection = d3.select(this);
-      selection.style('pointer-events', 'none').text(d.text);
-      that.styleFont(selection);
-    });
-  };
-  var __label = function __label(selection) {
-    selection.each(function (d) {
-      var selection = d3.select(this);
-      selection.attr('text-anchor', d.anchor).style('visibility', label ? 'visible' : 'hidden').transition(trans).attr('y', size.range[0]).text(d.text);
-      that.styleFont(selection);
-    });
-  };
-
-  var __appendPoints = function __appendPoints(selection) {
-    var point = selection.selectAll(that.nodeName()).data(function (d) {
-      return nested || aggregated ? d.children : d;
-    });
-    point.exit().remove();
-    var pointEnter = point.enter().append('g').attr('class', that.nodeName(true) + ' point').call(__local);
-    pointEnter.append('circle').call(__pointInit);
-    pointEnter.append('text').call(__labelInit);
-    point = pointEnter.merge(point).call(__local);
-
-    point.selectAll('circle').call(__point);
-    point.selectAll('text').call(__label);
-    point.each(function (d) {
-      var selection = d3.select(this);
-      if (!zoomed) selection = selection.transition(trans);
-      selection.attr('transform', 'translate(' + [d.x, d.y] + ')').style('fill', d.color);
-    });
-    that.__execs__.nodes = point;
-  };
-
-  canvas.selectAll(this.regionName()).call(__appendPoints);
-}
 
 function _axis$5() {
   var that = this;
@@ -7075,28 +7247,57 @@ function _axis$5() {
   this.renderAxis();
 }
 
-function _legend$5() {
-  var legendToggle = this.legend();
-  if (!legendToggle) return;
-  if (!this.isColor()) {
+function _domain$5() {
+  var keep = this.keep();
+  var scale = this.scale();
+  var munged = this.__execs__.munged;
+  var field = this.__execs__.field;
+  var aggregated = this.aggregated();
+  var viewInterval = this.viewInterval();
+
+  var regionDomain = void 0,
+      rDomain = void 0;
+
+  if (this.isColor()) {
+    regionDomain = field.region.munged(munged).domain();
+    scale.color = this.updateColorScale(regionDomain, keep);
+  }
+  if (this.isFacet()) {
+    scale.region = d3.scaleBand().domain(regionDomain).padding(this.regionPadding());
     return;
   }
-  this.renderLegend();
-}
 
-function _region$4() {
-  var aggregated = this.aggregated();
-  var scale = this.__execs__.scale;
-  var isFacet = this.isFacet();
-  var facet = this.facet();
-  this.renderRegion(function (d) {
-    if (aggregated) return;
-    var xy = [isFacet ? scale.region(d.key) : 0, 0];
-    if (facet.orient === 'vertical') xy.reverse();
-    d.x = xy[0];d.y = xy[1];
-  }, function (d) {
-    return d;
-  }, isFacet);
+  var data = aggregated ? this.data().children : this.data();
+  var xDomain = d3.extent(data, function (d) {
+    return (aggregated ? d.data : d)[field.x.field()];
+  });
+  var yDomain = d3.extent(data, function (d) {
+    return (aggregated ? d.data : d)[field.y.field()];
+  });
+  if (!keep) {
+    scale.x = continousScale(xDomain, undefined, field.x);
+    scale.y = continousScale(yDomain, undefined, field.y);
+  }
+
+  if (this.isSized()) {
+    rDomain = d3.extent(data, function (d) {
+      return d[field.radius.field()];
+    });
+    scale.r = d3.scaleLinear().domain(rDomain);
+  }
+  if (!keep && viewInterval) {
+    xDomain = this.limitViewInterval(scale.x, xDomain);
+    scale.x.domain(xDomain);
+  } else if (keep && this.stream()) {
+    xDomain = this.limitViewInterval(scale.x, xDomain, true);
+    scale.x.domain(xDomain);
+  } else {
+    this.setCustomDomain('x', xDomain);
+  }
+
+  this.setCustomDomain('y', yDomain);
+
+  return this;
 }
 
 function _facet$4() {
@@ -7164,6 +7365,209 @@ function _fitLine$1() {
   fitLineG.select('line').transition(trans).attr('x1', scale.x(xValues[0])).attr('y1', scale.y(yValues[0])).attr('x2', scale.x(xValues[1])).attr('y2', scale.y(yValues[1]));
 }
 
+function _legend$5() {
+  var legendToggle = this.legend();
+  if (!legendToggle) return;
+  if (!this.isColor()) {
+    return;
+  }
+  this.renderLegend();
+}
+
+function _range$4() {
+  var scale = this.scale();
+  var facet = this.facet();
+  var xAt = this.axisX();
+  var yAt = this.axisY();
+
+  if (this.isFacet()) {
+    scale.region.padding(this.regionPadding());
+    if (facet.orient === 'horizontal' && xAt) {
+      xAt.orient = 'top';
+      xAt.showDomain = false;
+      this.thickness(xAt, scale.region, true, true);
+      if (yAt) yAt.thickness = 0;
+    } else if (facet.orient === 'vertical' && yAt) {
+      yAt.orient = 'right';
+      yAt.showDomain = false;
+      this.thickness(yAt, scale.region, false, true);
+      if (xAt) xAt.thickness = 0;
+    }
+    var _innerSize = this.innerSize();
+    if (facet.orient === 'vertical') {
+      scale.region.rangeRound([0, _innerSize.height]);
+    } else {
+      scale.region.rangeRound([0, _innerSize.width]);
+    }
+    return;
+  }
+
+  if (this.isSized()) {
+    scale.r.range(this.size().range);
+  }
+
+  this.thickness(yAt, scale.y, false, false);
+  if (!this.stream()) this.thickness(xAt, scale.x, true, false);
+
+  var innerSize = this.innerSize();
+  scale.x.rangeRound([0, innerSize.width]);
+  scale.y.rangeRound([innerSize.height, 0]); //reverse
+}
+
+function _mark$4() {
+  var _this = this;
+
+  var zoomed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+  var that = this;
+  var canvas = this.__execs__.canvas;
+  var scale = this.__execs__.scale;
+  var color = this.color();
+  var size = this.size();
+  var label = this.label();
+  var trans = d3.transition().duration(this.transition().duration).delay(this.transition().delay);
+  var field = this.__execs__.field;
+  var aggregated = this.aggregated();
+  var nested = this.isColor();
+  var stream = this.stream();
+
+  var xValue = function xValue(d) {
+    return scale.x(d.data[field.x.field()]);
+  };
+  var yValue = function yValue(d) {
+    return scale.y(d.data[field.y.field()]);
+  };
+  var rValue = function rValue(d) {
+    return _this.isSized() ? scale.r(d.data[field.radius.field()]) : size.range[0];
+  };
+  var colorValue = function colorValue() {
+    var d = d3.select(this.parentNode).datum();
+    return nested ? scale.color(d.data.key) : color[0];
+  };
+  var __local = function __local(selection) {
+    selection.each(function (d) {
+      d.x = xValue(d);
+      if (stream) {
+        var curX = d.data[field.x.field()];
+        var dist = that.distDomain(scale.x);
+        if (curX > scale.x._lastDomain[scale.x._lastDomain.length - 1]) {
+          d.x0 = d.x + dist;
+        }
+      }
+      d.y = yValue(d);
+      d.color = colorValue.call(this);
+      d.r = rValue(d);
+      d.text = labelFormat(d.x) + ', ' + labelFormat(d.y);
+    });
+  };
+
+  var __pointInit = function __pointInit(selection) {
+    selection.attr('r', 0).attr('stroke', function (d) {
+      return d.color;
+    }).attr('stroke-width', '1px').attr('fill-opacity', 0.5).style('cursor', 'pointer');
+  };
+  var __point = function __point(selection) {
+    selection.transition(trans).attr('r', function (d) {
+      return d.r;
+    }).attr('stroke', function (d) {
+      return d.color;
+    });
+  };
+  var __labelInit = function __labelInit(selection) {
+    selection.each(function (d) {
+      var selection = d3.select(this);
+      selection.style('pointer-events', 'none').text(d.text);
+      that.styleFont(selection);
+    });
+  };
+  var __label = function __label(selection) {
+    selection.each(function (d) {
+      var selection = d3.select(this);
+      selection.attr('text-anchor', d.anchor).style('visibility', label ? 'visible' : 'hidden').transition(trans).attr('y', size.range[0]).text(d.text);
+      that.styleFont(selection);
+    });
+  };
+
+  var __appendPoints = function __appendPoints(selection) {
+    var point = selection.selectAll(that.nodeName()).data(function (d) {
+      return nested || aggregated ? d.children : d;
+    });
+    point.exit().remove();
+    var pointEnter = point.enter().append('g').attr('class', that.nodeName(true) + ' point').call(__local).attr('transform', function (d) {
+      return 'translate(' + [d.x0 || d.x, d.y] + ')';
+    });
+    pointEnter.append('circle').call(__pointInit);
+    pointEnter.append('text').call(__labelInit);
+    point = pointEnter.merge(point).call(__local);
+
+    point.selectAll('circle').call(__point);
+    point.selectAll('text').call(__label);
+    point.each(function (d) {
+      var selection = d3.select(this);
+      if (!zoomed) selection = selection.transition(trans);
+      selection.attr('transform', 'translate(' + [d.x, d.y] + ')').style('fill', d.color);
+    });
+    that.__execs__.nodes = point;
+  };
+
+  canvas.selectAll(this.regionName()).call(__appendPoints);
+}
+
+function _munge$4() {
+  var conditionFunc = function conditionFunc(dimensions, measures) {
+    var field = this.__execs__.field;
+    if (measures.length < 2) throw new ConditionException();
+    field.x = measureField(measures[0]);
+    field.y = measureField(measures[1]);
+    if (dimensions.length === 0 && measures.length === 2) return conditions$2[0];else if (dimensions.length === 1 && measures.length === 2) {
+      field.region = dimensionField(dimensions[0]);
+      return conditions$2[1];
+    } else if (dimensions.length === 0 && measures.length === 3) {
+      field.radius = measureField(measures[2]);
+      return conditions$2[2];
+    } else if (dimensions.length == 1 && measures.length === 3) {
+      field.radius = measureField(measures[2]);
+      field.region = dimensionField(dimensions[0]);
+      return conditions$2[3];
+    } else throw new ConditionException();
+  };
+  this.condition(conditionFunc);
+  this.limitRows();
+  if (this.aggregated()) {
+    this.__execs__.munged = [this.data()];
+  } else if (this.isColor()) {
+    this.__execs__.munged = this.aggregate(false, false).map(function (d) {
+      d.key = d.data.key;
+      return d;
+    });
+  } else {
+    this.__execs__.munged = [this.data().map(function (d) {
+      return { data: d };
+    })];
+  }
+}
+
+function _panning$3() {
+  if (this.stream()) {
+    this.streamPanning(this.__execs__.scale.x);
+  }
+}
+
+function _region$4() {
+  var aggregated = this.aggregated();
+  var scale = this.__execs__.scale;
+  var isFacet = this.isFacet();
+  var facet = this.facet();
+  this.renderRegion(function (d) {
+    if (aggregated) return;
+    var xy = [isFacet ? scale.region(d.key) : 0, 0];
+    if (facet.orient === 'vertical') xy.reverse();
+    d.x = xy[0];d.y = xy[1];
+  }, function (d) {
+    return d;
+  }, isFacet);
+}
+
 function _tooltip$5() {
   if (!this.tooltip() || this.isFacet()) return;
 
@@ -7228,14 +7632,13 @@ function _brushZoom$2() {
 function normal$1() {
   var _this = this;
 
-  var parent = this.parent();
   var zoomExtent = this.zoomExtent(this.isColor(), true);
   var zoomGen = d3.zoom().scaleExtent(zoomExtent).translateExtent([[0, 0], [this.width(), this.height()]]);
   this.__execs__.canvas.call(zoomGen);
 
   this.zoomGen(zoomGen).zoomed(function () {
     _mark$4.call(_this, true); //re-render mark
-    d3.select((parent ? parent : _this).__execs__.canvas.node().parentNode.parentNode).selectAll(className('tooltip', true)).remove(); //FIXME: currently, remove existing tooltip
+    _this.resetTooltip();
     _tooltip$5.call(_this); //re-render tooltip
   }, true);
 }
@@ -7247,7 +7650,7 @@ function _zoom$2() {
 
 var size$3 = { range: [3, 12], scale: 'linear', reverse: false };
 var conditions$2 = ['normal', 'color', 'bubble', 'mixed'];
-var _attrs$18 = {
+var _attrs$19 = {
   regionPadding: 0.1,
   size: size$3
 };
@@ -7260,6 +7663,7 @@ var _attrs$18 = {
  * @augments BrushMixin
  * @augments ZoomMixin
  * @augments PaddingMixin
+ * @augments StreamMixin
  */
 
 var Scatter = function (_mix$with) {
@@ -7270,12 +7674,12 @@ var Scatter = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Scatter.__proto__ || Object.getPrototypeOf(Scatter)).call(this));
 
-    _this.setAttrs(_attrs$18);
+    _this.setAttrs(_attrs$19);
     _this.process('munge', _munge$4, { isPre: true }).process('domain', _domain$5, { isPre: true }).process('range', _range$4, { isPre: true }).process('axis', _axis$5).process('fitLine', _fitLine$1).process('region', _region$4).process('facet', _facet$4, { allow: function allow() {
         return this.isFacet();
       } }).process('mark', _mark$4, { allow: function allow() {
         return !this.isFacet();
-      } }).process('legend', _legend$5).process('tooltip', _tooltip$5).process('zoom', _zoom$2);
+      } }).process('legend', _legend$5).process('tooltip', _tooltip$5).process('panning', _panning$3).process('zoom', _zoom$2);
     return _this;
   }
 
@@ -7326,7 +7730,7 @@ var Scatter = function (_mix$with) {
     }
   }]);
   return Scatter;
-}(mix(Facet).with(fitLineMixin, brushMixin, zoomMixin, paddingMixin));
+}(mix(Facet).with(fitLineMixin, brushMixin, zoomMixin, paddingMixin, streamMixin));
 
 var scatter = genFunc(Scatter);
 
@@ -7540,7 +7944,7 @@ function _tooltip$7() {
 }
 
 var conditions$3 = ['normal', 'count'];
-var _attrs$19 = {
+var _attrs$20 = {
   color: continousColorScheme,
   padding: 0.05,
   reverse: false
@@ -7560,7 +7964,7 @@ var XYHeatmap = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (XYHeatmap.__proto__ || Object.getPrototypeOf(XYHeatmap)).call(this));
 
-    _this.setAttrs(_attrs$19);
+    _this.setAttrs(_attrs$20);
     _this.process('munge', _munge$6, { isPre: true }).process('domain', _domain$7, { isPre: true }).process('range', _range$6, { isPre: true }).process('region', _region$6).process('axis', _axis$7).process('mark', _mark$6).process('spectrum', _legend$7).process('tooltip', _tooltip$7);
     return _this;
   }
@@ -7845,7 +8249,7 @@ function _tooltip$9() {
 
 var shapes$1 = ['treemap', 'pack', 'word'];
 var conditions$4 = ['normal', 'count'];
-var _attrs$20 = {
+var _attrs$21 = {
   autoResizeSkip: ['domain'], //treemap needs to re-munge beacuase of using .treemap method
   color: continousColorScheme,
   reverse: false,
@@ -7869,7 +8273,7 @@ var Treemap = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Treemap.__proto__ || Object.getPrototypeOf(Treemap)).call(this));
 
-    _this.setAttrs(_attrs$20);
+    _this.setAttrs(_attrs$21);
     _this.process('munge', _munge$8, { isPre: true }).process('domain', _domain$9, { isPre: true }).process('range', _range$8, { isPre: true }).process('mark', _mark$8).process('spectrum', _legend$8).process('tooltip', _tooltip$9);
     return _this;
   }
@@ -8289,7 +8693,7 @@ function _brush$2() {
 var size$4 = { range: [1, 1], scale: 'linear', reverse: false };
 var shapes$2 = ['par-coords', 'scatter-matrix'];
 var conditions$5 = ['normal', 'color'];
-var _attrs$21 = {
+var _attrs$22 = {
   regionPadding: 0.1,
   size: size$4,
   shape: shapes$2[0]
@@ -8314,7 +8718,7 @@ var ParCoords = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (ParCoords.__proto__ || Object.getPrototypeOf(ParCoords)).call(this));
 
-    _this.setAttrs(_attrs$21);
+    _this.setAttrs(_attrs$22);
     _this.brush(true);
     _this.process('munge', _munge$10, { isPre: true }).process('domain', _domain$11, { isPre: true }).process('range', _range$10, { isPre: true }).process('axis', _axis$9).process('region', _region$8).process('mark', _mark$10, { allow: function allow() {
         return this.isParcoords();
@@ -8567,7 +8971,7 @@ function _tooltip$11() {
 
 var size$5 = { range: [0, 150], scale: 'linear', reverse: false };
 var conditions$6 = ['normal', 'count'];
-var _attrs$22 = {
+var _attrs$23 = {
   limitKeys: 20,
   padding: 0,
   size: size$5
@@ -8589,7 +8993,7 @@ var Pie = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Pie.__proto__ || Object.getPrototypeOf(Pie)).call(this));
 
-    _this.setAttrs(_attrs$22);
+    _this.setAttrs(_attrs$23);
     _this.process('munge', _munge$12, { isPre: true }).process('domain', _domain$13, { isPre: true }).process('mark', _mark$12).process('legend', _legend$11).process('tooltip', _tooltip$11);
     return _this;
   }
@@ -8838,7 +9242,7 @@ var lngMeasure = { field: '__--jelly-lng--__' };
 
 var size$6 = { range: [0.5, 4], scale: 'linear', reverse: false };
 var conditions$7 = ['normal', 'point'];
-var _attrs$23 = {
+var _attrs$24 = {
   addr: false,
   mapBaseType: 'ROADMAP', // ROADMAP SKYVIEW HYBRID
   needCanvas: false,
@@ -8859,7 +9263,7 @@ var MarkerMap = function (_Default) {
 
     var _this = possibleConstructorReturn(this, (MarkerMap.__proto__ || Object.getPrototypeOf(MarkerMap)).call(this));
 
-    _this.setAttrs(_attrs$23);
+    _this.setAttrs(_attrs$24);
     _this.__execs__.dispatch = d3.dispatch('loading', 'end');
     rebindOnMethod(_this, _this.__execs__.dispatch);
     _this.process('munge', _munge$14, { isPre: true }).process('domain', _domain$15, { isPre: true }).process('map', _map).process('mark', _mark$14);
@@ -9023,7 +9427,7 @@ function _tooltip$13() {
 
 var size$7 = { range: [2, 2], scale: 'linear', reverse: false };
 var conditions$8 = ['normal'];
-var _attrs$24 = {
+var _attrs$25 = {
   padding: 0.05,
   point: false,
   pointRatio: 3,
@@ -9047,7 +9451,7 @@ var Combo = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Combo.__proto__ || Object.getPrototypeOf(Combo)).call(this));
 
-    _this.setAttrs(_attrs$24);
+    _this.setAttrs(_attrs$25);
     _this.process('munge', _munge$16, { isPre: true }).process('domain', _domain$17, { isPre: true }).process('region', _region$10).process('facet', _facet$8).process('axis', _axis$11).process('legend', _legend$13).process('tooltip', _tooltip$13);
     return _this;
   }

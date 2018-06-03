@@ -47,14 +47,7 @@
 			<li class="dropdown">
 				<a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#autoResize">autoResize</a></li>
+					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="StreamMixin.html">StreamMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
 				</ul>
 			</li>
 			
@@ -100,12 +93,14 @@ import zoomMixin from '../zoomMixin';
 import paddingMixin from '../paddingMixin';
 import shapeMixin from '../shapeMixin';
 import stackMixin from '../stackMixin';
+import streamMixin from '../streamMixin';
 import {mixedMeasure} from '../../modules/measureField';
 import {attrFunc, genFunc, mix} from '../../modules/util';
 import _brush from './_brush';
 import _brushZoom from './_brushZoom';
 import _mark from './_mark';
 import _munge from './_munge';
+import _panning from './_panning';
 import _domain from './_domain';
 import _range from './_range';
 import _axis from './_axis';
@@ -145,8 +140,9 @@ const _attrs = {
  * @augments ZoomMixin
  * @augments PaddingMixin
  * @augments ShapeMixin
+ * @augments StreamMixin
  */
-class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin) {
+class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin, streamMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
@@ -163,6 +159,7 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
       .process('meanLine', _meanLine, {allow: function() {return !this.isBrushZoom()}})
       .process('fitLine', _fitLine, {allow: function() {return !this.isBrushZoom()}})
       .process('tooltip', _tooltip, {allow: function() {return !this.isBrushZoom()}})
+      .process('panning', _panning, {allow: function() {return !this.isBrushZoom()}})
       .process('zoom', _zoom, {allow: function() {return !this.isBrushZoom()}})
       .process('brush', _brush, {allow: function() {return !this.isBrushZoom()}})
       .process('legend', _legend, {allow: function() {return !this.isBrushZoom()}})

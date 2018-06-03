@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Jelly-Chart Global</title>
+	<title>Jelly-Chart Source: streamMixin/stream.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -47,14 +47,7 @@
 			<li class="dropdown">
 				<a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#autoResize">autoResize</a></li>
+					<li><a href="BrushMixin.html">BrushMixin</a></li><li><a href="FitLineMixin.html">FitLineMixin</a></li><li><a href="PaddingMixin.html">PaddingMixin</a></li><li><a href="SeriesMixin.html">SeriesMixin</a></li><li><a href="ShapeMixin.html">ShapeMixin</a></li><li><a href="SortMixin.html">SortMixin</a></li><li><a href="StackMixin.html">StackMixin</a></li><li><a href="StreamMixin.html">StreamMixin</a></li><li><a href="ZoomMixin.html">ZoomMixin</a></li>
 				</ul>
 			</li>
 			
@@ -81,299 +74,46 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	<h1 class="page-title">Global</h1>
+		<h1 class="page-title">Source: streamMixin/stream.js</h1>
+    
 <section>
-
-<header>
-    
-        <h2>
-        
-        </h2>
-        
-    
-</header>
-
-
-<article>
-    <div class="container-overview">
-    
-        
-
-        
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id="autoResize"><span class="type-signature"></span>autoResize( [autoResize])</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        If autoResize is true, it will ignore current width setting and change the chart's width according to the containers's width. If autoResize is not specified, returns the current autoResize setting.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>autoResize</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last">If is true, resizes the chart's width according to the containers's width</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="core_autoResize.js.html">core/autoResize.js</a>,
-				 <a href="core_autoResize.js.html#sunlight-1-line-8">line 8</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    <ul>
-            <li>
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#autoResize">autoResize</a></span>
-|
-
-<span class="param-type"><a href="Core.html">Core</a></span>
-
-
-
-    </dd>
-</dl>
-
-</li>
-        
-            <li>
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#autoResize">autoResize</a></span>
-|
-
-<span class="param-type"><a href="Core.html">Core</a></span>
-
-
-
-    </dd>
-</dl>
-
-</li>
-        </ul>
-
-    
-</dd>
-
-        </dl>
-    
-
-    
-
-    
-</article>
-
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">/**
+ * If stream is an object or an array of objects, appends the stream to existing data. If stream is specified, during re-rendering, it will keeps the domain interval limited by {@link StreamMixin#viewInterval viewInterval}. When re-renders chart, should use .render(true).
+ * If stream is not specified, returns the existing stream.
+ * @memberOf StreamMixin#
+ * @function
+ * @example
+ * stream.stream({category:'A', sales: 100})
+ *  .render(true);
+ * 
+ * stream.stream([
+ *  {category: 'D', sales: 100}, 
+ *  {category: 'E', sales: 200}
+ * ]).render(true);
+ * @param {object|Object[]} [stream=null] 
+ * @return {zoom|ZoomMixin}
+ */
+function stream(stream) {
+  if (!arguments.length) return this.__execs__.stream;
+  if (stream) {
+    if (!Array.isArray(stream)) stream = [stream];
+    this.data(this.data().concat(stream));
+  }
+  this.__execs__.stream = stream;
+  return this;
+}
+
+export default stream;</pre>
+    </article>
 </section>
+
 
 
 
@@ -383,10 +123,6 @@
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>
