@@ -1,5 +1,6 @@
 const allowThreshold = 20;
 /**
+ * @memberOf Core#
  * If autoResize is true, it will ignore current width setting and change the chart's width according to the containers's width. If autoResize is not specified, returns the current autoResize setting. 
  * @return {autoResize|Core}
  * @param {boolean} [autoResize=false] If is true, resizes the chart's width according to the containers's width
