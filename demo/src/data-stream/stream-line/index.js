@@ -9,7 +9,14 @@ var line = jelly.line().container('#jelly-container')
   {category:'BBB', x: 1000, y: 20},{category:'BBB', x: 2000, y: 60},
   {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 60}
 ])
-.dimensions({field: 'x'})
+.dimensions([
+  {
+    field: 'x',
+    order: 'ascending'
+  }, {
+    field: 'category',
+    order: 'descending'
+  }])
 .measures({field:'y', op:'mean', customDomain: [0, 100]})
 .viewInterval(3000)
 .axis('x').axis('y')
@@ -23,6 +30,6 @@ var timer = setInterval(function() {
     {category:'AAA', x: lastValue, y: Math.random() * 100},
     {category:'BBB', x: lastValue, y: Math.random() * 100}
   ]).render(true);
-  if (lastValue > 5000) clearInterval(timer);
+  if (lastValue > 10000) clearInterval(timer);
 }, 1400);
 

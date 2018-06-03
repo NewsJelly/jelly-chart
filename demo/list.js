@@ -304,6 +304,11 @@ module.exports = [
     path: 'no-ticks',
     title: 'No Axis Ticks'
   },
+  {
+    category: 'Axis',
+    path: 'axis-sub-tick',
+    title: 'Sub Axis Ticks'
+  },
   //Event
   {
     category: 'Interaction',
@@ -367,6 +372,7 @@ module.exports = [
     path: 'sort-value-xyheatmap',
     title: 'Sort By Values: XY Heatmap'
   },
+  //Data Stream
   {
     category: 'Data Stream',
     path: 'stream-bar',
@@ -387,9 +393,5 @@ module.exports = [
     path: 'stream-line-time',
     title: 'Data Stream: Line with Time Interval'
   },
-  {
-    category: 'Data Stream',
-    path: 'stream-line-time-format',
-    title: 'Data Stream: Line with Tick Format'
-  },
+  
 ]

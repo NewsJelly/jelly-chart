@@ -15,7 +15,7 @@ var line = jelly.line().container('#jelly-container')
     field: 'date', 
     interval: 'month',
     format: '%m',
-    formatSub: '%Y'
+    formatSub: '%Y' //add sub-tick format shown on the dimension's axis.
   })
   .measures([{field: 'value', op:'mean', customDomain: [0, 1000]}])
   .viewInterval('year')

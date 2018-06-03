@@ -14,7 +14,8 @@ var line = jelly.line().container('#jelly-container')
   .dimensions({
     field: 'date', 
     interval: 'day',
-    format: '%Y-%m'
+    format: '%Y-%m',
+    formatSub: '%Y'
   })
   .measures([{field: 'value', op:'mean', customDomain: [0, 1000]}])
   .viewInterval('month', 3)
