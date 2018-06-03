@@ -30,3 +30,27 @@ tape('jelly-chart mono scatter', function(test) {
   
   test.end();
 });
+
+tape('jelly-chart streaming mono scatter', function(test) {
+  const container = 'jelly-test-container';
+  d3.select('body').append('div').attr('id', container);
+  let scatter = jelly.scatter()
+    .data(defaultRandTable(200))
+    .container(`#${container}`)
+    .width(520).height(480)
+    .measures(['number0', 'number1'])
+    .axis('x').axis('y');
+  scatter.render();
+  scatter.stream([
+    {number0: 100, number1: 100},
+    {number0: 200, number1: 200}
+  ]).render(true);
+  const canvas = scatter.__execs__.canvas;
+
+  test.test('should have 200 points', function(test) {
+    test.equal(canvas.selectAll('.jellychart-node').size(), 202);
+    test.end();
+  });
+  
+  test.end();
+});

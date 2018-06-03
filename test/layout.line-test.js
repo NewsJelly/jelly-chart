@@ -31,6 +31,26 @@ tape('jelly-chart mono line', function(test) {
   test.end();
 });
 
+tape('jelly-chart streaming mono line', function(test) {
+  const container = 'jelly-test-container-streaming-mono';
+  d3.select('body').append('div').attr('id', container);
+  let line = jelly.line()
+    .data(defaultRandTable())
+    .container(`#${container}`)
+    .width(520).height(480)
+    .dimensions(['category0'])
+    .measures(['number1'])
+    .axis('x').axis('y');
+  line.render();
+  line.stream([{category0: "DDD", number0: 100}]).render(true);
+  const canvas = line.__execs__.canvas;
+  test.test('streaming mono line should have 4 points', function(test) {
+    test.equal(canvas.selectAll('.jellychart-node').size(), 4);
+    test.end();
+  });
+  test.end();
+});
+
 tape('jelly-chart multi-series line', function(test) {
   const container = 'jelly-test-container-multi';
   d3.select('body').append('div').attr('id', container);
