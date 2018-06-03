@@ -50,22 +50,24 @@ function _domain() {
     if(isNaN(d)) {
       isNumberDomain = false;
       break;
-    } 
+    } else if (typeof d === 'string') {
+      xDomain[i] = +d;
+    }
   }
   
-    if (this.scaleBandMode()) {
-      if (!keep) scale.x = scaleBand().padding(this.padding());
-    } else if (field.x.interval() || isNumberDomain) { 
-      if (field.x.order() === 'natural') {
-        if (xDomain[0] instanceof Date) xDomain = extent(xDomain); 
-        else xDomain = extent(xDomain.map(d => +d)); 
-      } else {
-        xDomain = [xDomain[0], xDomain[xDomain.length-1]]
-      }
-      if (!keep) scale.x = continousScale(xDomain, null, field.x);
+  if (this.scaleBandMode()) {
+    if (!keep) scale.x = scaleBand().padding(this.padding());
+  } else if (field.x.interval() || isNumberDomain) { 
+    if (field.x.order() === 'natural') {
+      if (xDomain[0] instanceof Date) xDomain = extent(xDomain); 
+      else xDomain = extent(xDomain.map(d => +d)); 
     } else {
-      if (!keep) scale.x = scalePoint().padding(this.padding());
+      xDomain = [xDomain[0], xDomain[xDomain.length-1]]
     }
+    if (!keep) scale.x = continousScale(xDomain, null, field.x);
+  } else {
+    if (!keep) scale.x = scalePoint().padding(this.padding());
+  }
   
   
   if (!keep && viewInterval) {
