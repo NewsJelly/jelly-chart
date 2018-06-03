@@ -65,7 +65,7 @@ function render(keep = false, skip = []) {
     node.call(bindOn, dispatch);
   }
 
-  if (this.stream() && keep) {
+  if (this.stream && this.stream() && keep) {
     this.stream(null);
   }
 
