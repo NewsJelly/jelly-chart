@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Jelly-Chart Demo: Marker Map w/ coordinates</title>
+  <title>Jelly-Chart Demo: Bar &amp; Line Combo Chart</title>
   <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.css">
   <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
   <link type="text/css" rel="stylesheet" href="../style/demo.css">
@@ -11,7 +11,6 @@
   <script src="//d3js.org/d3.v4.min.js"></script>
     <script src="../release/latest/dist/jelly.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-    <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=7fd8127881fe4e612aabd7d3aca98636&libraries=services"></script>
   <script>
     hljs.initHighlightingOnLoad();
   </script>
@@ -59,7 +58,7 @@
         <div>
           <h3>Combo</h3>
           <ul>
-            <li class=""><a href="combo">Bar &amp; Line Combo Chart</a></li>
+            <li class="selected"><a href="combo">Bar &amp; Line Combo Chart</a></li>
           </ul>
         </div>
         <div>
@@ -105,7 +104,7 @@
           <h3>Marker Map</h3>
           <ul>
             <li class=""><a href="address-marker-map">Marker Map w/ addresses</a></li>
-            <li class="selected"><a href="coordinate-marker-map">Marker Map w/ coordinates</a></li>
+            <li class=""><a href="coordinate-marker-map">Marker Map w/ coordinates</a></li>
           </ul>
         </div>
         <div>
@@ -193,7 +192,7 @@
   <div id="wrapper">
     <div>
     <section id="content">
-      <h2>📊 Marker Map w/ coordinates</h2>
+      <h2>📊 Bar &amp; Line Combo Chart</h2>
       
       <div>
          
@@ -202,20 +201,21 @@
       <div class="desc"></div>
       
       <h3>🔑  Sample Code </h3>
-      <pre><code class="javascript">var latLngPoints = []
-for (var i = 0; i < 20; i++ ) {
-  latLngPoints.push({
-    lat: 36.5 + (Math.random()-0.5) * 0.5, 
-    lng: 128 + (Math.random()-0.5) * 0.5, 
-    key : (i+1), 
-    value : Math.random()*100
-  });
-}
-
-jelly.markerMap().data(latLngPoints)
+      <pre><code class="javascript">jelly.combo()
   .container('#jelly-container')
-  .dimensions(['key']) 
-  .measures(['lat', 'lng', 'value'])
+  .data([
+    {name: 'A', valueBar: 10, valueLine: 100},
+    {name: 'B', valueBar: 20, valueLine: 200},
+    {name: 'C', valueBar: 30, valueLine: 300},
+    {name: 'D', valueBar: 40, valueLine: 400},
+    {name: 'A', valueBar: 20, valueLine: 200},
+    {name: 'B', valueBar: 10, valueLine: 100},
+    {name: 'C', valueBar: 40, valueLine: 400},
+    {name: 'D', valueBar: 10, valueLine: 100}
+  ])
+  .dimensions(['name'])
+  .measures(['valueBar', 'valueLine'])
+  .axis('x').axis('y')
   .render();</code></pre>
     
       <footer>
@@ -227,20 +227,21 @@ jelly.markerMap().data(latLngPoints)
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       setTimeout(function() {
-        var latLngPoints = []
-for (var i = 0; i < 20; i++ ) {
-  latLngPoints.push({
-    lat: 36.5 + (Math.random()-0.5) * 0.5, 
-    lng: 128 + (Math.random()-0.5) * 0.5, 
-    key : (i+1), 
-    value : Math.random()*100
-  });
-}
-
-jelly.markerMap().data(latLngPoints)
+        jelly.combo()
   .container('#jelly-container')
-  .dimensions(['key']) 
-  .measures(['lat', 'lng', 'value'])
+  .data([
+    {name: 'A', valueBar: 10, valueLine: 100},
+    {name: 'B', valueBar: 20, valueLine: 200},
+    {name: 'C', valueBar: 30, valueLine: 300},
+    {name: 'D', valueBar: 40, valueLine: 400},
+    {name: 'A', valueBar: 20, valueLine: 200},
+    {name: 'B', valueBar: 10, valueLine: 100},
+    {name: 'C', valueBar: 40, valueLine: 400},
+    {name: 'D', valueBar: 10, valueLine: 100}
+  ])
+  .dimensions(['name'])
+  .measures(['valueBar', 'valueLine'])
+  .axis('x').axis('y')
   .render();
       }, 200);
     });
