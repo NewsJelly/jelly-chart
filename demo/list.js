@@ -116,6 +116,12 @@ module.exports = [
     path: 'meanline-line',
     title: 'Mean Line on Line Chart'
   },
+  //Combo
+  {
+    category: 'Combo',
+    path: 'combo',
+    title: 'Bar & Line Combo Chart'
+  },
   //Pie
   {
     category: 'Pie',
