@@ -11,7 +11,7 @@ function thickness(axisSetting, scale, isHorizontal = true, isOrdinal = true) {
   if (!(axisSetting && axisSetting.showTicks) || (axisSetting && axisSetting.autoTickFormat)) return;
   
   let font = axisSetting.font || defaultFont;
-  let tickFormat = axisSetting.tickFormat || (isOrdinal ? tickFormatForOrdinal : tickFormatForContinious(scale.domain()));
+  let tickFormat = axisSetting.tickFormat || (isOrdinal ? tickFormatForOrdinal : (axisSetting.autoTickFormat && tickFormatForContinious(scale.domain())));
   let ticks = isOrdinal ? scale.domain() : scale.ticks();
   if (scale._field) {
     let field = scale._field;
