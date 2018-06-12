@@ -44,6 +44,7 @@ function renderLegend(field = 'region') {
   let colorScale = this.scale().color;
   let legendObj = legend().scale(colorScale)
     .x(x).y(y)
+    .align(legendToggle.align)
     .width(width).height(height)
     .orient(legendToggle.orient)
     .format(legendToggle.format)

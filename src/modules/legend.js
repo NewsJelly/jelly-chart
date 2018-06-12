@@ -9,9 +9,11 @@ const defaultFont = {
 };
 const areaClipPath = className('legend-area-clip-path');
 const labelClipPath = className('legend-label-clip-path');
+const aligns = ['start', 'middle', 'bottom'];
 const orients = ['top', 'bottom'];
 const highlightDuration = 180;
 const _attrs = {
+  align: aligns[0],
   color: '#485465',
   muteIntensity: 0.3,
   font: defaultFont,
@@ -48,6 +50,22 @@ function _style(selection) {
   for (var k in font) {
     selection.style(k, (k === 'font-size' ? font[k] + 'px' : font[k]));
   }
+}
+
+function _align(selection) {
+  const area = selection.select(className('label-area', true));
+  const width = this.width();
+  const align = this.align();
+  const areaWidth = area.node().getBBox().width;
+  let alignPos = 0;
+  
+  if (align === aligns[1]) { //middle
+    alignPos = Math.round((width - areaWidth) /2); 
+  } else if (align === aligns[2]) { //end
+    alignPos = width - areaWidth;
+  }
+  area.attr('transform', `translate(${alignPos},0)`);
+  return selection;
 }
 
 function _arrow(selection, that, rowNum) {
@@ -275,6 +293,7 @@ function render(selection) {
   _style.call(this, selection);
   _render.call(this, selection);
   _overflow.call(this, selection);
+  _align.call(this, selection);
 }
 Legend.prototype.demute = demute;
 Legend.prototype.mute = mute;

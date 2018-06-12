@@ -11,16 +11,18 @@ const verticalThickness = 162;
  * core.legend();
  * @param {boolean|string|object} [legend] sets a legend type. If is a false, removes the legend.
  * @param {string} legend.orient=bottom sets a legend orient(top|right|bottom|left)
+ * @param {string} [legend.align=start] sets a legend align(start|middle|end)
  * @param {number} [legend.thickness=(54|162)] sets a legend thickness. if the orient is top or bottom, the default thickness is 54 pixels. Otherwise, it would be 162 pixels.
  * @return {legend|Core}
  */
 function legend (legend) { 
   if (!arguments.length) return this.__attrs__.legend;
-  if (legend === true) this.__attrs__.legend = {orient: 'bottom', thickness: horizontalThickness  }
+  if (legend === true) this.__attrs__.legend = {orient: 'bottom', align: 'start', thickness: horizontalThickness  }
   else if (legend === false) this.__attrs__.legend = null;
   else if (typeof legend === 'object') {
     if(!legend.orient) legend.orient = 'bottom';
     if(!legend.thickness) legend.thickness = (legend.orient === 'bottom' || legend.orient === 'top') ? horizontalThickness : verticalThickness;
+    if(!legend.align) legend.thickness = 'start';
     this.__attrs__.legend = legend;
   }
   return this;
