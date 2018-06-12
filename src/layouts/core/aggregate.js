@@ -50,10 +50,10 @@ function dateKey (result, reverse, preFormat) {
  * @param {boolean} sum=true sums values of children
  * @return {hierarchy}
  */
-function aggregate (reverse = false, rollup = true, preFormat = false, useHierarchy = true, sum = true) {
+function aggregate (reverse = false, rollup = true, preFormat = false, useHierarchy = true, sum = true, dimensions, measures) {
   let data = this.data();
-  let dimensions = this.dimensions();
-  let measures = this.measures();
+  dimensions = dimensions || this.dimensions();
+  measures = measures || this.measures();
   let nested = nest();
   for (let i = 0 ; i < dimensions.length ; i++) {
     let dim = reverse ? dimensions[dimensions.length - 1 - i] : dimensions[i] ;

@@ -15,7 +15,16 @@ function _munge() {
     } else throw new ConditionException();
   };
   this.condition(conditionFunc);
-  this.__execs__.munged = this.data();
+  //TODO: yBar munged, yLine munged;
+  /*
+  this.__execs__.munged = this.aggregate(this.facet() && !this.stacked());
+    }
+    if (!this.isNested()) this.__execs__.munged = [this.__execs__.munged[0].parent];
+
+  aggregate (reverse = false, rollup = true, preFormat = false, useHierarchy = true, sum = true, dimensions, measures) {
+  */
+  
+  this.__execs__.munged = this.aggregate();
 }
 
 export default _munge;

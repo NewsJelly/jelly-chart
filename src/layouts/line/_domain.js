@@ -1,5 +1,6 @@
 import {extent, scaleBand, scalePoint, scaleLinear} from 'd3';
 import {continousScale} from '../../modules/transform';
+import {domainY} from './index';
 
 function individualDomain (target, measureField, padding = 0) {
   let field = measureField.field();
@@ -41,8 +42,7 @@ function _domain() {
   } 
   
   xDomain = field.x.munged(munged).level(level).domain();
-  yDomain = field.y.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);
-  
+  yDomain = domainY(field.y, munged, level, aggregated, stacked);
   //use scaleLinear when domain is number
   let isNumberDomain = true;
   for (let i = 0; i < xDomain.length; i++) {

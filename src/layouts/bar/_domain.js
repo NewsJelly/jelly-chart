@@ -1,4 +1,5 @@
 import {scaleBand, scaleLinear} from 'd3';
+import { domainY } from './index';
 
 function _domain() { //set scales and domains
   const keep = this.keep();
@@ -30,21 +31,12 @@ function _domain() { //set scales and domains
   xDomain = field.x.level(level)
     .munged(munged)
     .domain(!isNestedAndSortByValue && this.sortByValue());
-  yDomain = field.y.level(level)
-    .munged(munged)
-    .aggregated(aggregated)
-    .domain(0, stacked);
+  
   if (nested || (!nested && (this.mono() === false || stacked))) { //nested
     scale.color = this.updateColorScale(xDomain, keep); //FIXME: need to update current colors
   }
-
-  if (yDomain[0] > 0) yDomain[0] = 0;
-  else if (yDomain[1] < 0) yDomain[1] = 0;
-
-  if (this.showDiff() && !nested) {
-    if (yDomain[0] === 0) yDomain[1] *= 1.25;
-    else if (yDomain[1] === 0) yDomain[0] *= 1.25;
-  }
+  yDomain = domainY(field.y, munged, level, nested, aggregated, stacked, this.showDiff());
+  
   if (isNestedAndSortByValue) {
     xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
     munged.forEach(d => d.domain = xDomain.find(x => x.key === d.data.key).values);

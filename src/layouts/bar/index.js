@@ -155,5 +155,20 @@ Bar.prototype.mono = attrFunc('mono');
  */
 Bar.prototype.orient = attrFunc('orient');
 
+function domainY(yField, munged, level = 0, nested = false, aggregated = false, stacked = false, showDiff = false) {
+  const yDomain = yField.level(level)
+  .munged(munged)
+  .aggregated(aggregated)
+  .domain(0, stacked);
+  
+  if (yDomain[0] > 0) yDomain[0] = 0;
+  else if (yDomain[1] < 0) yDomain[1] = 0;
+
+  if (showDiff && !nested) {
+    if (yDomain[0] === 0) yDomain[1] *= 1.25;
+    else if (yDomain[1] === 0) yDomain[0] *= 1.25;
+  }
+ return yDomain;
+}
 export default genFunc(Bar);
-export {conditions};
+export {conditions, domainY};

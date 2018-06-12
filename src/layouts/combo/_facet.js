@@ -5,7 +5,6 @@ import line from '../line/';
 function _facet () {
   let parent = this;
   let data = this.data();
-  let scale = this.__execs__.scale;
   let field = this.__execs__.field;
   let color = this.color();
   let innerSize = this.innerSize();
@@ -33,8 +32,6 @@ function _facet () {
         .scaleBandMode(true);
     lineSettings.forEach(d => smallLine[d.key](d.value));
     smallLine.render();
-    scale['x-line'] = smallLine.scale('x');
-    scale['y-line'] = smallLine.scale('y');
   }
   let _smallbar = function() {
     let smallBar = bar()
@@ -46,12 +43,10 @@ function _facet () {
         .legend(false)
         .tooltip(false)
         .zeroOffset(true) 
-        .parent(parent) 
+        .parent(parent)
         .color(color[0]);
     barSettings.forEach(d => {smallBar[d.key](d.value)});
     smallBar.render();
-    scale['x-bar'] = smallBar.scale('x');
-    scale['y-bar'] = smallBar.scale('y');
   }
   
   this.regions()

@@ -1,11 +1,13 @@
 import paddingMixin from '../paddingMixin';
 import seriesMixin from '../seriesMixin';
+import sortMixin from '../sortMixin/';
 import RectLinear from '../rectLinear/';
 import {mixedMeasure} from '../../modules/measureField';
 import {genFunc, mix} from '../../modules/util';
 import _axis from './_axis';
 import _munge from './_munge';
 import _domain from './_domain';
+import _range from './_range';
 import _region from './_region';
 import _legend from './_legend';
 import _facet from './_facet';
@@ -27,13 +29,15 @@ const _attrs = {
  * @augments Core
  * @augments RectLinear 
  * @augments PaddingMixin
+ * @augments SortMixin
  */
-class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin) {
+class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
     this.process('munge', _munge, {isPre:true})
       .process('domain', _domain, {isPre:true})
+      .process('range', _range, {isPre:true})
       .process('region', _region)
       .process('facet', _facet)
       .process('axis', _axis)

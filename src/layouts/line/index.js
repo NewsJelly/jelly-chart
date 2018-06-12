@@ -224,5 +224,8 @@ Line.prototype.scaleBandMode = attrFunc('scaleBandMode');
  */
 Line.prototype.individualScale = attrFunc('individualScale');
 
+function domainY(fieldY, munged, level=0, aggregated=false, stacked=false) {
+  return fieldY.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);
+}
 export default genFunc(Line);
-export {conditions, shapes};
+export {conditions, domainY, shapes};
