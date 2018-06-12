@@ -541,10 +541,12 @@ function aggregate() {
   var preFormat = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   var useHierarchy = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
   var sum$$1 = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+  var dimensions = arguments[5];
+  var measures = arguments[6];
 
   var data = this.data();
-  var dimensions = this.dimensions();
-  var measures = this.measures();
+  dimensions = dimensions || this.dimensions();
+  measures = measures || this.measures();
   var nested = d3.nest();
   for (var i = 0; i < dimensions.length; i++) {
     var _dim = reverse ? dimensions[dimensions.length - 1 - i] : dimensions[i];
@@ -1208,14 +1210,16 @@ var verticalThickness = 162;
  * core.legend();
  * @param {boolean|string|object} [legend] sets a legend type. If is a false, removes the legend.
  * @param {string} legend.orient=bottom sets a legend orient(top|right|bottom|left)
+ * @param {string} [legend.align=start] sets a legend align(start|middle|end)
  * @param {number} [legend.thickness=(54|162)] sets a legend thickness. if the orient is top or bottom, the default thickness is 54 pixels. Otherwise, it would be 162 pixels.
  * @return {legend|Core}
  */
 function legend(legend) {
   if (!arguments.length) return this.__attrs__.legend;
-  if (legend === true) this.__attrs__.legend = { orient: 'bottom', thickness: horizontalThickness };else if (legend === false) this.__attrs__.legend = null;else if ((typeof legend === 'undefined' ? 'undefined' : _typeof(legend)) === 'object') {
+  if (legend === true) this.__attrs__.legend = { orient: 'bottom', align: 'start', thickness: horizontalThickness };else if (legend === false) this.__attrs__.legend = null;else if ((typeof legend === 'undefined' ? 'undefined' : _typeof(legend)) === 'object') {
     if (!legend.orient) legend.orient = 'bottom';
     if (!legend.thickness) legend.thickness = legend.orient === 'bottom' || legend.orient === 'top' ? horizontalThickness : verticalThickness;
+    if (!legend.align) legend.thickness = 'start';
     this.__attrs__.legend = legend;
   }
   return this;
@@ -1825,9 +1829,11 @@ var defaultFont$1 = {
 };
 var areaClipPath = className('legend-area-clip-path');
 var labelClipPath = className('legend-label-clip-path');
+var aligns = ['start', 'middle', 'bottom'];
 var orients$1 = ['top', 'bottom'];
 var highlightDuration = 180;
 var _attrs$4 = {
+  align: aligns[0],
   color: '#485465',
   muteIntensity: 0.3,
   font: defaultFont$1,
@@ -1865,6 +1871,24 @@ function _style(selection) {
   for (var k in font) {
     selection.style(k, k === 'font-size' ? font[k] + 'px' : font[k]);
   }
+}
+
+function _align(selection) {
+  var area$$1 = selection.select(className('label-area', true));
+  var width = this.width();
+  var align = this.align();
+  var areaWidth = area$$1.node().getBBox().width;
+  var alignPos = 0;
+
+  if (align === aligns[1]) {
+    //middle
+    alignPos = Math.round((width - areaWidth) / 2);
+  } else if (align === aligns[2]) {
+    //end
+    alignPos = width - areaWidth;
+  }
+  area$$1.attr('transform', 'translate(' + alignPos + ',0)');
+  return selection;
 }
 
 function _arrow(selection, that, rowNum) {
@@ -2088,6 +2112,7 @@ function render$2(selection) {
   _style.call(this, selection);
   _render.call(this, selection);
   _overflow.call(this, selection);
+  _align.call(this, selection);
 }
 Legend.prototype.demute = demute$3;
 Legend.prototype.mute = mute$3;
@@ -2142,7 +2167,7 @@ function renderLegend() {
     height = innerSize.height - offsetThickness / 2;
   }
   var colorScale = this.scale().color;
-  var legendObj = _legend().scale(colorScale).x(x).y(y).width(width).height(height).orient(legendToggle.orient).format(legendToggle.format).transition(this.transition());
+  var legendObj = _legend().scale(colorScale).x(x).y(y).align(legendToggle.align).width(width).height(height).orient(legendToggle.orient).format(legendToggle.format).transition(this.transition());
   this.__execs__.legend = legendObj;
 
   legendObj.on('selectEnter', function (d) {
@@ -3681,6 +3706,7 @@ function setVal(axis) {
     val.thickness += val.showTicks ? offsetThickness : 0;
     val.defaultThickness = val.thickness;
   }
+  if (!('autoTickFormat' in val)) val.autoTickFormat = true;
 
   return val;
 }
@@ -3911,7 +3937,7 @@ function thickness(axisSetting, scale) {
   if (!(axisSetting && axisSetting.showTicks) || axisSetting && axisSetting.autoTickFormat) return;
 
   var font = axisSetting.font || defaultFont$4;
-  var tickFormat = axisSetting.tickFormat || (isOrdinal ? tickFormatForOrdinal : tickFormatForContinious(scale.domain()));
+  var tickFormat = axisSetting.tickFormat || (isOrdinal ? tickFormatForOrdinal : axisSetting.autoTickFormat && tickFormatForContinious(scale.domain()));
   var ticks = isOrdinal ? scale.domain() : scale.ticks();
   if (scale._field) {
     var field = scale._field;
@@ -4636,17 +4662,13 @@ function _domain() {
 
   var level = 1;
   xDomain = field.x.level(level).munged(munged).domain(!isNestedAndSortByValue && this.sortByValue());
-  yDomain = field.y.level(level).munged(munged).aggregated(aggregated).domain(0, stacked);
+
   if (nested || !nested && (this.mono() === false || stacked)) {
     //nested
     scale.color = this.updateColorScale(xDomain, keep); //FIXME: need to update current colors
   }
+  yDomain = domainY(field.y, munged, level, nested, aggregated, stacked, this.showDiff());
 
-  if (yDomain[0] > 0) yDomain[0] = 0;else if (yDomain[1] < 0) yDomain[1] = 0;
-
-  if (this.showDiff() && !nested) {
-    if (yDomain[0] === 0) yDomain[1] *= 1.25;else if (yDomain[1] === 0) yDomain[0] *= 1.25;
-  }
   if (isNestedAndSortByValue) {
     xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
     munged.forEach(function (d) {
@@ -5522,6 +5544,22 @@ Bar.prototype.mono = attrFunc('mono');
  */
 Bar.prototype.orient = attrFunc('orient');
 
+function domainY(yField, munged) {
+  var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var nested = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var aggregated = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  var stacked = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+  var showDiff = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+
+  var yDomain = yField.level(level).munged(munged).aggregated(aggregated).domain(0, stacked);
+
+  if (yDomain[0] > 0) yDomain[0] = 0;else if (yDomain[1] < 0) yDomain[1] = 0;
+
+  if (showDiff && !nested) {
+    if (yDomain[0] === 0) yDomain[1] *= 1.25;else if (yDomain[1] === 0) yDomain[0] *= 1.25;
+  }
+  return yDomain;
+}
 var bar = genFunc(Bar);
 
 function brushGen(brushGen) {
@@ -6288,8 +6326,7 @@ function _domain$2() {
   }
 
   xDomain = field.x.munged(munged).level(level).domain();
-  yDomain = field.y.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);
-
+  yDomain = domainY$1(field.y, munged, level, aggregated, stacked);
   //use scaleLinear when domain is number
   var isNumberDomain = true;
   for (var i = 0; i < xDomain.length; i++) {
@@ -7206,6 +7243,13 @@ Line.prototype.scaleBandMode = attrFunc('scaleBandMode');
  */
 Line.prototype.individualScale = attrFunc('individualScale');
 
+function domainY$1(fieldY, munged) {
+  var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var aggregated = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var stacked = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+
+  return fieldY.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);
+}
 var line$2 = genFunc(Line);
 
 function _axis$5() {
@@ -9299,28 +9343,40 @@ function _axis$11() {
   var _this = this;
 
   var scale = this.__execs__.scale;
+  var _execs__$field = this.__execs__.field,
+      yBar = _execs__$field.yBar,
+      yLine = _execs__$field.yLine;
+
   var xAt = this.axisX();
-  var yAt = this.axisY();
+  var yAtLeft = this.axis().find(function (a) {
+    return a.target === 'y' && a.orient === 'left';
+  });
+  var yAtRight = this.axis().find(function (a) {
+    return a.target === 'y' && a.orient === 'right';
+  });
   var fieldObj = this.__execs__.field;
 
   var _axisScaleX = function _axisScaleX(axisToggle) {
     axisToggle.field = fieldObj.x.field();
-    var curAxis = _this.axisDefault(scale['x-bar'], axisToggle);
-    if (axisToggle.orient === 'bottom') curAxis.y(scale['y-bar'].range()[0]);
+    var curAxis = _this.axisDefault(scale.x, axisToggle);
+    if (axisToggle.orient === 'bottom') curAxis.y(scale.yBar.range()[0]);
     return curAxis;
   };
   var _axisScaleY = function _axisScaleY(yScale, axisToggle) {
     var curAxis = _this.axisDefault(yScale, axisToggle);
-    if (axisToggle.orient === 'right') curAxis.x(scale['x-bar'].range()[1]);
+    if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     return curAxis;
   };
   if (xAt) {
     _axisScaleX(xAt);
   }
-  if (yAt) {
-    _axisScaleY(scale['y-bar'], { target: yAt.target, field: fieldObj.yBar.field(), orient: 'left' });
-    _axisScaleY(scale['y-line'], { target: yAt.target, field: fieldObj.yLine.field(), orient: 'right' });
+  if (yAtLeft) {
+    yAtLeft.field = yBar.field();
+    yAtRight.field = yLine.field();
+    _axisScaleY(scale.yBar, yAtLeft);
+    _axisScaleY(scale.yLine, yAtRight);
   }
+
   this.renderAxis();
 }
 
@@ -9336,23 +9392,83 @@ function _munge$16() {
     } else throw new ConditionException();
   };
   this.condition(conditionFunc);
-  this.__execs__.munged = this.data();
+  //TODO: yBar munged, yLine munged;
+  /*
+  this.__execs__.munged = this.aggregate(this.facet() && !this.stacked());
+    }
+    if (!this.isNested()) this.__execs__.munged = [this.__execs__.munged[0].parent];
+   aggregate (reverse = false, rollup = true, preFormat = false, useHierarchy = true, sum = true, dimensions, measures) {
+  */
+
+  this.__execs__.munged = this.aggregate();
 }
 
 function _domain$17(keep) {
+  var munged = this.__execs__.munged;
+  var _execs__$field = this.__execs__.field,
+      x = _execs__$field.x,
+      yBar = _execs__$field.yBar,
+      yLine = _execs__$field.yLine;
+
   var yAt = this.axisY();
-  if (yAt) {
+
+  if (yAt && yAt.orient === 'left') {
     //add the right axis directly
-    this.axis({ target: 'y', orient: 'right' });
+    var yAtRight = Object.assign({}, yAt);
+    yAtRight.orient = 'right';
+    this.axis(yAtRight);
   }
+  var xDomain = x.level(0).munged(munged).domain(this.sortByValue());
   var scale = this.scale();
+  scale.x = d3.scaleBand().padding(this.padding()).domain(xDomain);
+  scale.yBar = d3.scaleLinear();
+  scale.yLine = d3.scaleLinear();
+
+  this.setCustomDomain('yBar', domainY(yBar, munged));
+  this.setCustomDomain('yLine', domainY$1(yLine, munged));
   scale.color = this.updateColorScale(this.measures().map(function (d) {
     return d.field;
   }), keep);
 }
 
+function _range$12() {
+  var _scale = this.scale(),
+      x = _scale.x,
+      yBar = _scale.yBar,
+      yLine = _scale.yLine;
+
+  var xAt = this.axisX();
+  var yAtLeft = this.axis().find(function (a) {
+    return a.target === 'y' && a.orient === 'left';
+  });
+  var yAtRight = this.axis().find(function (a) {
+    return a.target === 'y' && a.orient === 'right';
+  });
+
+  if (yAtLeft) {
+    this.thickness(yAtLeft, yBar, false, false);
+    this.thickness(yAtRight, yLine, false, false);
+  }
+  if (xAt) {
+    this.thickness(xAt, x, true, true);
+  }
+
+  var _innerSize = this.innerSize(),
+      width = _innerSize.width,
+      height = _innerSize.height;
+
+  yBar.range([height, 0]);
+  yLine.range([height, 0]);
+  x.range([0, width]);
+  return this;
+}
+
+/**
+ * thickness -> margin에 반영 하기
+ */
 function _region$10() {
   var scale = this.__execs__.scale;
+
   this.renderRegion(function (d) {
     return d.x = d.y = 0;
   }, scale.color.domain().map(function (d) {
@@ -9372,7 +9488,6 @@ function _facet$8() {
 
   var parent = this;
   var data = this.data();
-  var scale = this.__execs__.scale;
   var field = this.__execs__.field;
   var color = this.color();
   var innerSize = this.innerSize();
@@ -9394,8 +9509,6 @@ function _facet$8() {
       return smallLine[d.key](d.value);
     });
     smallLine.render();
-    scale['x-line'] = smallLine.scale('x');
-    scale['y-line'] = smallLine.scale('y');
   };
   var _smallbar = function _smallbar() {
     var smallBar = bar().container(this).data(data).dimensions(dimensions).measures(barMeasures).width(width).height(height).padding(padding).legend(false).tooltip(false).zeroOffset(true).parent(parent).color(color[0]);
@@ -9403,8 +9516,6 @@ function _facet$8() {
       smallBar[d.key](d.value);
     });
     smallBar.render();
-    scale['x-bar'] = smallBar.scale('x');
-    scale['y-bar'] = smallBar.scale('y');
   };
 
   this.regions().each(function (_, i) {
@@ -9441,6 +9552,7 @@ var _attrs$25 = {
  * @augments Core
  * @augments RectLinear 
  * @augments PaddingMixin
+ * @augments SortMixin
  */
 
 var Combo = function (_mix$with) {
@@ -9452,7 +9564,7 @@ var Combo = function (_mix$with) {
     var _this = possibleConstructorReturn(this, (Combo.__proto__ || Object.getPrototypeOf(Combo)).call(this));
 
     _this.setAttrs(_attrs$25);
-    _this.process('munge', _munge$16, { isPre: true }).process('domain', _domain$17, { isPre: true }).process('region', _region$10).process('facet', _facet$8).process('axis', _axis$11).process('legend', _legend$13).process('tooltip', _tooltip$13);
+    _this.process('munge', _munge$16, { isPre: true }).process('domain', _domain$17, { isPre: true }).process('range', _range$12, { isPre: true }).process('region', _region$10).process('facet', _facet$8).process('axis', _axis$11).process('legend', _legend$13).process('tooltip', _tooltip$13);
     return _this;
   }
   /**
@@ -9475,7 +9587,7 @@ var Combo = function (_mix$with) {
     }
   }]);
   return Combo;
-}(mix(RectLinear).with(paddingMixin, seriesMixin));
+}(mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin));
 
 var combo = genFunc(Combo);
 

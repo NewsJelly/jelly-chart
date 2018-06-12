@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Jelly-Chart Source: core/autoResize.js</title>
+	<title>Jelly-Chart Global</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -81,64 +81,185 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: core/autoResize.js</h1>
-    
+	<h1 class="page-title">Global</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">const allowThreshold = 20;
-/**
- * @memberOf Core#
- * If autoResize is true, it will ignore current width setting and change the chart's width according to the containers's width. If autoResize is not specified, returns the current autoResize setting. 
- * @return {autoResize|Core}
- * @param {boolean} [autoResize=false] If is true, resizes the chart's width according to the containers's width
- * @return {autoResize|Core}
- */
-function autoResize(autoResize) {
-  if (!arguments.length) return this.__attrs__.autoResize;
-  if (autoResize) {
-    if (!this.__execs__.autoResize) {
-      const that = this;
-      let allowResize = true; 
-      let lastWidth;
-      this.__execs__.autoResize = function() {
-        if (allowResize &amp;&amp; that.__execs__.canvas) {
-          const rect = that.__execs__.container.node().getBoundingClientRect();
-          if ((!lastWidth || lastWidth !== rect.width))  {
-            const transition = that.transition();
-            that.width(rect.width)
-              .transition({duration: 0, delay:0})
-              .render(true, that.autoResizeSkip())
-              .transition(transition);
-            lastWidth = rect.width;
-          }
-          allowResize = false;
-          setTimeout(() => {
-            allowResize = true;
-          }, allowThreshold);
-        }
-      }
-    }
-    window.addEventListener('resize', this.__execs__.autoResize);
-  } else {
-    if (this.__execs__autoResize) {
-      window.removeEventListener('resize', this.__execs__.autoResize);
-      this.__execs__.autoResize = null;
-    }
-  }
-  this.__attrs__.autoResize = autoResize;
-  return this;
-}
 
-export default autoResize;</pre>
-    </article>
+<header>
+    
+        <h2>
+        
+        </h2>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="_region"><span class="type-signature"></span>_region()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        thickness -> margin에 반영 하기
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="combo__region.js.html">combo/_region.js</a>,
+				 <a href="combo__region.js.html#sunlight-1-line-4">line 4</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -148,6 +269,10 @@ export default autoResize;</pre>
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>

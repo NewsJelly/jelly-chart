@@ -51,6 +51,13 @@
 				</ul>
 			</li>
 			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#_region">_region</a></li>
+				</ul>
+			</li>
+			
 		</ul>
         
             <div class="col-sm-3 col-md-3">
@@ -310,8 +317,11 @@ Line.prototype.scaleBandMode = attrFunc('scaleBandMode');
  */
 Line.prototype.individualScale = attrFunc('individualScale');
 
+function domainY(fieldY, munged, level=0, aggregated=false, stacked=false) {
+  return fieldY.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);
+}
 export default genFunc(Line);
-export {conditions, shapes};
+export {conditions, domainY, shapes};
 </pre>
     </article>
 </section>

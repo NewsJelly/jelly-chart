@@ -51,6 +51,13 @@
 				</ul>
 			</li>
 			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#_region">_region</a></li>
+				</ul>
+			</li>
+			
 		</ul>
         
             <div class="col-sm-3 col-md-3">
@@ -153,7 +160,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="combo_index.js.html">combo/index.js</a>,
-				 <a href="combo_index.js.html#sunlight-1-line-24">line 24</a>
+				 <a href="combo_index.js.html#sunlight-1-line-26">line 26</a>
 			</li>
 		</ul>
 	</dd>
@@ -197,6 +204,8 @@
         <li><a href="RectLinear.html">RectLinear</a></li>
     
         <li><a href="PaddingMixin.html">PaddingMixin</a></li>
+    
+        <li><a href="SortMixin.html">SortMixin</a></li>
     </ul>
 
 
@@ -780,7 +789,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="rectLinear_axis.js.html">rectLinear/axis.js</a>,
-				 <a href="rectLinear_axis.js.html#sunlight-1-line-51">line 51</a>
+				 <a href="rectLinear_axis.js.html#sunlight-1-line-52">line 52</a>
 			</li>
 		</ul>
 	</dd>
@@ -5387,6 +5396,46 @@ core.label(); //returns the current height;</pre>
 
         <tr>
             
+                <td class="name"><code>align</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    start
+                
+                </td>
+            
+
+            <td class="description last">sets a legend align(start|middle|end)</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>thickness</code></td>
             
 
@@ -5481,7 +5530,7 @@ core.label(); //returns the current height;</pre>
 		<ul class="dummy">
 			<li>
 				<a href="core_legend.js.html">core/legend.js</a>,
-				 <a href="core_legend.js.html#sunlight-1-line-17">line 17</a>
+				 <a href="core_legend.js.html#sunlight-1-line-18">line 18</a>
 			</li>
 		</ul>
 	</dd>
@@ -9464,6 +9513,205 @@ scatter.size(10) // set point radius of a scatter chart to 10 pixel
 scatter.size([10, 100]) // set the range of point radius of a scatter chart from 10 to 100 pixel
 pie.size([20, 100]) // set the inner radius to 20 and the outer radius to 100 seperately
 treemap.size({range: [600, 400]}) // set the width to 600 and the height to 400 pixel of a treemap</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="sortByValue"><span class="type-signature"></span>sortByValue( [sortByValue])</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        If is true or a comparator string(natural, ascending, descending), sort nodes according to their values. If sortByValue is not specified, returns the current sortByValue setting.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sortByValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+|
+
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">(false|natural|ascending|descending)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="SortMixin.html#sortByValue">SortMixin#sortByValue</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="sortMixin_sortByValue.js.html">sortMixin/sortByValue.js</a>,
+				 <a href="sortMixin_sortByValue.js.html#sunlight-1-line-12">line 12</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">sortByValue</span>
+|
+
+<span class="param-type"><a href="SortMixin.html">SortMixin</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">bar.sortByValue(&#x27;ascending&#x27;) //sort bars in ascending order.</pre>
 
 
     

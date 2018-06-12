@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Jelly-Chart Source: core/autoResize.js</title>
+	<title>Jelly-Chart Source: combo/_region.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -86,56 +86,21 @@
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: core/autoResize.js</h1>
+		<h1 class="page-title">Source: combo/_region.js</h1>
     
 <section>
     <article>
         <pre
-            class="sunlight-highlight-javascript linenums">const allowThreshold = 20;
-/**
- * @memberOf Core#
- * If autoResize is true, it will ignore current width setting and change the chart's width according to the containers's width. If autoResize is not specified, returns the current autoResize setting. 
- * @return {autoResize|Core}
- * @param {boolean} [autoResize=false] If is true, resizes the chart's width according to the containers's width
- * @return {autoResize|Core}
+            class="sunlight-highlight-javascript linenums">/**
+ * thickness -> margin에 반영 하기
  */
-function autoResize(autoResize) {
-  if (!arguments.length) return this.__attrs__.autoResize;
-  if (autoResize) {
-    if (!this.__execs__.autoResize) {
-      const that = this;
-      let allowResize = true; 
-      let lastWidth;
-      this.__execs__.autoResize = function() {
-        if (allowResize &amp;&amp; that.__execs__.canvas) {
-          const rect = that.__execs__.container.node().getBoundingClientRect();
-          if ((!lastWidth || lastWidth !== rect.width))  {
-            const transition = that.transition();
-            that.width(rect.width)
-              .transition({duration: 0, delay:0})
-              .render(true, that.autoResizeSkip())
-              .transition(transition);
-            lastWidth = rect.width;
-          }
-          allowResize = false;
-          setTimeout(() => {
-            allowResize = true;
-          }, allowThreshold);
-        }
-      }
-    }
-    window.addEventListener('resize', this.__execs__.autoResize);
-  } else {
-    if (this.__execs__autoResize) {
-      window.removeEventListener('resize', this.__execs__.autoResize);
-      this.__execs__.autoResize = null;
-    }
-  }
-  this.__attrs__.autoResize = autoResize;
-  return this;
+function _region() {
+  const scale = this.__execs__.scale;
+  
+  this.renderRegion(d => d.x = d.y = 0, scale.color.domain().map(d => {return {key: d}})); 
 }
 
-export default autoResize;</pre>
+export default _region;</pre>
     </article>
 </section>
 
