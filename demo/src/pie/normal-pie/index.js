@@ -10,5 +10,5 @@ jelly.pie()
   ])
   .dimensions({field:'category', order:'descending'})
   .measures([{field: 'value', op: 'mean'}])
-  .legend(true)
+  .legend({orient: 'bottom', align: 'middle'})
   .render();

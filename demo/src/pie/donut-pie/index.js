@@ -11,5 +11,5 @@ jelly.pie()
   .dimensions({field:'category', order:'descending'})
   .measures([{field: 'value', op: 'mean'}])
   .size([40, 150])
-  .legend(true)
+  .legend({align: 'middle'})
   .render();

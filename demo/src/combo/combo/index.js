@@ -1,16 +1,16 @@
 jelly.combo()
   .container('#jelly-container')
   .data([
-    {name: 'A', valueBar: 10, valueLine: 100},
-    {name: 'B', valueBar: 20, valueLine: 200},
-    {name: 'C', valueBar: 30, valueLine: 300},
-    {name: 'D', valueBar: 40, valueLine: 400},
-    {name: 'A', valueBar: 20, valueLine: 200},
-    {name: 'B', valueBar: 10, valueLine: 100},
-    {name: 'C', valueBar: 40, valueLine: 400},
-    {name: 'D', valueBar: 10, valueLine: 100}
+    {name: 'A', valueBar: 1000000, valueLine: 1000000000},
+    {name: 'B', valueBar: 2000000, valueLine: 20000000},
+    {name: 'C', valueBar: 3000000, valueLine: 30000000},
+    {name: 'D', valueBar: 4000000, valueLine: 40000000},
+    {name: 'A', valueBar: 2000000, valueLine: 20000000},
+    {name: 'B', valueBar: 1000000, valueLine: 10000000},
+    {name: 'C', valueBar: 4000000, valueLine: 40000000},
+    {name: 'D', valueBar: 1000000, valueLine: 10000000}
   ])
   .dimensions(['name'])
   .measures(['valueBar', 'valueLine'])
-  .axis('x').axis('y')
+  .axis('x').axis({target: 'y', autoTickFormat: true})
   .render();
