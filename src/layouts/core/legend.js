@@ -22,7 +22,7 @@ function legend (legend) {
   else if (typeof legend === 'object') {
     if(!legend.orient) legend.orient = 'bottom';
     if(!legend.thickness) legend.thickness = (legend.orient === 'bottom' || legend.orient === 'top') ? horizontalThickness : verticalThickness;
-    if(!legend.align) legend.thickness = 'start';
+    if(!legend.align) legend.align = 'start';
     this.__attrs__.legend = legend;
   }
   return this;
