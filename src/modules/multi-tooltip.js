@@ -83,14 +83,13 @@ function _domain() {
   const points = target.__execs__.canvas.selectAll(this.nodeName());
   const domain = [];
   points.each(function(d) {
-    //const result = mark.get(this);
     let find = domain.find(dd => dd.x === d.x);
     if (find) {
       find.points.push(this);
     } else {
       domain.push({x:d.x, points:[this], value: d.key});
     }
-  })
+  });
   this.__execs__.domain = domain.sort((a,b) => a.x-b.x);
 }
 
@@ -146,13 +145,11 @@ function _show(selection, tick) {
         filtered.push({key:d.key, x:d.x, y: d.y, text: d.text});
       }
     })
-  
   points.classed(className('show'), true).selectAll('circle').transition(showTrans)
     .attr('opacity', 1)
     .style('fill', function(d){
       return d.color;
     })
-  
   
   let baseline = selection.select(className('baseline', true));
   baseline.transition(showTrans).attr('opacity', 1)
@@ -168,21 +165,25 @@ function _show(selection, tick) {
   });
   _sortByValue(values, this.sortByValue())
   values = values.map(d => {return {name: d.parent.data.key || d.data.key, value: d.text}})
+  
   if (this.keyFormat()) {
     const f = this.keyFormat();
-    values.forEach(d => d.name = f(d.name));
+    values.forEach(d => {
+      if (d.name instanceof Date || typeof d.name === 'number') d.name = f(d.name)
+    });
   }
   y = mean(y);
   y = Math.round(y);
   if (x && y) {
+    let keyValue = tick.value;
+    if (this.keyFormat() && (keyValue instanceof Date || typeof keyValue === 'number') ) keyValue = this.keyFormat()(keyValue);
     tooltip.x(x).y(y)
-    .key({name:'key', value:tick.value})
+    .key({name:'key', value:keyValue})
     .value(values)
     .show();
   } else {
     tooltip.hide();
   }
-  
 }
 
 function hide() {

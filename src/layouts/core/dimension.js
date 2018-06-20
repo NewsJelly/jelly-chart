@@ -13,8 +13,8 @@ import _dimensionType from './_dimensionType';
  * @param {string} dimension.field refers a key property in objects from the {@link Core#data data array}. The key property will be invoked for each element in the input array and must return a string identifier to assign the element to its group. 
  * @param {string} [dimension.order=natural] chooses comparator types among natural, ascending and descending, sorting nodes in selected order. 
  * @param {number} [dimension.max=100] maximum number of nodes
- * @param {string} [dimension.format=undefined] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
- * @param {string} [dimension.formatSub=undefined] a sub-time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}, which used sub-ticks on it's axis.
+ * @param {string|function} [dimension.format=undefined] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
+ * @param {string|function} [dimension.formatSub=undefined] a sub-time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}, which used sub-ticks on it's axis.
  * @param {string} [dimension.interval=undefined] If the dimension has Date type values, set an {@link https://github.com/d3/d3-time#intervals interval} which is a conventional unit of time to grouped its value.
  * @return {Core}
  */

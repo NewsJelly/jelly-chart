@@ -22,7 +22,7 @@ function setVal(axis) {
     val.thickness += val.showTicks ? offsetThickness : 0;
     val.defaultThickness = val.thickness;
   }
-  if (!('autoTickFormat' in val)) val.autoTickFormat = true;
+  if (!('autoTickFormat' in val) && !('format' in val)) val.autoTickFormat = false;
   
   return val;
 }

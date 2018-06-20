@@ -12,6 +12,8 @@ function setFormat(f) {
         throw e;
       }
     } 
+  } else if (typeof f === 'function') {
+    return f;
   } else {
     return null;
   }
