@@ -5,7 +5,8 @@ var i;
 for (i = 0; i < dataLength; i ++) {
   dataset.push({
     date: dates[i%dates.length], 
-    value: Math.random() * 1000
+    value: Math.random() * 1000,
+    value2: Math.random() * 1000,
   });
 }
 
@@ -16,6 +17,8 @@ jelly.line().container('#jelly-container')
     interval: 'month',
     format: '%Y-%m'
   })
-  .measures([{field: 'value', op:'mean'}])
+  .measures([{field: 'value', op:'mean'}, {field: 'value2', op:'mean'}])
   .axis('x').axis('y')
+  .legend({orient: 'right', thickness:100})
+  .multiTooltip(true)
   .render();
