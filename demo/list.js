@@ -98,6 +98,11 @@ module.exports = [
   },
   {
     category: 'Line',
+    path: 'stacked-area-gradient',
+    title: 'Stacked and Gradient Area Chart'
+  },
+  {
+    category: 'Line',
     path: 'normalized-stacked-area',
     title: 'Normalized Stacked Area Chart'
   },
