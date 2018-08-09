@@ -36,7 +36,8 @@ const _attrs = {
   padding: 0,
   pointRatio : 2,
   regionPadding: 0.1,
-  shape: shapes[0],
+	shape: shapes[0],
+	areaGradient: false,
   scaleBandMode : false,
   size: size,
   individualScale: false
@@ -82,6 +83,7 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
    * @override
    */
   renderCanvas() {
+		console.log('renderCanvas', this.__attrs__)
     return super.renderCanvas(this.point() ? this.size().range[0]*2 : 0);
   }
   /**
@@ -223,6 +225,16 @@ Line.prototype.scaleBandMode = attrFunc('scaleBandMode');
  * @return {individualScale|Line}
  */
 Line.prototype.individualScale = attrFunc('individualScale');
+
+/**
+ * If areaGradient is specified sets the areaGradient setting and returns the Line instance itself. If areaGradient is true, when a line chart shape area, each area filled gradient.
+ * @function
+ * @example
+ * line.areaGradient(true)
+ * @param {boolean} [areaGradient=false] If is true, each area filled gradient.
+ * @return {areaGradient|Line}
+ */
+Line.prototype.areaGradient = attrFunc('areaGradient');
 
 function domainY(fieldY, munged, level=0, aggregated=false, stacked=false) {
   return fieldY.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);

@@ -17,7 +17,8 @@ function _mark(zoomed = false) {
   const showPoint = this.point();
   const pointRatio = this.pointRatio();
   const trans = zoomed ? transition().duration(0).delay(0) : transition().duration(this.transition().duration).delay(this.transition().delay);  
-  const isArea = this.shape() === shapes[1];
+	const isArea = this.shape() === shapes[1];
+	const areaGradient = isArea && this.areaGradient()
   const yField = this.measureName();
   const curve = this.curve() === curves[0] ? curveLinear : (this.curve() === curves[1] ? curveStep : curveCatmullRom);
   const scaleBandMode = this.scaleBandMode();
@@ -118,10 +119,15 @@ function _mark(zoomed = false) {
       }
       
     })
-    if (area) {
-      selection
-        .attr('fill', c).attr('stroke', 'none')
-    } else {
+    if (areaGradient) {
+			let url = d => `url(#areaGradient-${d.data.key})` 
+			selection
+				.attr('stroke', 'none')
+				.attr("fill", url);
+			console.log('c', c)
+    }else if (area) {
+			selection.attr('fill', c)
+		}else {
       selection.attr('stroke', c)
         .attr('stroke-width', size.range[0] + 'px')
     }
