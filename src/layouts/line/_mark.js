@@ -14,8 +14,9 @@ function _mark(zoomed = false) {
   const label = this.label();
   const individualScale = this.isIndividualScale();
   const size = this.size();
-  const showPoint = this.point();
+  const showPoint = !!this.point();
   const pointRatio = this.pointRatio();
+  const pointType = this.point().type ? this.point().type : 'empty';
   const trans = zoomed ? transition().duration(0).delay(0) : transition().duration(this.transition().duration).delay(this.transition().delay);  
 	const isArea = this.shape() === shapes[1];
 	const areaGradient = isArea && this.areaGradient()
@@ -122,9 +123,8 @@ function _mark(zoomed = false) {
     if (areaGradient) {
 			let url = d => `url(#areaGradient-${d.data.key})` 
 			selection
-				.attr('stroke', 'none')
+				.attr('stroke', c)
 				.attr("fill", url);
-			console.log('c', c)
     }else if (area) {
 			selection.attr('fill', c)
 		}else {
@@ -136,7 +136,6 @@ function _mark(zoomed = false) {
     selection
       .attr('r', (size.range[0] - size.range[0] / 4) * pointRatio)
       .attr('stroke-width', size.range[0] / 4 * pointRatio)
-      .style('fill', '#fff')
       .attr('opacity',  showPoint ? 1 : 0)
       .style('cursor', 'pointer')
       .attr('cx', d => d.x0 || d.x)
@@ -150,6 +149,11 @@ function _mark(zoomed = false) {
       .attr('opacity',  showPoint ? 1 : 0)
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
+    if(pointType === 'fill') {
+      selection.attr('stroke', '#fff')
+    }else{
+      selection.style('fill', '#fff')
+    }
   }
   let __labelInit = function (selection) {
     selection.each(function(d) {

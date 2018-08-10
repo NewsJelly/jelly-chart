@@ -1,4 +1,4 @@
-import {local, select} from 'd3';
+import {local, select, transition} from 'd3';
 import {setMethodsFromAttrs} from './util';
 import {className, labelFormat} from './util';
 import {countMeasure, countMeasureTitle} from './measureField';
@@ -14,7 +14,7 @@ const defaultFont = {
   'font-weight': 'normal',
   'font-style': 'normal'
 };
-
+const pointOriginColor = '#fff';
 const _attrs = {
   absolute: false,
   anchor: {x:'left', y:'top'}, 
@@ -178,14 +178,50 @@ function showFromPoint(point, d) {
     .color(color ? color : d.color)
     .key(key ? key.call(this, d, d.key): null)
     .value(value.call(this, d, d.text))
-    .show();
+    .show(point);
   return this;
 }
 
-function show() {
+function renderPoint(point){
+  const showTrans = transition().duration(140);
+  const target = this.target();
+  const isMulti = !!target.__attrs__.multiTooltip;
+  if(isMulti) return;
+  const isShowPoint = !!target.__attrs__.point;
+  const pointType = target.__attrs__.point.type ? target.__attrs__.point.type : 'empty';
+  if(pointType === 'empty'){
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', function(d){
+      return d.color;
+    })
+  }else{
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', function(d){
+      return d.color;
+    });
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', pointOriginColor)
+  }
+  if(!isShowPoint) target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').attr('opacity', 0)
+  let showPoint =  select(point).classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1)
+  if(pointType === 'empty'){
+    showPoint
+      .style('fill', function(d){
+        return d.color;
+      })
+    showPoint.attr('stroke', 'rgb(255, 255, 255)')
+  }else{
+    showPoint.style('fill', 'rgb(255, 255, 255)')
+    showPoint.attr('stroke', function(d){
+      return d.color;
+    })
+  }
+}
+
+function show(point) {
   let valueFormat = this.valueFormat();
   let tooltip = this.__execs__.tooltip;
   
+  renderPoint.call(this, point)
+
   if(this.keys()) {
     let key = tooltip.select(className('keys', true)).selectAll(className('key', true))
     .data(this.keys())
