@@ -118,6 +118,11 @@ module.exports = [
   },
   {
     category: 'Line',
+    path: 'fixline-line',
+    title: 'Fix Line on Line Chart'
+  },
+  {
+    category: 'Line',
     path: 'meanline-line',
     title: 'Mean Line on Line Chart'
   },

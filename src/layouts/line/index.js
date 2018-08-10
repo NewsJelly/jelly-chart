@@ -2,6 +2,7 @@ import {dispatch} from 'd3';
 import Facet from '../facet/';
 import brushMixin from '../brushMixin';
 import fitLineMixin from '../fitLineMixin';
+import fixLineMixin from '../fixLineMixin';
 import seriesMixin from '../seriesMixin';
 import zoomMixin from '../zoomMixin';
 import paddingMixin from '../paddingMixin';
@@ -23,6 +24,7 @@ import _legend from './_legend';
 import _region from './_region';
 import _facet from './_facet';
 import _fitLine from './_fitLine';
+import _fixLine from './_fixLine';
 import _tooltip from './_tooltip';
 import _zoom from './_zoom';
 import {leastSquare as lsFunc} from '../../modules/transform';
@@ -57,7 +59,7 @@ const _attrs = {
  * @augments ShapeMixin
  * @augments StreamMixin
  */
-class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin, streamMixin) {
+class Line extends mix(Facet).with(fitLineMixin, fixLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin, streamMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);
@@ -73,6 +75,7 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
       .process('mark', _mark, {allow: function() {return !this.isBrushZoom() && !this.isFacet()}})
       .process('meanLine', _meanLine, {allow: function() {return !this.isBrushZoom()}})
       .process('fitLine', _fitLine, {allow: function() {return !this.isBrushZoom()}})
+      .process('fixLine', _fixLine, {allow: function() {return !this.isBrushZoom()}})
       .process('tooltip', _tooltip, {allow: function() {return !this.isBrushZoom()}})
       .process('panning', _panning, {allow: function() {return !this.isBrushZoom()}})
       .process('zoom', _zoom, {allow: function() {return !this.isBrushZoom()}})
