@@ -739,15 +739,6 @@ function measureField(measure) {
 
 setMethodsFromAttrs(MeasureField, attrs);
 
-/**
- * aggregate data which have N-measures (used in Bar and Line only)
- * @private
- * @memberOf Core#
- * @param {boolean} reverse=false
- * @param {boolean} useHierarchy=true
- * @param {boolean} sum=true
- * @return {hierarchy}
- */
 function aggregateMixed() {
   var reverse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
   var useHierarchy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -931,12 +922,6 @@ function mute(nodeOrRegion, intensity) {
   return this;
 }
 
-/**
- * recovers the selection's opacity from {@link Core#mute}
- * @memberOf Core#
- * @param {d3Selection} nodeOrRegion the selection of nodes and regions in the chart
- * @return {Core}
- */
 function demute(nodeOrRegion) {
   nodeOrRegion.transition().duration(duration).attr('opacity', 1);
   return this;
@@ -980,15 +965,6 @@ function conditionForMute (filter) {
   return cond;
 }
 
-/**
- * Fiters nodes according to excemptionFilter in the chart and {@link Core#demute demutes} the nodes. If excemptionFilter is no specified, demutes all nodes.
- * @memberOf Core#
- * @example
- * core.demuteNodes('Sales'); // nodes whose key is not 'Sales' are demuted
- * core.demuteNodes(d => d.key !== 'Sales') // nodes whose key is not 'Sales' are demuted
- * @param {string|function} [excemptionFilter] If the fiter is a string, select nodes which has different key with the filter. If the a function, it is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]).
- * @return {Core}
- */
 function demuteNodes(excemptionFilter) {
   var nodes = void 0;
   if (!arguments.length) {
@@ -1043,6 +1019,8 @@ function setFormat(f) {
         throw e;
       }
     }
+  } else if (typeof f === 'function') {
+    return f;
   } else {
     return null;
   }
@@ -1060,50 +1038,11 @@ function _dimensionType(dimension) {
   }
 }
 
-/**
- * appends a dimension to {@link Core#dimensions dimensions} array. A dimenension(key) acts as an index that is used to look up measure(value). A synonym for dimension is independent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions; multi-dimensions can make multiple levels of grouping. The combination of all dimensions would be unique for each item. Each dimension is converted into a mark(region or node) according to its chart type and level.
- * 
- * @memberOf Core#
- * @function
- * @example
- * core.dimension({field:'Sales', order:'ascending'});
- * core.dimension({field: 'Sales Date', format: '%y', interval: 'year'})
- * core.dimension('Profit');
- * @param {(string|object)} dimension
- * @param {string} dimension.field refers a key property in objects from the {@link Core#data data array}. The key property will be invoked for each element in the input array and must return a string identifier to assign the element to its group. 
- * @param {string} [dimension.order=natural] chooses comparator types among natural, ascending and descending, sorting nodes in selected order. 
- * @param {number} [dimension.max=100] maximum number of nodes
- * @param {string} [dimension.format=undefined] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
- * @param {string} [dimension.formatSub=undefined] a sub-time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}, which used sub-ticks on it's axis.
- * @param {string} [dimension.interval=undefined] If the dimension has Date type values, set an {@link https://github.com/d3/d3-time#intervals interval} which is a conventional unit of time to grouped its value.
- * @return {Core}
- */
 function dimension$1(dimension) {
   this.__attrs__.dimensions.push(_dimensionType(dimension));
   return this;
 }
 
-/**
- * If dimensions is specified, sets dimensions and returns the instance itself. If dimensions is an object or string, it would be turned into an array with a dimension. If dimensions is not specified, returns the instance's current dimensions. 
- * A dimenension(key) acts as an index that is used to look up measure(value). A synonym for dimension is independent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions; multi-dimensions can make multiple levels of grouping. The combination of all dimensions would be unique for each item. Each dimension is converted into a region or a node according to its chart type and level.
- * @memberOf Core#
- * @function
- * @example
- * bar.data([
- *    {category:'Blue', name: 'A', value: 10},
- *    {category:'Blue', name: 'B', value: 20},
- *    {category:'Blue', name: 'C', value: 30},
- *    {category:'Blue', name: 'D', value: 40},
- *    {category:'Red', name: 'A', value: 20},
- *    {category:'Red', name: 'B', value: 10},
- *    {category:'Red', name: 'C', value: 40},
- *    {category:'Red', name: 'D', value: 10},
- *  ]) //sets data
- *  .dimensions(['category', {field:'name', order:'ascending'}])
- *  //generates a grouped bar chart which has 2 regions (Red, Blue) with 4 bars(A,B,C,D) each.
- * @param {(string|object|Object[])} [dimensions] sets a {@link Core#dimension dimension} array which are objects has properties for aggregation(grouping).
- * @return {(dimensions|Core)}
- */
 function dimensions(dimensions) {
   if (!arguments.length) return this.__attrs__.dimensions;
   if (!Array.isArray(dimensions)) {
@@ -1146,16 +1085,6 @@ function filterNodes(filter) {
   return nodes.filter(filter);
 }
 
-/**
- * Fiters regions in the chart, returning a new selection that contains only the elements for which the specified filter is true. 
- * @memberOf Core#
- * @example
- * core.filterRegions(function(d) {
- *    return d.key === key;
- * })
- * @param {(string|function)} filter The filter may be specified either as a selector stringfilter is  or a function. If the a function, it is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]).
- * @return {d3Selection}
- */
 function filterRegions(callback) {
   var noFacet = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -1219,7 +1148,7 @@ function legend(legend) {
   if (legend === true) this.__attrs__.legend = { orient: 'bottom', align: 'start', thickness: horizontalThickness };else if (legend === false) this.__attrs__.legend = null;else if ((typeof legend === 'undefined' ? 'undefined' : _typeof(legend)) === 'object') {
     if (!legend.orient) legend.orient = 'bottom';
     if (!legend.thickness) legend.thickness = legend.orient === 'bottom' || legend.orient === 'top' ? horizontalThickness : verticalThickness;
-    if (!legend.align) legend.thickness = 'start';
+    if (!legend.align) legend.align = 'start';
     this.__attrs__.legend = legend;
   }
   return this;
@@ -1316,19 +1245,6 @@ function margin() {
   return this;
 }
 
-/**
- * appends a measure to {@link Core#measures measures} array. A measure(value) acts as an value that is looked up by dimensions(key). A synonym for measure is dependent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions. If measures are specified, leaves of the tree will be summarized by them. 
- * @memberOf Core#
- * @function
- * @example
- * core.measure({field:'Sales', 'op': 'mean'});
- * core.measure('Profit');
- * @param {(string|object)} measure
- * @param {string} [measure.field] refers a value property in objects from the {@link Core#data data array}. The value property will be invoked for leaf elements during aggregation and their values in the property will be summarized by the specified operator as an value.
- * @param {string} [measure.op=sum] an operator(sum, mean, variance, min, max, median) to summarize leaf elements.
- * @param {string} [measure.format] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
- * @return {Core}
- */
 function measure(measure) {
   if (typeof measure === 'string') {
     this.__attrs__.measures.push({ field: measure, op: 'sum' });
@@ -1339,44 +1255,12 @@ function measure(measure) {
   return this;
 }
 
-/**
- * get a transformed field name of a measure
- * @memberOf Core#
- * @function
- * @private
- * @param {object} measure
- * @param {string} suffix 
- */
 function measureName(measure, suffix) {
   measure = measure || this.measures()[0];
   var name = measure.field;
   if (!this.aggregated() || measure.field !== mixedMeasure.field) name += '-' + measure.op;
   return name + (suffix !== undefined ? '-' + suffix : '');
 }
-
-/**
- * If measures is specified, sets measures and returns the instance itself. If measures is an object or string, it would be turned into an array with a measure. If measures is not specified, returns the instance's current measures. 
- * A measure(value) acts as an value that is looked up by dimensions(key). A synonym for dimension is independent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions. If measures are specified, leaves of the tree will be summarized by them. 
- * @memberOf Core#
- * @function
- * @example
- * bar.data([
- *    {name: 'A', sales: 10},
- *    {name: 'B', sales: 20},
- *    {name: 'C', sales: 30},
- *    {name: 'D', sales: 40},
- *    {name: 'A', sales: 20},
- *    {name: 'B', sales: 10},
- *    {name: 'C', sales: 40},
- *    {name: 'D', sales: 10},
- *  ]) //sets data
- *  .dimensions(['name'])
- *  .measures([{field:'sales', op: 'mean'}])
- *  //generates a mono bar chart with 4 bars(A,B,C,D).
- *  //each bar's length will be determined mean of 'sales' values from leaf elements.
- * @param {(string|object|Object[])} [measures] sets a {@link Core#measure measure} array which are objects has properties for aggregation(grouping).
- * @return {(measures|Core)}
- */
 
 function measures(measures) {
   if (!arguments.length) return this.__attrs__.measures;
@@ -1558,10 +1442,6 @@ function process(type, call) {
   }
 }
 
-/**
- * @private
- * @param {d3Dispatch} listeners 
- */
 function rebindOnMethod$1 (listeners) {
   return rebindOnMethod(this, listeners);
 }
@@ -2124,14 +2004,6 @@ Legend.prototype.isHorizontal = isHorizontal;
 
 setMethodsFromAttrs(Legend, _attrs$4);
 
-/**
- * render a legend according to internal {@link Core#legend legend} settings
- * @memberOf Core#
- * @function
- * @private
- * @param {string} [field=region] specify a field name to select color scale.
- * @return {Core}
- */
 function renderLegend() {
   var field = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'region';
 
@@ -2192,17 +2064,6 @@ function renderLegend() {
   return this;
 }
 
-/**
- * render regions
- * @memberOf Core#
- * @function
- * @private
- * @param {function} posFunc specifies positions of a region by set x and y value of the region data
- * @param {function} [dataFunc=d => d] specify a data accessor
- * @param {boolean} [isFacet=false] 
- * @param {string} [suffix='']
- * @return {Core}
- */
 function renderRegion(posFunc) {
   var dataFunc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (d) {
     return d;
@@ -2375,13 +2236,6 @@ Spectrum.prototype.update = update$1;
 
 setMethodsFromAttrs(Spectrum, _attrs$5);
 
-/**
- * render a spectrum instead of a legend according to internal {@link Core#legend legend} settings. Charts such as treeemap and xy-heatmap, which use a contniuous color scale to present their measure level, use this method.
- * @memberOf Core#
- * @function
- * @private
- * @return {Core}
- */
 function renderSpectrum() {
   var legendToggle = this.legend();
   if (!legendToggle) return;
@@ -2429,7 +2283,7 @@ var defaultFont$3 = {
   'font-weight': 'normal',
   'font-style': 'normal'
 };
-
+var pointOriginColor = '#fff';
 var _attrs$6 = {
   absolute: false,
   anchor: { x: 'left', y: 'top' },
@@ -2567,13 +2421,48 @@ function showFromPoint(point, d) {
   var key = this.keyFunc();
   var value = this.valueFunc();
   var pos = this.__execs__.mark.get(point);
-  this.x(pos.x).y(pos.y).color(color ? color : d.color).key(key ? key.call(this, d, d.key) : null).value(value.call(this, d, d.text)).show();
+  this.x(pos.x).y(pos.y).color(color ? color : d.color).key(key ? key.call(this, d, d.key) : null).value(value.call(this, d, d.text)).show(point);
   return this;
 }
 
-function show$1() {
+function renderPoint(point) {
+  var showTrans = d3.transition().duration(140);
+  var target = this.target();
+  var isMulti = !!target.__attrs__.multiTooltip;
+  if (isMulti) return;
+  var isShowPoint = !!target.__attrs__.point;
+  var pointType = target.__attrs__.point.type ? target.__attrs__.point.type : 'empty';
+  if (pointType === 'empty') {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', function (d) {
+      return d.color;
+    });
+  } else {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', function (d) {
+      return d.color;
+    });
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', pointOriginColor);
+  }
+  if (!isShowPoint) target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').attr('opacity', 0);
+  var showPoint = d3.select(point).classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1);
+  if (pointType === 'empty') {
+    showPoint.style('fill', function (d) {
+      return d.color;
+    });
+    showPoint.attr('stroke', 'rgb(255, 255, 255)');
+  } else {
+    showPoint.style('fill', 'rgb(255, 255, 255)');
+    showPoint.attr('stroke', function (d) {
+      return d.color;
+    });
+  }
+}
+
+function show$1(point) {
   var valueFormat = this.valueFormat();
   var tooltip = this.__execs__.tooltip;
+
+  renderPoint.call(this, point);
 
   if (this.keys()) {
     var _key = tooltip.select(className('keys', true)).selectAll(className('key', true)).data(this.keys());
@@ -2638,23 +2527,6 @@ Tooltip.prototype.value = value;
 
 setMethodsFromAttrs(Tooltip, _attrs$6);
 
-/**
- * renders tooltip according to the internal {@link Core#tooltip tooltip} settings.
- * @memberOf Core#
- * @function
- * @private
- * @param {object} setting
- * @param {number} [setting.dx]
- * @param {number} [setting.dy]
- * @param {string} [setting.color ]
- * @param {function} [setting.key]
- * @param {function} [setting.value]
- * @param {function} [setting.offset]
- * @param {boolean} [setting.showDiff]
- * @param {boolean} fromMulti=false
- * @param {boolean} absolute=false
- * @return {Tooltip}
- */
 function renderTooltip() {
   var setting = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var fromMulti = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -2671,13 +2543,6 @@ function renderTooltip() {
   return tooltipObj;
 }
 
-/**
- * reset the chart
- * @memberOf Core#
- * @function
- * @param {boolean} [keep=false] If keep is true, not reset existing scales.
- * @return {Core} 
- */
 function reset() {
   var keep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
@@ -2743,12 +2608,6 @@ function scale(name) {
   return this.__execs__.scale[name];
 }
 
-/**
- * @memberOf Core#
- * @function
- * @private
- * @param {*} attrs 
- */
 function setAttrs$1(attrs) {
   setAttrs(this, attrs);
   return this;
@@ -2825,13 +2684,6 @@ function showTooltip() {
   return this;
 }
 
-/**
- * @memberOf Core#
- * @function
- * @private
- * @param {*} selection 
- * @param {*} font 
- */
 function styleFont(selection, font) {
   font = font || this.font();
   for (var fontKey in font) {
@@ -3592,7 +3444,7 @@ function _title(selection) {
       if (titleOrient === 'bottom' || titleOrient === 'top') {
         selection.attr('transform', 'translate(' + [0, titleOrient === 'bottom' ? d3.max(scale.range()) : d3.min(scale.range())] + ')');
       } else {
-        selection.attr('transform', 'translate(' + [that.thickness() * (orient === 'left' ? -1 : 1), halfPos] + ') ' + (orient === 'left' ? 'rotate(90)' : 'rotate(-90)'));
+        selection.attr('transform', 'translate(' + [that.thickness() * (orient === 'left' ? -1 : 1), halfPos] + ') ' + (titleOrient === 'left' ? 'rotate(90)' : 'rotate(-90)'));
       }
     }
   };
@@ -3706,7 +3558,7 @@ function setVal(axis) {
     val.thickness += val.showTicks ? offsetThickness : 0;
     val.defaultThickness = val.thickness;
   }
-  if (!('autoTickFormat' in val)) val.autoTickFormat = true;
+  if (!('autoTickFormat' in val) && !('format' in val)) val.autoTickFormat = false;
 
   return val;
 }
@@ -3879,10 +3731,6 @@ function axisTitle(targetAndField, title) {
   return this;
 }
 
-/**
- * @memberOf RectLinear#
- * @private
- */
 function renderAxis() {
   var _this = this;
 
@@ -3925,10 +3773,6 @@ function renderAxis() {
   return this;
 }
 
-/**
- * @memberOf RectLinear#
- * @private
- */
 function thickness(axisSetting, scale) {
   var isHorizontal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
   var isOrdinal = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
@@ -4204,15 +4048,6 @@ var paddingMixin = function paddingMixin(Base) {
   return PaddingMixin;
 };
 
-/**
- * If is true or a comparator string(natural, ascending, descending), sort nodes according to their values. If sortByValue is not specified, returns the current sortByValue setting.
- * @memberOf SortMixin#
- * @function
- * @example 
- * bar.sortByValue('ascending') //sort bars in ascending order.
- * @param {boolean|string} [sortByValue=false] (false|natural|ascending|descending)
- * @return {sortByValue|SortMixin}
- */
 function sortByValue(sortByValue) {
   if (!arguments.length) return this.__attrs__.sortByValue;
   if (sortByValue && (typeof sortByValue !== 'string' || !orders.find(function (o) {
@@ -4463,18 +4298,6 @@ function tempPosForOrdinalScale(key, scale) {
   }
 }
 
-/**
- * If unit is number or string, limit the key domain's length or distance within the interval. If the key domain's scale is ordnial, the length of domain will be the same to unit. Also, if the scale is continous, the distance of domain will be fixed as much as unit. If unit is string, it must be a time interval. When multiple exists, it will multiply the unit.
- * If unit is not specified, returns the existing viewInterval. 
- * @memberOf StreamMixin#
- * @function
- * @example
- * stream.viewInterval(1000)
- * stream.viewInterval('month', 3)
- * @param {number|string} [unit=null] 
- * @param {number} [multiple=1]
- * @return {zoom|ZoomMixin}
- */
 function viewInterval(unit) {
   var multiple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
@@ -6024,10 +5847,12 @@ function _mark$2() {
   var label = this.label();
   var individualScale = this.isIndividualScale();
   var size = this.size();
-  var showPoint = this.point();
+  var showPoint = !!this.point();
   var pointRatio = this.pointRatio();
+  var pointType = this.point().type ? this.point().type : 'empty';
   var trans = zoomed ? d3.transition().duration(0).delay(0) : d3.transition().duration(this.transition().duration).delay(this.transition().delay);
   var isArea = this.shape() === shapes[1];
+  var areaGradient = isArea && this.areaGradient();
   var yField = this.measureName();
   var curve = this.curve() === curves[0] ? d3.curveLinear : this.curve() === curves[1] ? d3.curveStep : d3.curveCatmullRom;
   var scaleBandMode = this.scaleBandMode();
@@ -6129,14 +5954,19 @@ function _mark$2() {
         thisSelect.transition(trans).attr('d', (area$$1 ? areaGenFunc : lineGenFunc)(individualScale ? d.scale : scale.y)(target));
       }
     });
-    if (area$$1) {
-      selection.attr('fill', c).attr('stroke', 'none');
+    if (areaGradient) {
+      var url = function url(d) {
+        return 'url(#areaGradient-' + d.data.key + ')';
+      };
+      selection.attr('stroke', c).attr("fill", url);
+    } else if (area$$1) {
+      selection.attr('fill', c);
     } else {
       selection.attr('stroke', c).attr('stroke-width', size.range[0] + 'px');
     }
   };
   var __pointInit = function __pointInit(selection) {
-    selection.attr('r', (size.range[0] - size.range[0] / 4) * pointRatio).attr('stroke-width', size.range[0] / 4 * pointRatio).style('fill', '#fff').attr('opacity', showPoint ? 1 : 0).style('cursor', 'pointer').attr('cx', function (d) {
+    selection.attr('r', (size.range[0] - size.range[0] / 4) * pointRatio).attr('stroke-width', size.range[0] / 4 * pointRatio).attr('opacity', showPoint ? 1 : 0).style('cursor', 'pointer').attr('cx', function (d) {
       return d.x0 || d.x;
     }).attr('cy', function (d) {
       return stream ? d.y : d3.max(scale.y.range());
@@ -6148,6 +5978,11 @@ function _mark$2() {
     }).attr('cy', function (d) {
       return d.y;
     });
+    if (pointType === 'fill') {
+      selection.attr('stroke', '#fff');
+    } else {
+      selection.style('fill', '#fff');
+    }
   };
   var __labelInit = function __labelInit(selection) {
     selection.each(function (d) {
@@ -6569,7 +6404,8 @@ function _region$2() {
   var facet = this.facet();
   var isFacet = this.isFacet();
   var color = this.color();
-  var __regionLocal = function __regionLocal(d) {
+  var areaGradient = this.areaGradient();
+  var __regionLocal = function __regionLocal(d, index) {
     if (aggregated) return;
     var xy = void 0;
     if (!nested) {
@@ -6584,6 +6420,13 @@ function _region$2() {
     }
     d.x = xy[0];d.y = xy[1];
     d.color = nested ? scale.color(d.data.key) : color[0];
+
+    if (areaGradient) {
+      var defs = canvas.append("defs");
+      var gradient = defs.append("linearGradient").attr("id", "areaGradient-" + d.data.key).attr("x1", "30%").attr("x2", "50%").attr("y1", "80%").attr("y2", "0%");
+      gradient.append("stop").attr("offset", "0%").attr("stop-color", d.color).attr("stop-opacity", 0);
+      gradient.append("stop").attr("offset", "100%").attr("stop-color", d.color).attr("stop-opacity", 1);
+    }
   };
 
   //create multiTooltip area
@@ -6696,7 +6539,7 @@ var defaultFont$5 = {
   'font-weight': 'normal',
   'font-style': 'normal'
 };
-var pointOriginColor = '#fff';
+var pointOriginColor$1 = '#fff';
 var baseColor = '#b0bec5';
 var _attrs$18 = {
   anchor: { x: 'left', y: 'top' },
@@ -6774,7 +6617,6 @@ function _domain$4() {
   var points = target.__execs__.canvas.selectAll(this.nodeName());
   var domain = [];
   points.each(function (d) {
-    //const result = mark.get(this);
     var find = domain.find(function (dd) {
       return dd.x === d.x;
     });
@@ -6794,10 +6636,11 @@ function _hide(selection) {
   selection.select(className('baseline', true)).transition(trans).attr('opacity', 0);
 
   var target = this.target();
-  var circle = target.nodes().filter(function () {
-    return d3.select(this).classed(className('show'));
-  }).classed(className('show'), false).selectAll('circle');
-  if (!target.point()) circle.attr('opacity', 0);else circle.style('fill', pointOriginColor);
+  // let circle = target.nodes().filter(function() {
+  //   return select(this).classed(className('show'));
+  // }).classed(className('show'), false).selectAll('circle');
+  // if (!target.point()) circle.attr('opacity', 0);
+  // else circle.style('fill', pointOriginColor);
   if (this.tooltip()) this.tooltip().hide();
 }
 
@@ -6820,22 +6663,37 @@ function _show(selection, tick) {
   var showTrans = d3.transition().duration(140);
   var target = this.target();
   var filtered = [];
-  if (!target.point()) {
-    //remove existing points
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('opacity', 0);
-  } else {
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
-  }
   var points = d3.selectAll(tick.points).each(function (d) {
     var x = d.x;
     if (x === tick.x) {
       filtered.push({ key: d.key, x: d.x, y: d.y, text: d.text });
     }
   });
+  var pointType = target.__attrs__.point.type ? target.__attrs__.point.type : 'empty';
+  if (pointType === 'empty') {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor$1);
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', function (d) {
+      return d.color;
+    });
+  } else {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', function (d) {
+      return d.color;
+    });
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', pointOriginColor$1);
+  }
 
-  points.classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1).style('fill', function (d) {
-    return d.color;
-  });
+  var shwoPoints = points.classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1);
+  if (pointType === 'empty') {
+    shwoPoints.style('fill', function (d) {
+      return d.color;
+    });
+    shwoPoints.attr('stroke', 'rgb(255, 255, 255)');
+  } else {
+    shwoPoints.style('fill', 'rgb(255, 255, 255)');
+    shwoPoints.attr('stroke', function (d) {
+      return d.color;
+    });
+  }
 
   var baseline = selection.select(className('baseline', true));
   baseline.transition(showTrans).attr('opacity', 1).attr('x1', tick.x + 0.5).attr('x2', tick.x + 0.5);
@@ -6853,16 +6711,19 @@ function _show(selection, tick) {
   values = values.map(function (d) {
     return { name: d.parent.data.key || d.data.key, value: d.text };
   });
+
   if (this.keyFormat()) {
     var f = this.keyFormat();
     values.forEach(function (d) {
-      return d.name = f(d.name);
+      if (d.name instanceof Date || typeof d.name === 'number') d.name = f(d.name);
     });
   }
   y = d3.mean(y);
   y = Math.round(y);
   if (x && y) {
-    tooltip.x(x).y(y).key({ name: 'key', value: tick.value }).value(values).show();
+    var keyValue = tick.value;
+    if (this.keyFormat() && (keyValue instanceof Date || typeof keyValue === 'number')) keyValue = this.keyFormat()(keyValue);
+    tooltip.x(x).y(y).key({ name: 'key', value: keyValue }).value(values).show();
   } else {
     tooltip.hide();
   }
@@ -7008,6 +6869,7 @@ var _attrs$12 = {
   pointRatio: 2,
   regionPadding: 0.1,
   shape: shapes[0],
+  areaGradient: false,
   scaleBandMode: false,
   size: size$2,
   individualScale: false
@@ -7242,6 +7104,16 @@ Line.prototype.scaleBandMode = attrFunc('scaleBandMode');
  * @return {individualScale|Line}
  */
 Line.prototype.individualScale = attrFunc('individualScale');
+
+/**
+ * If areaGradient is specified sets the areaGradient setting and returns the Line instance itself. If areaGradient is true, when a line chart shape area, each area filled gradient.
+ * @function
+ * @example
+ * line.areaGradient(true)
+ * @param {boolean} [areaGradient=false] If is true, each area filled gradient.
+ * @return {areaGradient|Line}
+ */
+Line.prototype.areaGradient = attrFunc('areaGradient');
 
 function domainY$1(fieldY, munged) {
   var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
@@ -9591,10 +9463,6 @@ var Combo = function (_mix$with) {
 
 var combo = genFunc(Combo);
 
-/**
- * @namespace jelly
- * @type {object}
- */
 var _layout = {
   /**
    * Generator returns a {@link Bar} instance

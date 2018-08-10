@@ -9,7 +9,11 @@
   <link type="text/css" rel="stylesheet" href="../style/demo.css">
   <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
   <script src="//d3js.org/d3.v4.min.js"></script>
+<<<<<<< Updated upstream
     <script src="../release/latest/dist/jelly.min.js"></script>
+=======
+    <script src="../../dist/jelly.js"></script>
+>>>>>>> Stashed changes
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>
     hljs.initHighlightingOnLoad();
@@ -228,8 +232,12 @@
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
+<<<<<<< Updated upstream
       setTimeout(function() {
         jelly.bar()
+=======
+      jelly.bar()
+>>>>>>> Stashed changes
   .container('#jelly-container')
   .data([
     {category:'Blue', name: 'A', value: 10},
@@ -245,7 +253,10 @@
   .measures([{field: 'value', op: 'sum', customDomain: [0, 1000]}])
   .axis('x').axis('y')
   .render();
+<<<<<<< Updated upstream
       }, 200);
+=======
+>>>>>>> Stashed changes
     });
   </script>
 </body>
