@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Jelly-Chart Demo: Select a Node</title>
+  <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.css">
+  <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+  <link type="text/css" rel="stylesheet" href="../style/demo.css">
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+  <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="../release/latest/dist/jelly.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+</head>
+
+<body>
+  <aside id="list">
+    <h2>
+      <a href="../">🤓 Jelly-Chart </a>
+    </h2>
+    <nav>
+        <div>
+          <h3>Bar</h3>
+          <ul>
+            <li class=""><a href="mono-bar">Mono Bar Chart</a></li>
+            <li class=""><a href="mono-bar-no-measure">Mono Bar Chart w/o Measures</a></li>
+            <li class=""><a href="mono-bar-color">Mono Bar Chart w/ Color Pattern</a></li>
+            <li class=""><a href="grouped-bar">Grouped Bar Chart</a></li>
+            <li class=""><a href="multi-measure-bar">Multi-measure Bar Chart</a></li>
+            <li class=""><a href="multi-measure-grouped-bar">Multi-measure Grouped Bar Chart</a></li>
+            <li class=""><a href="stacked-bar">Stacked Bar Chart</a></li>
+            <li class=""><a href="normalized-stacked-bar">Normalized Stacked Bar Chart</a></li>
+            <li class=""><a href="horizontal-bar">Horizontal Bar Chart</a></li>
+            <li class=""><a href="facet-bar">Small Multiples Bar Chart</a></li>
+            <li class=""><a href="annotation-bar">Annotation On Bar Chart</a></li>
+            <li class=""><a href="showDiff-bar">Difference On Bar Chart</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Line</h3>
+          <ul>
+            <li class=""><a href="mono-line">Mono Line Chart</a></li>
+            <li class=""><a href="multi-line">Multi-series Line Chart</a></li>
+            <li class=""><a href="curved-line">Curved Line Chart</a></li>
+            <li class=""><a href="stepped-line">Stepped Line Chart</a></li>
+            <li class=""><a href="multi-measure-line">Multi-measure Line Chart</a></li>
+            <li class=""><a href="multi-measure-individual-line">Multi-measure Line Chart w/ Individual Scale</a></li>
+            <li class=""><a href="stacked-area">Stacked Area Chart</a></li>
+            <li class=""><a href="stacked-area-gradient">Stacked and Gradient Area Chart</a></li>
+            <li class=""><a href="normalized-stacked-area">Normalized Stacked Area Chart</a></li>
+            <li class=""><a href="facet-line">Small Multiples Line Chart</a></li>
+            <li class=""><a href="fitline-line">Fit Line on Line Chart</a></li>
+            <li class=""><a href="meanline-line">Mean Line on Line Chart</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Combo</h3>
+          <ul>
+            <li class=""><a href="combo">Bar &amp; Line Combo Chart</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Pie</h3>
+          <ul>
+            <li class=""><a href="normal-pie">Normal Pie Chart</a></li>
+            <li class=""><a href="donut-pie">Donut Pie Chart</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Scatter</h3>
+          <ul>
+            <li class=""><a href="mono-scatter">Mono Scatter Chart</a></li>
+            <li class=""><a href="color-scatter">Color Scatter Chart</a></li>
+            <li class=""><a href="sized-scatter">Sized Scatter Chart</a></li>
+            <li class=""><a href="facet-scatter">Small Multiples Scatter Chart</a></li>
+            <li class=""><a href="fitLine-scatter">Fit Line on Scatter Chart</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Parallel Coordinates</h3>
+          <ul>
+            <li class=""><a href="mono-par-coords">Mono Parallel Coordinates</a></li>
+            <li class=""><a href="color-par-coords">Color Parallel Coordinates</a></li>
+            <li class=""><a href="scatter-matrix">Scatter Plot Matrix</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Treemap</h3>
+          <ul>
+            <li class=""><a href="treemap">Treemap</a></li>
+            <li class=""><a href="circle-packing">Circle Packing Diagram</a></li>
+            <li class=""><a href="word-cloud">Word Cloud</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>XY Heatmap</h3>
+          <ul>
+            <li class=""><a href="xy-heatmap">XY Heatmap</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Marker Map</h3>
+          <ul>
+            <li class=""><a href="address-marker-map">Marker Map w/ addresses</a></li>
+            <li class=""><a href="coordinate-marker-map">Marker Map w/ coordinates</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Zoom</h3>
+          <ul>
+            <li class=""><a href="normal-zoom-line">Normal Zoom with Line Chart</a></li>
+            <li class=""><a href="normal-zoom-scatter">Normal Zoom with Scatter Chart</a></li>
+            <li class=""><a href="brush-zoom-line">Brush Zoom with Line Chart</a></li>
+            <li class=""><a href="brush-zoom-scatter">Brush Zoom with Scatter Chart</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Time</h3>
+          <ul>
+            <li class=""><a href="time-line">Timeseries Line chart</a></li>
+            <li class=""><a href="time-line-auto">Timeseries Line chart w/ autoTickFormat</a></li>
+            <li class=""><a href="time-line-brush">Timeseries Line chart w/ Brush Zoom</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Color</h3>
+          <ul>
+            <li class=""><a href="color-pattern">Color Pattern</a></li>
+            <li class=""><a href="color-domain">Color Domain</a></li>
+            <li class=""><a href="color-domain-pattern">Color Domain w/ Pattern</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Domain</h3>
+          <ul>
+            <li class=""><a href="custom-domain">Custom Domain</a></li>
+            <li class=""><a href="custom-domain-measure">Custom Domain on a Measure</a></li>
+            <li class=""><a href="custom-domain-measures">Custom Domain on Measures</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Axis</h3>
+          <ul>
+            <li class=""><a href="axis-title-axis">Axis Title: .axis</a></li>
+            <li class=""><a href="axis-title-axistitle">Axis Title: .axisTitle</a></li>
+            <li class=""><a href="axis-orient">Axis Orient</a></li>
+            <li class=""><a href="no-axis">No Axis</a></li>
+            <li class=""><a href="no-axis-title">No Axis Title</a></li>
+            <li class=""><a href="no-ticks">No Axis Ticks</a></li>
+            <li class=""><a href="axis-sub-tick">Sub Axis Ticks</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Interaction</h3>
+          <ul>
+            <li class="selected"><a href="select-node">Select a Node</a></li>
+            <li class=""><a href="mute-node">Mute Nodes</a></li>
+            <li class=""><a href="mute-region-bar">Mute Regions: Bar</a></li>
+            <li class=""><a href="mute-region-line">Mute Regions: Line</a></li>
+            <li class=""><a href="mute-legend">Mute Labels on a Legend</a></li>
+            <li class=""><a href="show-tooltip">Show a Tooltip over a Node</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Size</h3>
+          <ul>
+            <li class=""><a href="auto-resize-bar">Resize Automatically: Bar</a></li>
+            <li class=""><a href="auto-resize-treemap">Resize Automatically: Treemap</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Sort</h3>
+          <ul>
+            <li class=""><a href="sort-value-bar">Sort By Values: Bar</a></li>
+            <li class=""><a href="sort-value-pie">Sort By Values: Pie</a></li>
+            <li class=""><a href="sort-value-treemap">Sort By Values: Treemap</a></li>
+            <li class=""><a href="sort-value-xyheatmap">Sort By Values: XY Heatmap</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Data Stream</h3>
+          <ul>
+            <li class=""><a href="stream-bar">Data Stream: Bar</a></li>
+            <li class=""><a href="stream-line">Data Stream: Line</a></li>
+            <li class=""><a href="stream-scatter">Data Stream: Scatter</a></li>
+            <li class=""><a href="stream-line-time">Data Stream: Line with Time Interval</a></li>
+          </ul>
+        </div>
+    </nav>  </aside>
+  <div id="wrapper">
+    <div>
+    <section id="content">
+      <h2>📊 Select a Node</h2>
+      
+      <div>
+         
+          <div class="containers" id="jelly-container"></div>
+      </div>
+      <div class="desc"></div>
+      
+      <h3>🔑  Sample Code </h3>
+      <pre><code class="javascript">var bar = jelly.bar().container('#jelly-container')
+  .data([
+    {category:'Blue', name: 'A', value: 10},
+    {category:'Blue', name: 'B', value: 20},
+    {category:'Blue', name: 'C', value: 30},
+    {category:'Blue', name: 'D', value: 40},
+    {category:'Red', name: 'A', value: 20},
+    {category:'Red', name: 'B', value: 10},
+    {category:'Red', name: 'C', value: 40},
+    {category:'Red', name: 'D', value: 10}
+  ]).dimensions(['category', 'name'])
+  .measures('value')
+  .axis('x').axis('y')
+  .legend(true)
+bar.render();
+//If you hover or click a node, it will print the node's key on console.
+bar.on('selectEnter', function(d) {
+  console.log('Enter: ' + d.key);
+}).on('selectLeave', function(d) {
+  console.log('Leave: ' + d.key);
+}).on('selectClick', function(d) {
+  console.log('Click: ' + d.key);
+})</code></pre>
+    
+      <footer>
+        <p>© Newsjelly Corp.</p>
+      </footer>
+    </section>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(function() {
+        var bar = jelly.bar().container('#jelly-container')
+  .data([
+    {category:'Blue', name: 'A', value: 10},
+    {category:'Blue', name: 'B', value: 20},
+    {category:'Blue', name: 'C', value: 30},
+    {category:'Blue', name: 'D', value: 40},
+    {category:'Red', name: 'A', value: 20},
+    {category:'Red', name: 'B', value: 10},
+    {category:'Red', name: 'C', value: 40},
+    {category:'Red', name: 'D', value: 10}
+  ]).dimensions(['category', 'name'])
+  .measures('value')
+  .axis('x').axis('y')
+  .legend(true)
+bar.render();
+//If you hover or click a node, it will print the node's key on console.
+bar.on('selectEnter', function(d) {
+  console.log('Enter: ' + d.key);
+}).on('selectLeave', function(d) {
+  console.log('Leave: ' + d.key);
+}).on('selectClick', function(d) {
+  console.log('Click: ' + d.key);
+})
+      }, 200);
+    });
+  </script>
+</body>
+
+</html>
