@@ -143,16 +143,16 @@ function _render(selection) { //pre-render the tooltip
 			.style('list-style', 'none')
 			.style('padding', 0)
 			.style('margin', 0)
-    tooltip.append('div')
-      .attr('class', className('arrow'))
-      .style('position', 'absolute')
-      .style('top', 'calc(' + arrowWidth + 'px + 50%)')
-      .style('left', '0%')
-      .style('margin', -(arrowWidth*2) + 'px')
-      .style('border-width', arrowWidth + 'px')
-      .style('border-style', 'solid')
-      .style('border-color', 'transparent ' + backgroundColor + ' transparent transparent')
-      .text(' ');
+    // tooltip.append('div')
+    //   .attr('class', className('arrow'))
+    //   .style('position', 'absolute')
+    //   .style('top', 'calc(' + arrowWidth + 'px + 50%)')
+    //   .style('left', '0%')
+    //   .style('margin', -(arrowWidth*2) + 'px')
+    //   .style('border-width', arrowWidth + 'px')
+    //   .style('border-style', 'solid')
+    //   .style('border-color', 'transparent ' + backgroundColor + ' transparent transparent')
+    //   .text(' ');
   }
   for (let fontKey in this.font()) {
     tooltip.style(fontKey, this.font()[fontKey] + (fontKey === 'font-size' ? 'px' : ''));
