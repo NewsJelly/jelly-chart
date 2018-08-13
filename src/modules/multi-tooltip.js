@@ -102,7 +102,6 @@ function _hide(selection) {
     return select(this).classed(className('show'));
   }).classed(className('show'), false).selectAll('circle');
   if (!target.point()) circle.attr('opacity', 0);
-  else circle.style('fill', pointOriginColor);
   if (this.tooltip()) this.tooltip().hide();
 }
 
@@ -132,12 +131,18 @@ function _render(selection) {
 function _show(selection, tick) {
   const showTrans = transition().duration(140);
   const target = this.target();
-  const filtered = [];
-  if (!target.point()) { //remove existing points
+	const filtered = [];
+	
+	//point redraw
+  if (!target.point()) {
     target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('opacity', 0);
   } else {
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
-  }
+		target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor)
+		.attr('stroke', function(d){
+			return d.color;
+		});
+	}
+	//current point redraw
   let points = selectAll(tick.points)
     .each(function(d) {
       let x = d.x;
@@ -145,12 +150,11 @@ function _show(selection, tick) {
         filtered.push({key:d.key, x:d.x, y: d.y, text: d.text});
       }
     })
-  points.classed(className('show'), true).selectAll('circle').transition(showTrans)
-    .attr('opacity', 1)
-    .style('fill', function(d){
-      return d.color;
-    })
-  
+  let pointsShow = points.classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1)
+  pointsShow.style('fill', function(d){
+		return d.color;
+	}).attr('stroke', pointOriginColor)
+
   let baseline = selection.select(className('baseline', true));
   baseline.transition(showTrans).attr('opacity', 1)
     .attr('x1', tick.x + 0.5).attr('x2', tick.x + 0.5);  

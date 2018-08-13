@@ -7,7 +7,11 @@ jelly.line().container('#jelly-container')
     {category:'BBB', x: 1000, y: 80},{category:'BBB', x: 2000, y: 60},
     {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 70},
     {category:'BBB', x: 1000, y: 20},{category:'BBB', x: 2000, y: 60},
-    {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 60}
+    {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 60},
+    {category:'CCC', x: 1000, y: 25},{category:'CCC', x: 2000, y: 50},
+    {category:'CCC', x: 3000, y: 80},{category:'CCC', x: 4000, y: 10},
+    {category:'CCC', x: 1000, y: 40},{category:'CCC', x: 2000, y: 20},
+    {category:'CCC', x: 3000, y: 40},{category:'CCC', x: 4000, y: 90},
   ]).dimensions([
     {
       field: 'x',
@@ -18,7 +22,7 @@ jelly.line().container('#jelly-container')
     }])
   .measures({field:'y', op:'mean'})
   .stacked(true)
-  .point(true)
+  .point(false)
   .shape('area').areaGradient(true)
   .axis('x').axis('y')
   .legend(true)
