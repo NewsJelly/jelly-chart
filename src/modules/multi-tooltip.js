@@ -97,12 +97,6 @@ function _hide(selection) {
   const trans = transition().duration(180);
   selection.select(className('baseline', true)).transition(trans).attr('opacity', 0);
 
-  let target = this.target();
-  // let circle = target.nodes().filter(function() {
-  //   return select(this).classed(className('show'));
-  // }).classed(className('show'), false).selectAll('circle');
-  // if (!target.point()) circle.attr('opacity', 0);
-  // else circle.style('fill', pointOriginColor);
   if (this.tooltip()) this.tooltip().hide();
 }
 

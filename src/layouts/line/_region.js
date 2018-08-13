@@ -8,7 +8,7 @@ function _region() {
   const isFacet = this.isFacet();
 	const color = this.color();
 	const areaGradient = this.areaGradient();
-  let __regionLocal = (d, index ) => {
+  let __regionLocal = d => {
     if (aggregated) return;
     let xy;
     if(!nested) {

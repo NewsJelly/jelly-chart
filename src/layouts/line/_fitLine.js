@@ -16,7 +16,6 @@ export default function() {
   let yValues = leastSquares.map(l => {
     return xValues.map(d => l.slope * d + l.intercept);
   });
-  console.log('fit yValues', yValues)
   if (fitLineG.empty()) {
     fitLineG = canvas.append('g').attr('class',  className('fit-line-g'))
       .attr('clip-path', `url(#${canvas.selectAll(className('canvas-g-clip-path', true)).attr('id')}`);
