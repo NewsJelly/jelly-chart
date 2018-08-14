@@ -33,4 +33,5 @@ jelly.line().container('#jelly-container')
   .axis({target: 'x', compressTicks: true}).axis('y')
   .legend(true)
   .multiTooltip(true)
+  .font({'font-size': 20})
   .render();

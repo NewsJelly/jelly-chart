@@ -9,7 +9,6 @@ function setVal(axis) {
     val.target = val.orient;
     val.orient = 'left';
   } 
-  console.log('val', val)
   let isHorizontal = val.target === 'x';
   if (!('showDomain' in val)) val.showDomain = true;
   if (!('showTicks' in val)) val.showTicks = true;

@@ -6,10 +6,12 @@ function _axis() {
   const individualScale = this.isIndividualScale();
   const innerSize = this.innerSize();
   const fieldObj = this.__execs__.field;
+  const font = this.font()
+  console.log(this.font())
   let _axisScaleX = function (axisToggle) {
     fieldObj.x.axis(axisToggle);
     let curAxis = that.axisDefault(scale.x, axisToggle);
-    
+    console.log('curAxis', curAxis)
     if (scale.x.invert) curAxis.grid(grid).gridSize(innerSize.height);
     if (axisToggle.orient === 'bottom') curAxis.y(scale.y.range()[0]);
     return curAxis;
