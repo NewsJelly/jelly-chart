@@ -9,10 +9,11 @@ function setVal(axis) {
     val.target = val.orient;
     val.orient = 'left';
   } 
-
+  console.log('val', val)
   let isHorizontal = val.target === 'x';
   if (!('showDomain' in val)) val.showDomain = true;
   if (!('showTicks' in val)) val.showTicks = true;
+  if (!('compressTicks' in val)) val.compressTicks = false;
   if (!('showTitle' in val)) val.showTitle = true;
   if (!('orient' in val)) val.orient = (isHorizontal ? 'bottom' : 'left'); // x축일 경우 기본 bottom;
   if (!('thickness' in val)) {
@@ -42,6 +43,7 @@ function setVal(axis) {
  * @param {number} [axis.thickness=18]
  * @param {boolean} [axis.showDomain=true]
  * @param {boolean} [axis.showticks=true]
+ * @param {boolean} [axis.compressTicks=false] if is true, only first or end value of the tick shown.
  * @param {boolean} [axis.showTitle=true]
  * @param {string} [axis.title]
  * @param {string} [axis.titleOrient] top|right|bottom|left

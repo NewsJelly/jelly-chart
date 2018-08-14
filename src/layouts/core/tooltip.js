@@ -5,7 +5,7 @@
  * @example
  * core.tooltip(true); //set to show a tooltip
  * core.tooltip({sortByValue:'ascending'}); // set to show a tooltip and sort items in order of their measrue values.
- * @param {boolean|object} [tooltip=false]
+ * @param {boolean|object} [tooltip=true]
  * @return {tooltip|Core}
  */
 

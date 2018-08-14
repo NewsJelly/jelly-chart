@@ -5,7 +5,6 @@ import {countMeasure, countMeasureTitle} from './measureField';
 
 const arrowWidth = 4;
 const backgroundColor = '#ffffff';
-const whiteColor = '#fff';
 const greyColor = '#485464';
 const greyColor2 = '#171b20';
 const IS_IE9 = typeof navigator === 'object' ? (/MSIE 9/i.test(navigator.userAgent)) : false;
@@ -129,6 +128,7 @@ function _render(selection) { //pre-render the tooltip
       .style('box-shadow', '0 0 10px 0 rgba(72, 84, 100, 0.2)')
       .style('position', 'absolute')
       .style('z-index', '999')
+      .style('min-width', '127px')
       .call(_styleOpacity, 0)
     
     tooltip.append('div')
@@ -209,7 +209,8 @@ function show() {
 		.attr('class', className('value'))
 		.style('list-style', 'none')
 		.style('padding', 0)
-		.style('margin', 0)
+    .style('margin', 0)
+    .style('overflow', 'hidden')
     .merge(value)
   if (this.showDiff() && value.size() > 1) {
     value.style('color', greyColor);
