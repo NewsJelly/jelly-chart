@@ -18,11 +18,16 @@ function _mark(zoomed = false) {
   const pointRatio = this.pointRatio();
   const trans = zoomed ? transition().duration(0).delay(0) : transition().duration(this.transition().duration).delay(this.transition().delay);  
   const isArea = this.shape() === shapes[1];
+	const areaGradient = isArea && this.areaGradient()
   const yField = this.measureName();
   const curve = this.curve() === curves[0] ? curveLinear : (this.curve() === curves[1] ? curveStep : curveCatmullRom);
   const scaleBandMode = this.scaleBandMode();
   const multiTooltip = this.multiTooltip();
   const stream = this.stream();
+const diffWithArrow = this.diffWithArrow();
+const downArrow = this.downArrowPath();
+const upArrow = this.upArrowPath();
+const font = this.font();
   const xKey = d => field.x.interval() ? new Date(d.data.key) : d.data.key;
   const xValue = d => scale.x( xKey(d)) + (scaleBandMode ? scale.x.bandwidth()/2 : 0);
   const yValueFunc = (s) => {
@@ -43,7 +48,7 @@ function _mark(zoomed = false) {
   }
   let __local = function (selection) {
     let tFormat = (key) => {
-      let f = field.x.isInterval() ? timeFormat(field.x.format()) : null; 
+      let f = field.x.isInterval() ? timeFormat(field.x.format()) : null;
       return f ? f(key) : key;
     }
 
@@ -65,7 +70,7 @@ function _mark(zoomed = false) {
         }
       }
       d.y = yValueFunc(individualScale ? d.parent.scale : scale.y)(d);
-      d.anchor = i === 0 ? 'start' : (i === arr.length-1 ? 'end' : 'middle'); 
+      d.anchor = i === 0 ? 'start' : (i === arr.length-1 ? 'end' : 'middle');
       d.text = labelFormat(d.value);
       d.color = d.parent.color;
       d.key = tFormat(d.data.key);
@@ -97,6 +102,12 @@ function _mark(zoomed = false) {
         let target = d.children;
         select(this).attr('d', lineInitGen(target))
           .style('fill', 'none');
+      let values = target.map(function(d) {
+                       return d.value
+                   });
+       d.diff = values[values.length - 1] - values[values.length - 2];
+       d.y = yValueFunc(scale.y)(d.children[d.children.length - 1]);
+       d.x = xValue(d.children[d.children.length - 1]);
       })
     }
   }
@@ -116,12 +127,21 @@ function _mark(zoomed = false) {
         thisSelect.transition(trans)
           .attr('d', (area ? areaGenFunc : lineGenFunc)(individualScale ? d.scale : scale.y)(target));
       }
-      
+
     })
     if (area) {
       selection
         .attr('fill', c).attr('stroke', 'none')
     } else {
+    if (areaGradient) {
+			let url = d => `url(#areaGradient-${d.data.key})`
+			selection
+				.attr('stroke', 'none')
+				.attr("fill", url);
+			// console.log('c', c)
+    }else if (area) {
+			selection.attr('fill', c)
+		}else {
       selection.attr('stroke', c)
         .attr('stroke-width', size.range[0] + 'px')
     }
@@ -130,7 +150,7 @@ function _mark(zoomed = false) {
     selection
       .attr('r', (size.range[0] - size.range[0] / 4) * pointRatio)
       .attr('stroke-width', size.range[0] / 4 * pointRatio)
-      .style('fill', '#fff')
+      // .style('fill', '#fff')
       .attr('opacity',  showPoint ? 1 : 0)
       .style('cursor', 'pointer')
       .attr('cx', d => d.x0 || d.x)
@@ -151,6 +171,7 @@ function _mark(zoomed = false) {
       selection.attr('x', d => d.x0 || d.x)
         .attr('y', d => stream ? d.y : max(scale.y.range()))
         .attr('stroke', 'none')
+        .style("fiil", "#ffffff")
         .style('visibility', label ? 'visible' : 'hidden')
         .text(d.text)
       that.styleFont(selection);
@@ -159,10 +180,19 @@ function _mark(zoomed = false) {
   let __label = function(selection) {
     selection.each(function(d) {
       let selection = select(this);
+      if (d.anchor == "end") {
+            d.anchor = "start";
+            d.x += 15;
+            d.text += "  " + d.parent.data.key
+        } else if (d.anchor == "start") {
+            d.anchor = "end";
+            d.x -= 15
+        }
       selection.attr('text-anchor', d.anchor)
         .style('pointer-events', multiTooltip ? 'none' : 'all')
         .transition(trans)
-        .attr('y', d.y  + (size.range[0] / 2 * pointRatio + 1) * (d.upward ? 1 : -1))
+        // .attr('y', d.y  + (size.range[0] / 2 * pointRatio + 1) * (d.upward ? 1 : -1))
+        .attr('y', d.y  + font["font-size"] * .75 / 2)
         .attr('x', d.x)
         .attr('dy', d.upward ? '.71em' : 0)
         .style('visibility', label ? 'visible' : 'hidden')
@@ -216,6 +246,43 @@ function _mark(zoomed = false) {
     point.select('text')
       .call(__label)
   }
+
+  let __appendArrow = function (selection) {
+      var arrow = selection.select(that.seriesName(true) + "arrow");
+      if (arrow.empty()) {
+          arrow = selection.append("g").attr("class", that.seriesName(true) + "arrow")
+      }
+      arrow.append("svg:image").attr("class", className("markarrow"));
+      arrow.append("text").attr("class", className("markarrow"));
+      var series = selection.select(that.seriesName());
+      var diff = {};
+      series.each(function(d, e, i) {
+          diff = {
+              value: d.diff,
+              x: d.x + 125,
+              y: d.y - 10,
+              h: 20,
+              w: 20,
+              text: labelFormat(d.diff, true)
+          }
+      });
+      // var o = select(this);
+      arrow.select("image" + className("markarrow", true))
+        .datum(diff)
+        .attr("x", diff.x)
+        .attr("y", diff.y)
+        .attr("height", diff.h)
+        .attr("width", diff.w)
+        .attr("xlink:href", diff.value < 0 ? downArrow : upArrow);
+      arrow.select("text" + className("markarrow", true))
+        .datum(diff)
+        .attr("x", diff.x + 25)
+        .attr("y", diff.y + 15)
+        .attr("height", diff.h)
+        .attr("width", diff.w)
+        .text(diff.text)
+  };
+
   let region = canvas.selectAll(this.regionName());
   region.each(function() {
     select(this).each(function(d) {
@@ -223,6 +290,13 @@ function _mark(zoomed = false) {
     }).call(__appendSeries)
       .call(__appendPoints);
   });
+  if (diffWithArrow) {
+      region.each(function() {
+        select(this).each(function(d) {
+          d.children.sort((a,b) => xValue(a) - xValue(b));
+      }).call(__appendArrow);
+      });
+  }
 }
 
 export default _mark;

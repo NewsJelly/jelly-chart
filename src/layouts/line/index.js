@@ -26,6 +26,9 @@ import _fitLine from './_fitLine';
 import _tooltip from './_tooltip';
 import _zoom from './_zoom';
 import {leastSquare as lsFunc} from '../../modules/transform';
+import _unit from './_unit';
+import _title from './_title';
+
 
 const size = {range: [2, 2], scale: 'linear', reverse: false};
 const shapes = ['line', 'area'];
@@ -63,6 +66,8 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
     this.__execs__.multiTooltipDispatch = dispatch('selectStart', 'selectMove', 'selectEnd', 'multiTooltip');
     this.rebindOnMethod(this.__execs__.multiTooltipDispatch);
     this.process('munge', _munge, {isPre: true})
+    .process('unit', _unit)
+    .process('title', _title)
       .process('brushZoom', _brushZoom, {isPre: true, allow: function() {return this.isBrushZoom()}})
       .process('domain', _domain, {isPre: true, allow: function() {return !this.isBrushZoom()}})
       .process('range', _range, {isPre: true, allow: function() {return !this.isBrushZoom()}})
@@ -89,8 +94,8 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
    * @example
    * line.multiTooltip(true) // show multiple points on the same horizontal position on a tooltip
    * line.multiTooltip('ascending') //sort items in ascending order by their each value
-   * line.multiTooltip(false) 
-   * line.multiTooltip() 
+   * line.multiTooltip(false)
+   * line.multiTooltip()
    * @param {boolean|string|object} [multiTooltip=false]
    * @param {string} [multiTooltip.sortByValue=natural] (natural|ascending|descending)
    * @return {multiTooltip|Line}
@@ -100,8 +105,8 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
     if (typeof multiTooltip === 'boolean') {
       if (multiTooltip) {
         multiTooltip = {sortByValue: 'natural'};
-      } 
-    } 
+      }
+    }
     if (typeof multiTooltip === 'object') {
       if (!multiTooltip.sortByValue) multiTooltip.sortByValue = 'natural';
     }
@@ -111,7 +116,7 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
 
   /**
    * gets a result of linear least squres from serieses. If key is specified, returns the value only froma specific series. It is used for draw fit-lines.
-   * @param {string} [key] a name of a series 
+   * @param {string} [key] a name of a series
    * @example
    * let l = line.data([
    *  {name: 'A', sales: 10, profit: 5},
@@ -124,7 +129,7 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
    *  .render();
    * l.leastSquare('A') // returns a result of the series A
    * l.leastSquare() // returns from all serieses
-   * @return {object[]} returns [{key: fitLineVal, slope, intercept, rSquare}...] 
+   * @return {object[]} returns [{key: fitLineVal, slope, intercept, rSquare}...]
    */
   leastSquare(key) {
     const measureName = this.measureName();
@@ -149,7 +154,7 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
   measureName() {
     let measures = this.measures();
     let yField;
-    if (this.condition() === conditions[2]) yField = mixedMeasure.field; 
+    if (this.condition() === conditions[2]) yField = mixedMeasure.field;
     else if (this.aggregated() && measures[0].field === mixedMeasure.field) yField = measures[0].field;
     else yField = measures[0].field + '-' + measures[0].op;
     return yField;
@@ -184,26 +189,26 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
   muteFromLegend(legend) {
     this.muteRegions(legend.key);
   }
-  
+
   muteToLegend(d) {
     this.muteLegend(d.parent.data.key);
   }
-  
+
   demuteFromLegend(legend) {
     this.demuteRegions(legend.key);
   }
-  
+
   demuteToLegend(d) {
     this.demuteLegend(d.parent.data.key);
   }
-  
+
   showMultiTooltip(tick, start) { //for the facet condition
     if (this.multiTooltip()) {
       let mt = this.__execs__.tooltip;
       mt.tick(tick, start);
     }
   }
-} 
+}
 /**
  * If meanLine is specified sets the meanLine setting and returns the Line instance itself. If meanLine is true renders a mean-line on each series. If meanLine is not specified, returns the current meanLine setting.
  * @function
@@ -224,8 +229,22 @@ Line.prototype.scaleBandMode = attrFunc('scaleBandMode');
  */
 Line.prototype.individualScale = attrFunc('individualScale');
 
+/**
+ * If areaGradient is specified sets the areaGradient setting and returns the Line instance itself. If areaGradient is true, when a line chart shape area, each area filled gradient.
+ * @function
+ * @example
+ * line.areaGradient(true)
+ * @param {boolean} [areaGradient=false] If is true, each area filled gradient.
+ * @return {areaGradient|Line}
+ */
+Line.prototype.areaGradient = attrFunc('areaGradient');
+Line.prototype.diffWithArrow = attrFunc("diffWithArrow");
+
 function domainY(fieldY, munged, level=0, aggregated=false, stacked=false) {
   return fieldY.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);
 }
+
+Line.prototype.unit = attrFunc('unit');
+Line.prototype.title = attrFunc('title');
 export default genFunc(Line);
 export {conditions, domainY, shapes};

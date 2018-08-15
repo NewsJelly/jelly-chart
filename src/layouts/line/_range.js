@@ -6,8 +6,9 @@ function _range() {
   const isMixed = this.isMixed();
   const xAt = this.axisX();
   const yAt = this.axisY();
-  
-  if (this.isFacet()) { 
+  const diffWithArrow = this.diffWithArrow();
+
+  if (this.isFacet()) {
     if (facet.orient === 'horizontal' && xAt) {
       xAt.orient = 'top';
       xAt.showDomain = false;
@@ -26,7 +27,7 @@ function _range() {
       scale.region.rangeRound([0, innerSize.width]);
     }
     return;
-  } 
+  }
 
   if (isMixed && individualScale && yAt) {
     yAt.orient = 'left';
@@ -36,14 +37,14 @@ function _range() {
     this.axis(tempAt);
     this.thickness(tempAt, munged[munged.length-1].scale, false, false);
    } else if (yAt) {
-    let right = this.axis().find(d => d.target === 'y' && d.orient !== yAt.orient) 
+    let right = this.axis().find(d => d.target === 'y' && d.orient !== yAt.orient)
     if (right) this.axis(right, false);
     this.thickness(yAt, scale.y, false, false);
   }
- 
+
   this.thickness(xAt, scale.x, true, scale.x.invert ? false : true);
   const innerSize = this.innerSize();
-  scale.x.range([0, innerSize.width]); 
+  scale.x.range([0, innerSize.width]);
   if (scale.x.invert && !this.scaleBandMode()) {
     const xDomain = scale.x.domain();
     let d0 = this.padding();
@@ -53,12 +54,17 @@ function _range() {
       let center = (d0+d1)/2;
       scale.x.range([center, center]) ;
     } else {
-      scale.x.range([d0, d1]); 
+      scale.x.range([d0, d1]);
     }
-  } 
+  }
+  if (diffWithArrow) {
+      let d0 = 0;
+      let d1 = innerSize.width - d0;
+      scale.x.range([d0 + 100, d1 - 200])
+  }
   scale.y.range([innerSize.height, 0]); //reverse
-  
-  if (individualScale) { //individual scale 
+
+  if (individualScale) { //individual scale
     munged.forEach(m => {
       m.scale.range([innerSize.height, 0])
     });

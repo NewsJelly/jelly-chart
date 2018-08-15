@@ -22,11 +22,11 @@ function conditionFunc (dimensions, measures) {
   } else if (dimensions.length <=1 && measures.length >= 2) {
     if(dimensions.length === 1) { //mixed
       field.region = dimensionField(dimensions[0]);
-    } 
+    }
     field.x = dimensionField(this.mixedDimension());
     field.y = measureField(mixedMeasure).mixed(true).measures(measures);
     return conditions[2];
-  } 
+  }
   else throw new ConditionException();
 }
 
@@ -34,7 +34,19 @@ function _munge() {
   this.condition(conditionFunc);
   const field = this.__execs__.field;
   const mixed = this.isMixed();
-  
+
+    const diffArrow = this.diffArrow();
+    const data = this.data();
+    const colorDomin = this.colorDomain();
+    if (diffArrow) {
+        var diff = {};
+        diff[field.x.field()] = "diff-arrow";
+        data.splice(diffArrow["pos"], 0, diff);
+        this.data(data);
+        colorDomin.splice(diffArrow["pos"], 0, "diff-arrow");
+        this.colorDomain(colorDomin);
+    }
+
   if (this.aggregated()) {
     this.__execs__.munged = [this.data()];
   } else {
@@ -44,13 +56,13 @@ function _munge() {
       this.__execs__.munged = this.aggregate(this.facet() && !this.stacked());
     }
     if (!this.isNested()) this.__execs__.munged = [this.__execs__.munged[0].parent];
-  } 
+  }
 
-  if (this.stacked()) { 
+  if (this.stacked()) {
     if (!field.region) {
       stack(this.__execs__.munged, field.y, this.normalized());
-    } else { 
-      let domain; 
+    } else {
+      let domain;
       this.__execs__.munged.forEach((d,i) => {
         if (field.x.order() === 'natural') {
           if (i === 0) domain = d.children.map(d => d.data.key);

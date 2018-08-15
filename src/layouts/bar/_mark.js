@@ -16,17 +16,22 @@ function _mark() {
   const diffColor = this.showDiff();
   const isShowDiff = !nested && diffColor;
   const isNestedAndSortByValue = this.isNestedAndSortByValue();
-  
+    const diffArrow = this.diffArrow();
+    const data = this.data();
+    const arrowOnMark = this.arrowOnMark();
+  const downArrow = this.downArrowPath();
+  const upArrow = this.upArrowPath();
+
   let __local = function (selection, monoColor = false, stream = false) {
     let _fill = d => {
       if(monoColor) return color[0];
       else return scale.color(d.data.key);
     }
     let tFormat = (key) => {
-      let f = field.x.interval() && field.x.format() ? timeFormat(field.x.format()) : null; 
+      let f = field.x.interval() && field.x.format() ? timeFormat(field.x.format()) : null;
       return f ? f(key) : key;
     }
-    
+
     selection.each(function(d) { //local에 저장
       let x,y,w,h;
       let yValue = d.value//d.data.value[yField];
@@ -43,7 +48,7 @@ function _mark() {
         x =  scale.x(d.data.key);
         if (isNaN(x) && scale.x._defaultDomain) {
           x = that.tempPosForOrdinalScale(d.data.key, scale.x)
-        } 
+        }
         if (stream) {
           d.x0 = that.tempPosForOrdinalScale(d.data.key, scale.x);
         }
@@ -68,8 +73,8 @@ function _mark() {
         .style('fill', function(d) {
           if (select(this).classed(className('diff'))) return 'none';
           else return d.color;
-        }); 
-      if(vertical) { 
+        });
+      if(vertical) {
         selection.attr('x', d.x0 || d.x)
           .attr('y', d.upward ? d.y + d.h : d.y)
           .attr('width', d.w )
@@ -97,6 +102,9 @@ function _mark() {
         else if(d.upward) selection.attr('x', d.x).attr('dx', '.5em');
         else selection.attr('x', d.x + d.w).attr('text-anchor', 'end').attr('dx', '-.1em')
       }
+        if (d.key === "diff-arrow") {
+            selection.style("visibility", "hidden")
+        }
       that.styleFont(selection);
     })
   }
@@ -104,11 +112,12 @@ function _mark() {
     selection.transition(trans).attr('x', d => d.x)
       .attr('y', d => d.y)
       .attr('width', d => d.w)
-      .attr('height',d => d.h) 
+      .attr('height',d => d.h)
       .style('fill', function(d) {
         if (select(this).classed(className('diff'))) return 'none'
+        if (select(this).classed(className("diff-arrow"))) return "none";
         else return d.color;
-      }); 
+      });
   }
   let __label = function(selection, vertical=true) {
     selection.each(function(d) {
@@ -116,19 +125,22 @@ function _mark() {
       if (vertical) {
         selection.transition(trans).attr('y', d.upward ? d.y : d.y + d.h);
       } else {
-        if (stacked) selection.transition(trans).attr('x', d.x + d.w/2).attr('text-anchor', 'middle');        
+        if (stacked) selection.transition(trans).attr('x', d.x + d.w/2).attr('text-anchor', 'middle');
         else selection.transition(trans).attr('x', d.upward ? d.x + d.w : d.x);
       }
       selection.text(d.text)
         .style('fill', stacked ? '#fff' : d.color)
         .style('visibility', label && (!diffColor || (diffColor && selection.classed(className('diff')))) ? 'visible' : 'hidden');
+        if (d.key === "diff-arrow") {
+           selection.style("visibility", selection.classed(className("diff-arrow")) ? "visible" : "hidden")
+       }
     })
   }
- 
+
   let bar;
   let region = canvas.selectAll(this.regionName());
   bar = region
-    .selectAll(this.nodeName()) 
+    .selectAll(this.nodeName())
     .data(d => {
       let target = d.children;
       return stacked ? target.slice().reverse() : target;
@@ -136,10 +148,10 @@ function _mark() {
   bar.exit().remove();
   let barEnter = bar.enter().append('g')
     .attr('class', this.nodeName(true))
-    .call(__local, nested ? false : this.mono(), this.stream()); 
+    .call(__local, nested ? false : this.mono(), this.stream());
   barEnter.append('rect')
     .attr('class', className('bar'))
-    .call(__barInit, vertical); 
+    .call(__barInit, vertical);
   barEnter.append('text')
     .attr('class', className('bar'))
     .call(__labelInit, vertical);
@@ -149,12 +161,12 @@ function _mark() {
       .style('visibility', 'hidden')
       .attr('opacity', '0.5')
   }
-  bar.call(__local, nested ? false : this.mono());    
+  bar.call(__local, nested ? false : this.mono());
   bar = barEnter.merge(bar);
   bar.select('rect' + className('bar', true)).call(__bar, vertical);
   bar.select('text' + className('bar', true)).call(__label, vertical);
 
-  if (isShowDiff) { 
+  if (isShowDiff) {
     let last;
     let strokeWidth = 1;
     let halfStrokeWidth = strokeWidth /2;
@@ -169,7 +181,7 @@ function _mark() {
         d.neighbor = last;
         let diff = {value: d.value - last.value, upward: d.upward};
         if (vertical) {
-          diff.x = d.x; diff.w = d.w; 
+          diff.x = d.x; diff.w = d.w;
           if (diff.value > 0) {
             diff.y = d.y;
             diff.h = last.y - d.y;
@@ -201,7 +213,7 @@ function _mark() {
               } else {
                 selection.attr('x', (d.upward ? d.x + d.w : d.x) + diff.w);
               }
-            }  
+            }
           });
         select(this).select('rect' +  className('bar', true))
           .transition(trans)
@@ -230,6 +242,82 @@ function _mark() {
     })
   }
 
+  if (diffArrow) {
+    let last;
+    let strokeWidth = 1;
+    bar.each(function(d, i, arr) {
+        if (i === diffArrow["pos"]) {
+            d.neighbor = last;
+            select(this).append("image")
+                .attr("class", className("diff-arrow"));
+            select(this).append("text")
+                .attr("class", className("diff-arrow"));
+            d.y = last.y - 100;
+            d.h = 100;
+            d.text = labelFormat(diffArrow["value"], true);
+            select(this).select("text" + className("bar", true))
+                .each(function(e) {
+                var i = select(this).transition(trans);
+                i.attr("y", d.y)
+                });
+            select(this).select("rect" + className("bar", true)).transition(trans);
+            select(this).select("image" + className("diff-arrow", true))
+                .attr("x", d.x)
+                .attr("y", d.y)
+                .attr("width", vertical ? d.w - strokeWidth : 0)
+                .attr("height", vertical ? 0 : d.h - strokeWidth)
+                .attr("xlink:href", diffArrow["value"] < 0 ? downArrow : upArrow)
+                .call(__bar).style("stroke", "#40bbfb");
+            select(this).select("text" + className("diff-arrow", true))
+                .datum(d)
+                .call(__labelInit, vertical)
+                .call(__label, vertical)
+                .style("fill", "#40bbfb")
+        } else {}
+        last = d;
+    })
+}
+
+if (arrowOnMark) {
+    let strokeWidth = 1;
+    let halfStrokeWidth = strokeWidth /2;
+    barEnter.append("svg:image").attr("class", className("markarrow"));
+    barEnter.append("text").attr("class", className("markarrow"));
+    bar.each(function(d, i, r) {
+        var diff = {
+            value: data.filter(function(item) {
+                return item.name == d.key
+            })[0][arrowOnMark],
+            upward: true
+        };
+        diff.text = labelFormat(diff.value, true);
+        diff.x = d.x + 40;
+        diff.w = d.w - 80;
+        diff.h = 60;
+        diff.y = 50;
+        select(this).select("text" + className("markarrow", true))
+            .each(function(e) {
+                let selection = select(this).transition(trans);
+                selection.attr("y", d.y - 100)
+            });
+        select(this).select("rect" + className("bar", true))
+            .transition(trans);
+        select(this).select("image" + className("markarrow", true))
+            .datum(diff)
+            .attr("x", vertical ? diff.x + halfStrokeWidth : 0)
+            .attr("y", vertical ? (d.upward ? d.y + d.h : d.y) : diff.y + halfStrokeWidth)
+            .attr("width", vertical ? d.w - strokeWidth : 0)
+            .attr("height", vertical ? 0 : d.h - strokeWidth)
+            .attr("xlink:href", diff.value < 0 ? downArrow : upArrow)
+            .call(__bar).style("stroke", "#40bbfb");
+        select(this).select("text" + className("markarrow", true))
+            .datum(diff)
+            .call(__labelInit, vertical)
+            .call(__label, vertical)
+            .style("fill", "#40bbfb")
+    })
+}
+
   if (nested && stacked) { //show diff of stacked
     let pathLocal = local();
     region.each(function(r,i,arr) {
@@ -255,7 +343,7 @@ function _mark() {
           points.push([neighborParent.x + neighbor.x - parent.x, neighborParent.y - parent.y + neighbor.y]);
           points.push([points[1][0], points[1][1] + neighbor.h]);
           points.push([points[0][0], points[0][1] + d.h]);
-        } else { 
+        } else {
           points.push([d.x, d.y + d.h]);
           points.push([points[0][0] + d.w, points[0][1]]);
           points.push([neighborParent.x + neighbor.x + neighbor.w - parent.x , points[0][1] + neighborParent.y + neighbor.y - parent.y - d.y - d.h]);
@@ -264,9 +352,9 @@ function _mark() {
         let source = (vertical ? [points[0], points[3]] : [points[0], points[1]])
         source =  'M' + source[0] + 'L' + (vertical? source[0] : source[1]) + 'L' + source[1] + 'L' + (vertical? source[1] : source[0])  + 'z';
         let target = points.map((point,i) => (i === 0 ? 'M' : 'L') + point).join('') + 'z';
-        pathLocal.set(this, {source, target});  
+        pathLocal.set(this, {source, target});
       });
-  
+
     bar.on('mouseenter.stacked',function(d) {
       bar.filter(t => t.data.key !== d.data.key)
         .selectAll('rect' + className('bar', true))
@@ -278,13 +366,13 @@ function _mark() {
         neighbor.select('text' + className('bar', true)).style('visibility', 'visible');
       }
       neighbor.select('path').style('visibility', 'visible')
-        .attr('d', function() { 
+        .attr('d', function() {
           let path = pathLocal.get(this);
           if (path) return path.source;
         })
         .interrupt()
         .transition(trans)
-        .attr('d', function() { 
+        .attr('d', function() {
           let path = pathLocal.get(this);
           if (path) return path.target;
         })
@@ -296,12 +384,12 @@ function _mark() {
       let neighbor = region.selectAll(that.nodeName()).filter(t => t.data.key === d.data.key);
       if (!label) {
         select(this).select('text' + className('bar', true)).style('visibility', 'hidden');
-        neighbor.select('text' + className('bar', true)).style('visibility', 'hidden');        
+        neighbor.select('text' + className('bar', true)).style('visibility', 'hidden');
       }
       neighbor.select('path')
         .interrupt()
         .transition(trans)
-        .attr('d', function() { 
+        .attr('d', function() {
           let path = pathLocal.get(this);
           if (path) return path.source;
         }).on('end', function(){

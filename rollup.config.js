@@ -1,5 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
+import polyfill from 'rollup-plugin-polyfill'
 import pkg from './package.json';
 
 export default {
@@ -30,7 +31,8 @@ export default {
     babel({
       exclude: 'node_modules/**',
       plugins: ["external-helpers"]
-    })
+  }),
+    polyfill('./src/layouts/index.js', ['../../polyfill.js'])
   ],
   external: ['d3']
 };

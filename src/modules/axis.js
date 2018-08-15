@@ -4,7 +4,7 @@ import {countMeasure, countMeasureTitle} from './measureField';
 import interval from '../modules/interval';
 
 const offsetThickness = 14;
-const verticalAxisThickness = 18; 
+const verticalAxisThickness = 18;
 const horizontalAxisThickness = 18;
 const tickFormatForOrdinal = labelFormat;
 const targets = ['x', 'y'];
@@ -19,9 +19,9 @@ const defaultFont = {
   'letter-spacing': '0.1px'
 };
 const titleSize = 13;
-const domainColor = '#c0ccda';
+const defaultDomainColor = '#c0ccda';
 const titleColor = '#485465';
-const gridColor = '#e7ebef';
+const defaultGridColor = '#3d4145';
 const zerocolor = '#aaa';
 const defaultTickRotate = 45;
 const smallModeThreshold = 300;
@@ -50,10 +50,13 @@ const _attrs = {
   ticks: null,
   tickRotate: 0,
   tickSize: 0,
-  tickPadding: 4,
+  tickPadding: 20,
   transition: null,
   x: 0,
   y: 0,
+domainColor: defaultDomainColor,
+showAxisLine: true,
+gridColor: defaultGridColor,
 }
 
 class Axis {
@@ -75,7 +78,7 @@ function _generator () {
   let orient = this.orient();
   let scale = this.scale();
   let axis;
-  
+
   if (orient === orients[0]) axis = axisTop();
   else if (orient === orients[1]) axis = axisRight();
   else if (orient === orients[3]) axis = axisLeft();
@@ -104,7 +107,7 @@ function _grid (selection, zoomed) {
     let gridLineEnter = gridLine.enter().append('g')
       .attr('class', 'grid')
     gridLineEnter.append('line')
-      .style('stroke', gridColor);
+      .style('stroke', this.gridColor());
     gridLine = gridLineEnter.merge(gridLine);
     if(this.transition() && !zoomed) {
       gridLine = gridLine.transition(this.__execs__.transition);
@@ -141,7 +144,7 @@ function _overflow (selection) {
   let _tooltip = () => {
     selection.selectAll('.tick')
       .each(function() {
-        let sel = select(this); 
+        let sel = select(this);
         let t = sel.select('title');
         if (t.empty()) t = sel.insert('title', ':first-child');
         let text = sel.select('text').text();
@@ -151,7 +154,7 @@ function _overflow (selection) {
   let _clipPath = () => {
     let defs = selection.select('defs')
     if (defs.empty()) {
-      let _id = _generateId(); 
+      let _id = _generateId();
       defs = selection.append('defs');
       defs.append('clipPath')
         .attr('id', _id)
@@ -197,7 +200,7 @@ function _overflow (selection) {
         .attr('transform', 'translate(' + padding+') rotate('+ (_tickRotate * -1)+')').attr('text-anchor', isHorizontal ? 'start': 'end')
         .attr('text-anchor', isPositive ? 'start' : 'end');
     }
-    
+
     if (tickRotate !== 0) {
       selection.selectAll('.tick > text')
         .call(_rotateFunc);
@@ -223,11 +226,11 @@ function _overflow (selection) {
           if(this.transition()) rotated = rotated.transition().duration(180);
           rotated.attr('transform', null).attr('text-anchor', 'middle');
         }
-      } 
+      }
     }
   }
   _tooltip();
-  _clipPath();
+  // _clipPath();
   _rotate();
   _hidden();
 }
@@ -241,7 +244,7 @@ function _format() { //apply before rendering
   const axis = this.__execs__.axis;
   const tickFormat = this.tickFormat();
   const scale = this.scale();
-  if (tickFormat) { 
+  if (tickFormat) {
     if (typeof tickFormat === 'function')  axis.tickFormat(function(d){
       if (typeof d === 'string' && isNaN(d)) return d;
       return tickFormat(d);
@@ -256,7 +259,7 @@ function _format() { //apply before rendering
     } else {
       axis.tickFormat(d => labelFormat(d));
     }
-  } 
+  }
 }
 function tickNumber(scale, dist) {
   let range = scale.range();
@@ -280,8 +283,8 @@ function _preStyle(selection) { //TODO : tickSize and font-style
   if (this.ticks()) {
     axis.ticks(this.ticks());
     axis._tickNumber = this.ticks();
-  } else if (scale.invert) { 
-    if (scale._scaleType === 'time' || scale.domain()[0] instanceof Date) { //scale's type is time 
+  } else if (scale.invert) {
+    if (scale._scaleType === 'time' || scale.domain()[0] instanceof Date) { //scale's type is time
       let intervalType = interval[this.interval()];
       if (intervalType && !this.autoTickFormat() && this.tickFormat()) { //user interval
         axis.ticks(intervalType);
@@ -304,6 +307,7 @@ function _preStyle(selection) { //TODO : tickSize and font-style
     axis._tickNumber = scale.domain().length;
   }
   for (var k in font) {
+    if (k !== 'fill')
     selection.style(k, (k === 'font-size' ? font[k] + 'px' : font[k]));
   }
 }
@@ -313,7 +317,7 @@ function _render(selection, zoomed) {
   if (selection.selectAll('.domain').size() ===0) {
     selection.attr('transform', 'translate(' +[this.x(), this.y()] + ')');
   }
-    
+
   if(this.transition() && !zoomed) {
     selection.transition(this.__execs__.transition).attr('transform', 'translate(' +[this.x(), this.y()] + ')')
       .call((selection) => {
@@ -362,11 +366,11 @@ function _renderSubFormat(selection) {
       .attr('opacity', 0)
       .call(updateFunc)
       .merge(subTick)
-    
+
     subTick.transition(transition)
       .call(updateFunc)
       .attr('opacity', 1);
-    
+
   } else {
     selection.selectAll('.tick-sub-text').remove();
   }
@@ -374,10 +378,11 @@ function _renderSubFormat(selection) {
 function _style(selection) {
   const tick = selection.selectAll('.tick');
   tick.select('line').style('stroke', this.color());
-  tick.select('text').style('fill', this.color());
-  selection.select('.domain').style('stroke', domainColor)
+  tick.select('text').style('fill', this.font()["fill"] ? this.font()["fill"] : this.color());
+  selection.select('.domain').style('stroke', this.domainColor())
     .style('shape-rendering', 'crispEdges')
     .style('stroke-width', '1px')
+    .style('stroke-opacity', this.showAxisLine() ? 1 : 0)
     .style('visibility', this.showDomain() ? 'visible' : 'hidden'); //showDomain
   selection.selectAll('.tick-sub-text')
     .style('fill', this.color());
@@ -392,7 +397,7 @@ function _title(selection) {
       if (titleOrient === 'bottom' || titleOrient === 'top') {
         selection
           .attr('dy', titleOrient === 'bottom' ? '2em' : '-1em');
-      } 
+      }
     }
   }
   let _transform = function(selection) {
@@ -413,12 +418,12 @@ function _title(selection) {
   if (!this.showTitle()){
     selection.selectAll('.title').remove();
     return;
-  } 
+  }
   let orient = this.orient();
   let titleOrient = this.titleOrient() || orient;
   let scale = this.scale();
   let halfPos = (scale.range()[0] + scale.range()[1]) /2;
-  
+
   let titleSel = selection.selectAll('.title')
     .data([title]);
   titleSel.exit().remove();
@@ -430,7 +435,7 @@ function _title(selection) {
     .style('font-size', titleSize + 'px')
     .style('fill', titleColor)
     .call(_textTransform);
-    
+
   titleSel = titleSelEnter.merge(titleSel)
   titleSel.select('text')
     .text(title);
@@ -508,11 +513,11 @@ setMethodsFromAttrs(Axis, _attrs);
 
 export default _axis;
 export {
-  defaultFont, 
-  verticalAxisThickness, 
-  horizontalAxisThickness, 
-  offsetThickness, 
-  tickFormatForContinious, 
+  defaultFont,
+  verticalAxisThickness,
+  horizontalAxisThickness,
+  offsetThickness,
+  tickFormatForContinious,
   tickFormatForOrdinal,
   tickNumber
 };

@@ -7,6 +7,8 @@ function _mark() {
   const trans = transition().duration(this.transition().duration).delay(this.transition().delay);
   const innerSize = this.innerSize();
   const size = this.size();
+        const font = this.font();
+        const textWithLabel = this.textWithLabel();
   const arcGen = arc().innerRadius(size.range[0])
     .outerRadius(size.range[1])
     .startAngle(d => d.startAngle)
@@ -26,7 +28,9 @@ function _mark() {
       d.x = innerSize.width/2 + d.dx;
       d.y = innerSize.height/2 + d.dy;
       d.color = scale.color(d.key);
-      d.text = labelFormat(d.value);
+        d.labeltext = textWithLabel ? d.data.key : null;
+        d.percentage = (d.endAngle - d.startAngle) * 100 / (Math.PI * 2);
+      d.text = labelFormat(d.percentage)+'%';
     })
   }
 
@@ -34,18 +38,18 @@ function _mark() {
     selection
       .style('fill', d => d.color)
       .style('cursor', 'pointer');
-  } 
+  }
   let __node = function (selection) {
     selection.style('fill', d => d.color)
       .transition(trans)
       .attrTween('d', tweenArc);
   }
-  
+
   let __labelInit = function (selection) {
     selection.each(function(d) {
       select(this).attr('x', d.dx)
         .attr('dy', '.35em')
-        .attr('y', d.dy)
+        .attr('y', d.dy + font['font-size']/2)
         .attr('text-anchor', 'middle')
         .style('pointer-events', 'none')
         .text(d.text);
@@ -63,6 +67,28 @@ function _mark() {
     })
   }
 
+  let __labelTextInit = function (selection) {
+    selection.each(function(d) {
+      select(this).attr('x', d.dx)
+        .attr('dy', '.35em')
+        .attr('y', d.dy - font['font-size']/2)
+        .attr('text-anchor', 'middle')
+        .style('pointer-events', 'none')
+        .text(d.labeltext);
+      that.styleFont(select(this));
+    })
+  }
+
+  let __labelText = function (selection) {
+    selection.each(function(d) {
+      select(this).style('visibility',label ? 'visible' : 'hidden')
+        .text(d.labeltext)
+        .transition(trans).attr('x', d.dx)
+        .attr('y', d.dy);
+      that.styleFont(select(this));
+    })
+  }
+
   let __appendNodes = function (selection) {
     let node = selection.selectAll(that.nodeName())
       .data(d => d, d => d.data.key);
@@ -72,18 +98,24 @@ function _mark() {
       .call(__local)
     nodeEnter.append('path')
       .call(__nodeInit);
-    nodeEnter.append('text')
+    if(textWithLabel){
+        nodeEnter.append('text').attr('class', that.nodeName(true) + " labeltext").call(__labelTextInit)
+    }
+    nodeEnter.append('text').attr('class', that.nodeName(true) + " label")
       .call(__labelInit);
     node.call(__local);
     node = nodeEnter.merge(node)
       .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
     node.select('path')
       .call(__node);
-    node.select('text')
+      if(textWithLabel){
+          node.select("labeltext").call(__labelText)
+      }
+    node.select('label')
       .call(__label);
     that.__execs__.nodes = node;
   }
-  
+
   this.renderRegion(d => {
     d.x = 0; d.y = 0;
   }, d => [d])

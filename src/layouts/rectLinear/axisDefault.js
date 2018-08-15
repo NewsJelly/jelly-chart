@@ -3,7 +3,7 @@ import axis from '../../modules/axis';
 function _axisExec (target, field, axis) {
   if(!arguments.length) return this.__execs__.axis;
   this.__execs__.axis[target] = this.__execs__.axis[target] || {}
-  this.__execs__.axis[target][field] = axis; // => axis.x.field 
+  this.__execs__.axis[target][field] = axis; // => axis.x.field
   return this;
 }
 
@@ -15,7 +15,7 @@ function _set(source, target, key) {
  * @memberOf Core#
  * @function
  * @private
- * @param {d3Scale} scale 
+ * @param {d3Scale} scale
  * @param {object} axisSetting
  * @return {Axis}
  */
@@ -43,7 +43,7 @@ function axisDefault(scale, axisSetting) {
     else if (axisSetting.autoTickFormat) curAxis.tickFormat(null);
   }
   else curAxis.interval(null);
-  ['tickPadding', 'thickness', 'showTitle', 'showDomain', 'showTicks'].forEach(k => _set(axisSetting, curAxis, k));
+  ['tickPadding', 'thickness', 'showTitle', 'showDomain', 'showTicks', 'font', 'domainColor', 'showAxisLine', 'gridColor', 'tickSize'].forEach(k => _set(axisSetting, curAxis, k));
   _axisExec.call(this, axisSetting.target, axisSetting.field, curAxis);
   return curAxis;
 }

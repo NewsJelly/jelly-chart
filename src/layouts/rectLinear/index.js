@@ -9,7 +9,7 @@ import renderAxis from './renderAxis';
 import thickness from './thickness';
 
 const _attrs = {
-  axis: [], 
+  axis: [],
   axisTitles: [],
   grid: false,
   noAxisOffset: false, //assume that no axis offset
@@ -26,7 +26,7 @@ class RectLinear extends Core {
   /**
    * @override
    */
-  offset() {  
+  offset() {
     let offset = super.offset();
     offset = Object.assign({}, offset);
     let axisSetting = this.axis();
@@ -44,7 +44,7 @@ class RectLinear extends Core {
  * @function
  * @example
  * rectLinear.axisTitles({target:'x', title: 'custom title X'});
- * @param {Object[]} [axisTitles] 
+ * @param {Object[]} [axisTitles]
  * @param {string} axisTitles[].target target scale name of the axis(x|y)
  * @param {string} axisTitles[].title  title to show
  * @param {string} [axisTitles[].field] target field name of the axis
@@ -55,7 +55,7 @@ RectLinear.prototype.axisTitles = attrFunc('axisTitles');
 /**
  * set and get all axis settings
  * @function
- * @private 
+ * @private
  * @return {axisToggle[]}
  */
 RectLinear.prototype.axisToggle = attrFunc('axisToggle');
@@ -63,7 +63,7 @@ RectLinear.prototype.axisToggle = attrFunc('axisToggle');
 /**
  * If grid is specified, sets grid setting and returns the instance itself. If grid is true, shows grids of axes. If grid is not specified, it returns the current grid setting.
  * @function
- * @param {boolean} [grid=false] 
+ * @param {boolean} [grid=false]
  * @return {grid|RectLinear}
  */
 RectLinear.prototype.grid = attrFunc('grid');
@@ -84,6 +84,8 @@ RectLinear.prototype.axisDefault = axisDefault;
 RectLinear.prototype.axisTitle = axisTitle;
 RectLinear.prototype.renderAxis = renderAxis;
 RectLinear.prototype.thickness = thickness;
+RectLinear.prototype.downArrowPath = attrFunc("down-arrow");
+RectLinear.prototype.upArrowPath = attrFunc("up-arrow");
 
 
 export default RectLinear;
