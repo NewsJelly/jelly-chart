@@ -41,6 +41,7 @@ const _attrs = {
   showTitle: true,
   showDomain: true,
   showTicks: true,
+  compressTicks: false,
   thickness: 40,
   target: targets[0],
   tickFormat: null,
@@ -183,6 +184,15 @@ function _overflow (selection) {
     selection.selectAll('.tick')
       .style('visibility', isSmall && scale.bandwidth ? 'hidden': (showTicks ? 'inherit' : 'hidden'));
   }
+  let _compressTicks = () => {
+    let compressTicks = this.compressTicks();
+    if(compressTicks) {
+      selection.selectAll('.tick')
+      .filter(function(d, i,list) {
+        return i > 0 && i < list.length - 1;
+      }).attr('display', 'none');
+    }
+  }
   let _rotate = () => {
     let tickPadding = this.tickPadding();
     let tickRotate = this.tickRotate();
@@ -230,6 +240,7 @@ function _overflow (selection) {
   _clipPath();
   _rotate();
   _hidden();
+  _compressTicks();
 }
 
 function tickFormatForContinious(domain) {
@@ -303,6 +314,7 @@ function _preStyle(selection) { //TODO : tickSize and font-style
   } else {
     axis._tickNumber = scale.domain().length;
   }
+  
   for (var k in font) {
     selection.style(k, (k === 'font-size' ? font[k] + 'px' : font[k]));
   }
@@ -313,7 +325,6 @@ function _render(selection, zoomed) {
   if (selection.selectAll('.domain').size() ===0) {
     selection.attr('transform', 'translate(' +[this.x(), this.y()] + ')');
   }
-    
   if(this.transition() && !zoomed) {
     selection.transition(this.__execs__.transition).attr('transform', 'translate(' +[this.x(), this.y()] + ')')
       .call((selection) => {

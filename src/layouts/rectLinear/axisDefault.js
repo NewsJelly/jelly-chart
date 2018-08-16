@@ -43,7 +43,7 @@ function axisDefault(scale, axisSetting) {
     else if (axisSetting.autoTickFormat) curAxis.tickFormat(null);
   }
   else curAxis.interval(null);
-  ['tickPadding', 'thickness', 'showTitle', 'showDomain', 'showTicks'].forEach(k => _set(axisSetting, curAxis, k));
+  ['tickPadding', 'thickness', 'showTitle', 'showDomain', 'showTicks', 'compressTicks'].forEach(k => _set(axisSetting, curAxis, k));
   _axisExec.call(this, axisSetting.target, axisSetting.field, curAxis);
   return curAxis;
 }
