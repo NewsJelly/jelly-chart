@@ -15,6 +15,7 @@ const defaultFont = {
   'font-style': 'normal'
 };
 const pointOriginColor = '#fff';
+
 const _attrs = {
   absolute: false,
   anchor: {x:'left', y:'top'}, 
@@ -227,8 +228,8 @@ function show(point) {
 	let tooltip = this.__execs__.tooltip;
 	let scale = this.__attrs__.target.__execs__.scale;
 	const isMultiTooltip = !!this.__attrs__.target.__attrs__.multiTooltip
-  
-  renderPoint.call(this, point)
+	
+	renderPoint.call(this, point)
 
   if(this.keys()) {
     let key = tooltip.select(className('keys', true)).selectAll(className('key', true))

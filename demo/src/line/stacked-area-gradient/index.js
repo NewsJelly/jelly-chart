@@ -31,7 +31,7 @@ jelly.line().container('#jelly-container')
   .point(true)
   .shape('area').areaGradient(true)
   .axis('x').axis({"target":"y","titleOrient":"right"})
-  .point({'type':'fill'})
+  .point(false)
   .legend(true)
   .multiTooltip(true)
   .render();
