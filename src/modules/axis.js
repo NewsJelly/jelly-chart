@@ -222,7 +222,7 @@ function _overflow (selection) {
         totalW += w;
       })
       let isOver = totalW >= Math.abs(scale.range()[1] - scale.range()[0]);
-      if (isHorizontal) {
+      if (isHorizontal && !this.compressTicks()) {
         if (isOver) {
           tick.selectAll('text')
             .classed(className('rotated'), true)
@@ -237,7 +237,7 @@ function _overflow (selection) {
     }
   }
   _tooltip();
-  _clipPath();
+	_clipPath();
   _rotate();
   _hidden();
   _compressTicks();
@@ -439,9 +439,11 @@ function _title(selection) {
   titleSelEnter.append('text')
     .attr('text-anchor', 'middle')
     .style('font-size', titleSize + 'px')
-    .style('fill', titleColor)
-    .call(_textTransform);
+    .style('fill', titleColor);
     
+  if(!this.compressTicks()){
+		//titleSelEnter.call(_textTransform);
+	}
   titleSel = titleSelEnter.merge(titleSel)
   titleSel.select('text')
     .text(title);

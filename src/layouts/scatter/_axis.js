@@ -4,10 +4,12 @@ function _axis() {
   let grid = this.grid();
   let innerSize = this.innerSize();
   let field = this.__execs__.field;
+	const font = this.font()
 
   let _axisScaleX = function (axisToggle) {
     field.x.axis(axisToggle);
-    let curAxis = that.axisDefault(scale.x, axisToggle);
+		let curAxis = that.axisDefault(scale.x, axisToggle);
+		curAxis.font(font);//font update
     if (axisToggle.orient === 'bottom') curAxis.y(scale.y.range()[0]);
     curAxis.grid(grid).gridSize(innerSize.height);
     return curAxis;
@@ -15,7 +17,8 @@ function _axis() {
 
   let _axisScaleY = function (axisToggle) {
     field.y.axis(axisToggle);
-    let curAxis = that.axisDefault(scale.y, axisToggle);
+		let curAxis = that.axisDefault(scale.y, axisToggle);
+		curAxis.font(font);//font update
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     curAxis.grid(grid).gridSize(innerSize.width);
     return curAxis;

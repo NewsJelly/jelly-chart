@@ -21,7 +21,7 @@ jelly.line().container('#jelly-container')
   ]).dimensions([
     {
       field: 'x',
-      order: 'ascending'
+			order: 'ascending',
     }, {
       field: 'category',
       order: 'descending'
@@ -33,5 +33,4 @@ jelly.line().container('#jelly-container')
   .axis('x').axis('y')
   .legend(true)
   .multiTooltip(true)
-  .font({'font-size': 20})
   .render();

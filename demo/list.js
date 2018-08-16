@@ -121,11 +121,6 @@ module.exports = [
     path: 'meanline-line',
     title: 'Mean Line on Line Chart'
   },
-  {
-    category: 'Line',
-    path: 'axis-compress-ticks',
-    title: 'Axis Compress Ticks'
-  },
   //Combo
   {
     category: 'Combo',
@@ -324,6 +319,11 @@ module.exports = [
     category: 'Axis',
     path: 'axis-sub-tick',
     title: 'Sub Axis Ticks'
+	},
+	{
+    category: 'Axis',
+    path: 'axis-compress-ticks',
+    title: 'Axis Compress Ticks'
   },
   //Event
   {
