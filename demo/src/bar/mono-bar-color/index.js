@@ -13,5 +13,5 @@ jelly.bar()
   .dimensions(['name'])
   .measures([{field: 'value', op: 'sum'}])
   .mono(false)
-  .axis('x').axis('y')
+	.axis('x').axis('y')
   .render();

@@ -13,5 +13,5 @@ jelly.bar().container('#jelly-container')
     {field:'x', op:'mean'}, 
     {field:'y', op:'sum'}
   ])
-  .axis('x').axis('y')
+	.axis('x').axis('y')
   .render();

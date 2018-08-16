@@ -41,6 +41,7 @@ const _attrs = {
   showTitle: true,
   showDomain: true,
   showTicks: true,
+  compressTicks: false,
   thickness: 40,
   target: targets[0],
   tickFormat: null,
@@ -164,7 +165,7 @@ function _overflow (selection) {
     if (scaleDist === 0) scaleDist = scale.range()[0] * 2;
     if (this.isHorizontal()) {
       rectPos.width = scaleDist;
-      rectPos.height = this.thickness() - (this.showTitle() ? this.font()['font-size'] * 1.71 : 0);
+      rectPos.height = this.thickness();
       rectPos.x = -rectPos.width/2;
       rectPos.y = orient === 'bottom' ? 0 : -rectPos.height;
     } else {
@@ -182,6 +183,15 @@ function _overflow (selection) {
     let isSmall = tickStepSize < this.font()['font-size'] * (this.isHorizontal() ? 1 : 0.72);
     selection.selectAll('.tick')
       .style('visibility', isSmall && scale.bandwidth ? 'hidden': (showTicks ? 'inherit' : 'hidden'));
+  }
+  let _compressTicks = () => {
+    let compressTicks = this.compressTicks();
+    if(compressTicks) {
+      selection.selectAll('.tick')
+      .filter(function(d, i,list) {
+        return i > 0 && i < list.length - 1;
+      }).attr('display', 'none');
+    }
   }
   let _rotate = () => {
     let tickPadding = this.tickPadding();
@@ -212,7 +222,7 @@ function _overflow (selection) {
         totalW += w;
       })
       let isOver = totalW >= Math.abs(scale.range()[1] - scale.range()[0]);
-      if (isHorizontal) {
+      if (isHorizontal && !this.compressTicks()) {
         if (isOver) {
           tick.selectAll('text')
             .classed(className('rotated'), true)
@@ -227,9 +237,10 @@ function _overflow (selection) {
     }
   }
   _tooltip();
-  _clipPath();
+	_clipPath();
   _rotate();
   _hidden();
+  _compressTicks();
 }
 
 function tickFormatForContinious(domain) {
@@ -303,6 +314,7 @@ function _preStyle(selection) { //TODO : tickSize and font-style
   } else {
     axis._tickNumber = scale.domain().length;
   }
+  
   for (var k in font) {
     selection.style(k, (k === 'font-size' ? font[k] + 'px' : font[k]));
   }
@@ -313,7 +325,6 @@ function _render(selection, zoomed) {
   if (selection.selectAll('.domain').size() ===0) {
     selection.attr('transform', 'translate(' +[this.x(), this.y()] + ')');
   }
-    
   if(this.transition() && !zoomed) {
     selection.transition(this.__execs__.transition).attr('transform', 'translate(' +[this.x(), this.y()] + ')')
       .call((selection) => {
@@ -428,9 +439,11 @@ function _title(selection) {
   titleSelEnter.append('text')
     .attr('text-anchor', 'middle')
     .style('font-size', titleSize + 'px')
-    .style('fill', titleColor)
-    .call(_textTransform);
+    .style('fill', titleColor);
     
+  if(!this.compressTicks()){
+		titleSelEnter.call(_textTransform);
+	}
   titleSel = titleSelEnter.merge(titleSel)
   titleSel.select('text')
     .text(title);

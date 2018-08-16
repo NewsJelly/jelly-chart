@@ -16,7 +16,7 @@ function _mark() {
     let i = interpolate({endAngle:0}, d);
     return function(t) {return arcGen(i(t));};
   }
-
+	const font = this.font()
   let __local = function (selection) {
     let sizeMean = mean(size.range);
     selection.each(function(d) {
@@ -49,7 +49,7 @@ function _mark() {
         .attr('text-anchor', 'middle')
         .style('pointer-events', 'none')
         .text(d.text);
-      that.styleFont(select(this));
+      that.styleFont(select(this), font);
     })
   }
 
@@ -59,7 +59,7 @@ function _mark() {
         .text(d.text)
         .transition(trans).attr('x', d.dx)
         .attr('y', d.dy);
-      that.styleFont(select(this));
+      that.styleFont(select(this), font);
     })
   }
 

@@ -15,7 +15,8 @@ function _mark() {
   const field = this.__execs__.field;
   const diffColor = this.showDiff();
   const isShowDiff = !nested && diffColor;
-  const isNestedAndSortByValue = this.isNestedAndSortByValue();
+	const isNestedAndSortByValue = this.isNestedAndSortByValue();
+	const barWidth = this.barWidth();
   
   let __local = function (selection, monoColor = false, stream = false) {
     let _fill = d => {
@@ -101,10 +102,34 @@ function _mark() {
     })
   }
   let __bar = function(selection) {
-    selection.transition(trans).attr('x', d => d.x)
-      .attr('y', d => d.y)
-      .attr('width', d => d.w)
-      .attr('height',d => d.h) 
+    selection.transition(trans).attr('x', d => {
+			if(stacked || !vertical || !barWidth || barWidth > d.w){
+				return d.x
+			}else{
+				return d.x + (d.w - barWidth) / 2
+			}
+		})
+      .attr('y', d =>  {
+				if(stacked || vertical || !barWidth || barWidth > d.h){
+					return d.y
+				}else{
+					return d.y + (d.h - barWidth) / 2
+				}
+			})
+      .attr('width', d => {
+				if(stacked || !vertical || !barWidth || barWidth > d.w){
+					return d.w
+				}else{
+					return barWidth
+				}
+			})
+      .attr('height',d => {
+				if(stacked || vertical || !barWidth || barWidth > d.h){
+					return d.h
+				}else{
+					return barWidth
+				}
+			}) 
       .style('fill', function(d) {
         if (select(this).classed(className('diff'))) return 'none'
         else return d.color;

@@ -10,12 +10,13 @@ function _facet () {
   let innerSize = this.innerSize();
   let width = innerSize.width, height = innerSize.height;
   let padding = this.padding();
-  let dimensions =  this.dimensions();
-  let barMeasures = [field.yBar.toObject()];
+	let dimensions =  this.dimensions();
+	let barWidth = this.barWidth();
+	let barMeasures = [field.yBar.toObject()];
   let barSettings =   ['axisTitles', 'padding', 'font', 'label', 'grid']
     .map(d => { return {key: d, value:this[d]()};});
-  let lineMeasures = [field.yLine.toObject()];
-  let lineSettings = ['axisTitles', 'curve', 'point', 'pointRatio', 'regionPadding', 'size', 'grid', 'font', 'label']
+	let lineMeasures = [field.yLine.toObject()];
+	let lineSettings = ['axisTitles', 'curve', 'point', 'pointRatio', 'regionPadding', 'size', 'grid', 'font', 'label']
     .map(d => { return {key: d, value:parent[d]()};});
   let _smallLine = function() {
     let smallLine = line()
@@ -28,7 +29,7 @@ function _facet () {
         .padding(padding)
         .parent(parent) 
         .zeroOffset(true) 
-        .color(color[1])
+				.color(color[1])
         .scaleBandMode(true);
     lineSettings.forEach(d => smallLine[d.key](d.value));
     smallLine.render();
@@ -43,7 +44,8 @@ function _facet () {
         .legend(false)
         .tooltip(false)
         .zeroOffset(true) 
-        .parent(parent)
+				.parent(parent)
+				.barWidth(barWidth)
         .color(color[0]);
     barSettings.forEach(d => {smallBar[d.key](d.value)});
     smallBar.render();

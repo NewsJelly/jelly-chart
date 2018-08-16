@@ -97,6 +97,11 @@ function _hide(selection) {
   const trans = transition().duration(180);
   selection.select(className('baseline', true)).transition(trans).attr('opacity', 0);
 
+  let target = this.target();
+  let circle = target.nodes().filter(function() {
+    return select(this).classed(className('show'));
+  }).classed(className('show'), false).selectAll('circle');
+  if (!target.point()) circle.attr('opacity', 0);
   if (this.tooltip()) this.tooltip().hide();
 }
 
@@ -127,6 +132,17 @@ function _show(selection, tick) {
   const showTrans = transition().duration(140);
   const target = this.target();
   const filtered = [];
+	
+	//point redraw
+  if (!target.point()) {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('opacity', 0);
+  } else {
+		target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor)
+		.attr('stroke', function(d){
+			return d.color;
+		});
+	}
+	//current point redraw
   let points = selectAll(tick.points)
     .each(function(d) {
       let x = d.x;
@@ -134,33 +150,11 @@ function _show(selection, tick) {
         filtered.push({key:d.key, x:d.x, y: d.y, text: d.text});
       }
     })
-  const pointType = target.__attrs__.point.type ? target.__attrs__.point.type : 'empty'
-  if(pointType === 'empty'){
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', function(d){
-      return d.color;
-    })
-  }else{
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', function(d){
-      return d.color;
-    });
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', pointOriginColor)
-  }
-  
-  let shwoPoints = points.classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1)
-  if(pointType === 'empty'){
-    shwoPoints
-      .style('fill', function(d){
-        return d.color;
-      })
-    shwoPoints.attr('stroke', 'rgb(255, 255, 255)')
-  }else{
-    shwoPoints.style('fill', 'rgb(255, 255, 255)')
-    shwoPoints.attr('stroke', function(d){
-      return d.color;
-    })
-  }
-    
+  let pointsShow = points.classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1)
+  pointsShow.style('fill', function(d){
+		return d.color;
+	}).attr('stroke', pointOriginColor)
+
   let baseline = selection.select(className('baseline', true));
   baseline.transition(showTrans).attr('opacity', 1)
     .attr('x1', tick.x + 0.5).attr('x2', tick.x + 0.5);  

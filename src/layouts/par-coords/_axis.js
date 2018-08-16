@@ -4,9 +4,11 @@ function _parCoords() {
   let that = this;
   let measures = this.measures();
   let scale = this.__execs__.scale;
+	const font = this.font()
 
   let _axisScaleY = function (yScale, axisToggle) {
-    let curAxis = that.axisDefault(yScale, axisToggle);
+		let curAxis = that.axisDefault(yScale, axisToggle);
+		curAxis.font(font);//font update
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     curAxis.x(scale.x(axisToggle.field));
     return curAxis;

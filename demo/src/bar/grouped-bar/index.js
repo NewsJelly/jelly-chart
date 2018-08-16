@@ -11,5 +11,5 @@ jelly.bar().container('#jelly-container')
   ]).dimensions(['category', 'name'])
   .measures('value')
   .axis('x').axis('y')
-  .legend(true)
+	.legend(true)
   .render();

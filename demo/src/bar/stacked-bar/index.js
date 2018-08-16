@@ -12,5 +12,5 @@ jelly.bar().container('#jelly-container')
   .measures('value')
   .stacked(true)
   .axis('x').axis('y')
-  .legend(true)
+	.legend(true)
   .render();

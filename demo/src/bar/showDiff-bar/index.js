@@ -15,5 +15,5 @@ jelly.bar()
   .showDiff(true)
   .annotation(true)
   .label(true)
-  .axis('x').axis('y')
+	.axis('x').axis('y')
   .render();

@@ -11,5 +11,5 @@ jelly.bar()
     {category:'Red', name: 'D', value: 10}
   ])
   .dimensions(['name'])
-  .axis('x').axis('y')
+	.axis('x').axis('y')
   .render();

@@ -12,7 +12,7 @@ import _region from './_region';
 import _legend from './_legend';
 import _facet from './_facet';
 import _tooltip from './_tooltip';
-
+import {attrFunc} from '../../modules/util';
 const size = {range: [2, 2], scale: 'linear', reverse: false};
 const conditions = ['normal'];
 const _attrs = {
@@ -20,7 +20,8 @@ const _attrs = {
   point: false,
   pointRatio : 3,
   regionPadding: 0.1,
-  size: size,
+	size: size,
+	barWidth: false,
 };
 
 /**
@@ -43,7 +44,7 @@ class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin) {
       .process('axis', _axis)
       .process('legend', _legend)
       .process('tooltip', _tooltip)
-  }
+	}
   /**
    * @override
    */
@@ -60,6 +61,16 @@ class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin) {
     return this.condition() === conditions[1];
   }
 }
+
+/**
+ * If barWidth is specified, sets each bar width(or height on vertical bar) and returns the instance itself. If barWidth is not specified, or barWidth bigger than origin barWidth, just  returns the instance's current barWidth setting. Not surpport Stacked Bar Chart.
+ * @function
+ * @example
+ * bar.orient('horizontal'); // renders the horizontal bar chart
+ * @param {boolean|number} [barWidth=false] false or specific number
+ * @return {barWidth|Bar}
+ */
+Combo.prototype.barWidth = attrFunc('barWidth');
 
 export default genFunc(Combo);
 export {conditions};
