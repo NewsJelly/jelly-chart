@@ -442,7 +442,7 @@ function _title(selection) {
     .style('fill', titleColor);
     
   if(!this.compressTicks()){
-		//titleSelEnter.call(_textTransform);
+		titleSelEnter.call(_textTransform);
 	}
   titleSel = titleSelEnter.merge(titleSel)
   titleSel.select('text')

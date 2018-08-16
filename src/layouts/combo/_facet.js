@@ -13,7 +13,6 @@ function _facet () {
 	let dimensions =  this.dimensions();
 	let barWidth = this.barWidth();
 	let barMeasures = [field.yBar.toObject()];
-	let grid = this.grid();
   let barSettings =   ['axisTitles', 'padding', 'font', 'label', 'grid']
     .map(d => { return {key: d, value:this[d]()};});
 	let lineMeasures = [field.yLine.toObject()];
@@ -31,7 +30,6 @@ function _facet () {
         .parent(parent) 
         .zeroOffset(true) 
 				.color(color[1])
-				//.grid(grid)
         .scaleBandMode(true);
     lineSettings.forEach(d => smallLine[d.key](d.value));
     smallLine.render();
@@ -47,7 +45,6 @@ function _facet () {
         .tooltip(false)
         .zeroOffset(true) 
 				.parent(parent)
-				//.grid(grid)
 				.barWidth(barWidth)
         .color(color[0]);
     barSettings.forEach(d => {smallBar[d.key](d.value)});
