@@ -121,6 +121,11 @@ module.exports = [
     path: 'meanline-line',
     title: 'Mean Line on Line Chart'
   },
+  {
+    category: 'Line',
+    path: 'axis-x-compress-ticks',
+    title: 'Axis X Compress Ticks'
+  },
   //Combo
   {
     category: 'Combo',

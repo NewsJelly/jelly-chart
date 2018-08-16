@@ -117,7 +117,8 @@ function _position() {
 }
 
 function _render(selection) { //pre-render the tooltip 
-  let tooltip = this.__execs__.tooltip //selection.select('.tooltip'); //FIXME: can not generate tooltip area independently.
+	let tooltip = this.__execs__.tooltip //selection.select('.tooltip'); //FIXME: can not generate tooltip area independently.
+	console.log('this.__attrs__',this.__attrs__)
   if (selection.style('position') === 'static') selection.style('position', 'relative');
   if (!tooltip || tooltip.empty()) {
     tooltip = selection.append('div').attr('class', className('tooltip'))
