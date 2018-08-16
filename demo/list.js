@@ -123,8 +123,8 @@ module.exports = [
   },
   {
     category: 'Line',
-    path: 'axis-x-compress-ticks',
-    title: 'Axis X Compress Ticks'
+    path: 'axis-compress-ticks',
+    title: 'Axis Compress Ticks'
   },
   //Combo
   {

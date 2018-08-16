@@ -23,20 +23,14 @@ jelly.line().container('#jelly-container')
     {category:'BBB', x: new Date('08/01/2018 00:00:00'), y: 80},{category:'BBB', x: new Date('08/02/2018 00:00:00'), y: 30},
     {category:'BBB', x: new Date('08/03/2018 00:00:00'), y: 90},{category:'BBB', x: new Date('08/04/2018 00:00:00'), y: 40},
   ]).dimensions([
-    {
-      field: 'x',
-			order: 'ascending',
-			format: '%m/%d',
-			interval: 'month'
-    }, {
-      field: 'category',
-      order: 'descending'
-    }])
+    { field: 'x', order: 'ascending', format: '%m/%d', }, 
+    { field: 'category', order: 'descending' }
+  ])
   .measures({field:'y', op:'mean'})
   .stacked(true)
-  .point(true)
+  .point(false)
   .shape('area').areaGradient(true)
-  .axis('x').axis('y')
+  .axis({target:'x', compressTicks:true}).axis('y')
   .legend(true)
   .multiTooltip(true)
   .render();
