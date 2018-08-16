@@ -165,7 +165,7 @@ function _overflow (selection) {
     if (scaleDist === 0) scaleDist = scale.range()[0] * 2;
     if (this.isHorizontal()) {
       rectPos.width = scaleDist;
-      rectPos.height = this.thickness() - (this.showTitle() ? this.font()['font-size'] * 1.71 : 0);
+      rectPos.height = this.thickness();
       rectPos.x = -rectPos.width/2;
       rectPos.y = orient === 'bottom' ? 0 : -rectPos.height;
     } else {

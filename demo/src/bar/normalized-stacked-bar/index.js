@@ -13,5 +13,5 @@ jelly.bar().container('#jelly-container')
   .stacked(true)
   .normalized(true)
   .axis('x').axis('y')
-  .legend(true)
+	.legend(true)
   .render();

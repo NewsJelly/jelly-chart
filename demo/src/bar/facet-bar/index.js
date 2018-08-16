@@ -12,5 +12,6 @@ jelly.bar().container('#jelly-container')
   .measures('value')
   .facet('vertical')
   .axis('x').axis('y')
-  .legend(true)
+	.legend(true)
+	.font({'font-size': 15})
   .render();
