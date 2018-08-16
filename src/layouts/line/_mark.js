@@ -122,15 +122,13 @@ function _mark(zoomed = false) {
     if (areaGradient) {
 			let url = d => `url(#areaGradient-${d.data.key})` 
 			selection
-				.attr('stroke', 'none')
 				.attr("fill", url);
-			console.log('c', c)
     }else if (area) {
 			selection.attr('fill', c)
 		}else {
       selection.attr('stroke', c)
-        .attr('stroke-width', size.range[0] + 'px')
-    }
+		}
+		selection.attr('stroke-width', size.range[0] + 'px')
   }
   let __pointInit = function (selection) {
     selection

@@ -9,7 +9,8 @@ function _facet () {
   let innerSize = this.innerSize();
   let dimensions = [this.dimensions()[0]];
   let measures = this.isMixed() ? [mixedMeasure] : this.measures();
-  let width, height;
+	let width, height;
+	let barWidth = this.barWidth();
   let settings = ['axisTitles','normalized', 'padding', 'orient', 'font', 'label', 'grid', 'tooltip']
     .map(d => { return {key: d, value:this[d]()};});
   let hasX = this.axisX();
@@ -23,7 +24,8 @@ function _facet () {
         .legend(false)
         .zeroMargin(true) //remove margin
         .aggregated(true) 
-        .parent(parent) 
+				.parent(parent)
+				.barWidth(barWidth)
     settings.forEach(d => {smallBar[d.key](d.value)});
 
     if (!mono) smallBar.color(scale.color(d.data.key));

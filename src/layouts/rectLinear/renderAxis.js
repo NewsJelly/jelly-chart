@@ -8,6 +8,7 @@ import {className} from '../../modules/util';
 function renderAxis() {
   let canvas = this.__execs__.canvas;
   let axisObj = this.__execs__.axis;
+  
   let _appendAxis = function(selection, axis, targetNum) {
     let cName = 'axis target-' + axis.target() + ' orient-' + axis.orient() + ' targetNum-' + targetNum ; 
     let axisSel = selection.selectAll(className(cName, true)) 

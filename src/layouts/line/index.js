@@ -83,7 +83,6 @@ class Line extends mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMi
    * @override
    */
   renderCanvas() {
-		console.log('renderCanvas', this.__attrs__)
     return super.renderCanvas(this.point() ? this.size().range[0]*2 : 0);
   }
   /**

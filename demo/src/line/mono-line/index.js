@@ -12,5 +12,6 @@ jelly.line().container('#jelly-container')
   .dimensions('x')
   .measures({field:'y', op:'mean'})
   .axis('x').axis('y')
-  .point(true)
+	.point(true)
+	.grid(true)
   .render();

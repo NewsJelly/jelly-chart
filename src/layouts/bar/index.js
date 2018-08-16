@@ -25,7 +25,8 @@ const _attrs = {
   orient: orients[0],
   padding: 0.05,
   showDiff: false,
-  regionPadding: 0.1
+	regionPadding: 0.1,
+	thickness: false,
 };
 
 /**
@@ -154,6 +155,16 @@ Bar.prototype.mono = attrFunc('mono');
  * @return {orient|Bar}
  */
 Bar.prototype.orient = attrFunc('orient');
+
+/**
+ * If barWidth is specified, sets each bar width(or height on vertical bar) and returns the instance itself. If barWidth is not specified, or barWidth bigger than origin barWidth, just  returns the instance's current barWidth setting. Not surpport Stacked Bar Chart.
+ * @function
+ * @example
+ * bar.orient('horizontal'); // renders the horizontal bar chart
+ * @param {boolean|number} [barWidth=false] false or specific number
+ * @return {barWidth|Bar}
+ */
+Bar.prototype.barWidth = attrFunc('barWidth');
 
 function domainY(yField, munged, level = 0, nested = false, aggregated = false, stacked = false, showDiff = false) {
   const yDomain = yField.level(level)

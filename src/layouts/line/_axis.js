@@ -6,10 +6,12 @@ function _axis() {
   const individualScale = this.isIndividualScale();
   const innerSize = this.innerSize();
   const fieldObj = this.__execs__.field;
- 
+	const font = this.font()
+	
   let _axisScaleX = function (axisToggle) {
     fieldObj.x.axis(axisToggle);
     let curAxis = that.axisDefault(scale.x, axisToggle);
+		curAxis.font(font);//font update
     if (scale.x.invert) curAxis.grid(grid).gridSize(innerSize.height);
     if (axisToggle.orient === 'bottom') curAxis.y(scale.y.range()[0]);
     return curAxis;
@@ -21,14 +23,15 @@ function _axis() {
     } else {
       axisToggle.field = field;
     }
-    let curAxis = that.axisDefault(scaleY, axisToggle);
+		let curAxis = that.axisDefault(scaleY, axisToggle);
+		curAxis.font(font);//font update
     curAxis.grid(grid).gridSize(innerSize.width);
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     return curAxis;
-  }
+	}
 
   let xAt = this.axisX();
-  let yAt = this.axisY();
+	let yAt = this.axisY();
   if (this.isFacet()) {
     this.axisFacet();
   } else {
@@ -44,8 +47,8 @@ function _axis() {
       } else {
         _axisScaleY(yAt);
       }
-    }
-  }
+		}
+	}
   this.renderAxis();
 }
 

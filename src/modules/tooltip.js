@@ -4,13 +4,13 @@ import {className, labelFormat} from './util';
 import {countMeasure, countMeasureTitle} from './measureField';
 
 const arrowWidth = 4;
-const backgroundColor = '#001a32';
-const whiteColor = '#fff';
-const greyColor = '#7b92ae';
+const backgroundColor = '#ffffff';
+const greyColor = '#485464';
+const greyColor2 = '#171b20';
 const IS_IE9 = typeof navigator === 'object' ? (/MSIE 9/i.test(navigator.userAgent)) : false;
 const defaultFont = {
   'font-family': 'sans-serif',
-  'font-size': 11,
+  'font-size': 12,
   'font-weight': 'normal',
   'font-style': 'normal'
 };
@@ -116,38 +116,44 @@ function _position() {
 }
 
 function _render(selection) { //pre-render the tooltip 
-  let tooltip = this.__execs__.tooltip //selection.select('.tooltip'); //FIXME: can not generate tooltip area independently.
+	let tooltip = this.__execs__.tooltip //selection.select('.tooltip'); //FIXME: can not generate tooltip area independently.
   if (selection.style('position') === 'static') selection.style('position', 'relative');
   if (!tooltip || tooltip.empty()) {
     tooltip = selection.append('div').attr('class', className('tooltip'))
-      .style('color', whiteColor)
       .style('pointer-events', 'none')
       .style('background-color', backgroundColor)
       .style('padding', '9px')
-      .style('border-radius', '8px')
+      .style('border-radius', '2px')
+      .style('border-color', '#b2c0d0')
+      .style('box-shadow', '0 0 10px 0 rgba(72, 84, 100, 0.2)')
       .style('position', 'absolute')
       .style('z-index', '999')
+      .style('min-width', '127px')
       .call(_styleOpacity, 0)
     
     tooltip.append('div')
       .attr('class', className('keys'))
       .style('padding-bottom', '1em')
-      .style('letter-spacing', '0.1px')
-      .call(_styleOpacity, 0.9);
-    tooltip.append('table')
-      .attr('class', className('values'))
-      .style('border-collapse', 'collapse')
-      .call(_styleOpacity, 0.72);
-    tooltip.append('div')
-      .attr('class', className('arrow'))
-      .style('position', 'absolute')
-      .style('top', 'calc(' + arrowWidth + 'px + 50%)')
-      .style('left', '0%')
-      .style('margin', -(arrowWidth*2) + 'px')
-      .style('border-width', arrowWidth + 'px')
-      .style('border-style', 'solid')
-      .style('border-color', 'transparent ' + backgroundColor + ' transparent transparent')
-      .text(' ');
+			.style('letter-spacing', '0.1px')
+			.style('color', greyColor2)
+			.style('font-weight', 'bold')
+			.style('font-size', '12px')
+    tooltip.append('ul')
+			.attr('class', className('values'))
+			.style('list-style', 'none')
+			.style('padding', 0)
+			.style('margin', 0)
+		// remove arrow
+    // tooltip.append('div')
+    //   .attr('class', className('arrow'))
+    //   .style('position', 'absolute')
+    //   .style('top', 'calc(' + arrowWidth + 'px + 50%)')
+    //   .style('left', '0%')
+    //   .style('margin', -(arrowWidth*2) + 'px')
+    //   .style('border-width', arrowWidth + 'px')
+    //   .style('border-style', 'solid')
+    //   .style('border-color', 'transparent ' + backgroundColor + ' transparent transparent')
+    //   .text(' ');
   }
   for (let fontKey in this.font()) {
     tooltip.style(fontKey, this.font()[fontKey] + (fontKey === 'font-size' ? 'px' : ''));
@@ -184,7 +190,9 @@ function showFromPoint(point, d) {
 
 function show() {
   let valueFormat = this.valueFormat();
-  let tooltip = this.__execs__.tooltip;
+	let tooltip = this.__execs__.tooltip;
+	let scale = this.__attrs__.target.__execs__.scale;
+	const isMultiTooltip = !!this.__attrs__.target.__attrs__.multiTooltip
   
   if(this.keys()) {
     let key = tooltip.select(className('keys', true)).selectAll(className('key', true))
@@ -198,32 +206,58 @@ function show() {
   let value = tooltip.select(className('values', true)).selectAll(className('value', true))
     .data(this.values());
   value.exit().remove();
-  value = value.enter().append('tr')
-    .attr('class', className('value'))
+  value = value.enter().append('li')
+		.attr('class', className('value'))
+		.style('list-style', 'none')
+		.style('padding', 0)
+    .style('margin', 0)
+    .style('overflow', 'hidden')
     .merge(value)
   if (this.showDiff() && value.size() > 1) {
-    value.style('color', (_,i) => (i ===0 ? greyColor : whiteColor));
+    value.style('color', greyColor);
   } else {
-    value.style('color', whiteColor);
+    value.style('color', greyColor);
   }
   
-  let label = value.selectAll('td')
-    .data(d => [d.name, d.value])
+  let label = value.selectAll('span')
+    .data(d => [d, d.name, d.value])
   label.exit().remove();
-  label = label.enter().append('td')
+  label = label.enter().append('span')
     .style('padding', 0)
-    .style('margin', 0)
-    .style('padding-bottom', '.35em')
-    .style('padding-right', (_,i) => (i===0 ? '2em' : 0))
-    .style('text-align', (_,i) => (i===0 ? 'left' : 'right'))
+		.style('margin', 0)
+		.style('color', (_,i) => (i === 1 ? greyColor : greyColor2))
+    .style('margin-bottom', '.35em')
+    .style('margin-right', (_,i) => {
+			if(isMultiTooltip){
+				return i===0 ? '1em' : i===1 ? '2em' : 0
+			}else{
+				return i===1 ? '2em' : 0
+			}
+			
+		})
+		.style('text-align', (_,i) => (i===0 ? 'left' : 'right'))
+		.style('display', 'block')
+		.style('float', 'left')
+		.style('width', (_,i) => {
+			if(isMultiTooltip){
+				return i === 0 ? '11px' : 'auto'
+			}else{
+				return i === 0 ? '0px' : 'auto'
+			}
+		})
+		.style('height', (_,i) => (i === 0 ? '11px' : 'auto'))
+		.style('background-color', (d,i) => {
+			return i === 0 && isMultiTooltip ? scale.color(d.name) : 'none'
+		})
     .merge(label)
     .text((d,i) => {
-      if (i === 0) {
+      if (i === 1) {
         return d.localeCompare(countMeasure.field) === 0 ? countMeasureTitle : d;
-      } else {
+      } else if (i===2) {
         return valueFormat(d);
       }
-    })
+		})
+
   let tooltipH = tooltip.node().getBoundingClientRect().height/2;
   tooltip
     .style('left', (this.x() + this.dx()) + 'px')

@@ -5,15 +5,21 @@ function _axis() {
   const yAtLeft = this.axis().find(a => a.target === 'y' && a.orient === 'left');
   const yAtRight = this.axis().find(a => a.target === 'y' && a.orient === 'right');
   const fieldObj = this.__execs__.field;
-  
+	const font = this.font();
+	const innerSize = this.innerSize();
+	const grid = this.grid();
+	
   let _axisScaleX = (axisToggle) => {
     axisToggle.field = fieldObj.x.field();
-    let curAxis = this.axisDefault(scale.x, axisToggle);
+		let curAxis = this.axisDefault(scale.x, axisToggle);
+		curAxis.font(font);//font update
     if (axisToggle.orient === 'bottom') curAxis.y(scale.yBar.range()[0]);
     return curAxis;
   }
   let _axisScaleY =  (yScale, axisToggle) => {
-    let curAxis = this.axisDefault(yScale, axisToggle);
+		let curAxis = this.axisDefault(yScale, axisToggle);
+		curAxis.font(font);//font update
+		if (axisToggle.orient === 'right') curAxis.grid(grid).gridSize(innerSize.width);
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     return curAxis;
   }
