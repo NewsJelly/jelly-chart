@@ -9,7 +9,7 @@
   <link type="text/css" rel="stylesheet" href="../style/demo.css">
   <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
   <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="../release/latest/dist/jelly.min.js"></script>
+    <script src="../../dist/jelly.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>
     hljs.initHighlightingOnLoad();
@@ -49,9 +49,11 @@
             <li class=""><a href="multi-measure-line">Multi-measure Line Chart</a></li>
             <li class=""><a href="multi-measure-individual-line">Multi-measure Line Chart w/ Individual Scale</a></li>
             <li class=""><a href="stacked-area">Stacked Area Chart</a></li>
+            <li class=""><a href="stacked-area-gradient">Stacked and Gradient Area Chart</a></li>
             <li class=""><a href="normalized-stacked-area">Normalized Stacked Area Chart</a></li>
             <li class=""><a href="facet-line">Small Multiples Line Chart</a></li>
             <li class=""><a href="fitline-line">Fit Line on Line Chart</a></li>
+            <li class=""><a href="fixline-line">Fix Line on Line Chart</a></li>
             <li class=""><a href="meanline-line">Mean Line on Line Chart</a></li>
           </ul>
         </div>
@@ -150,6 +152,7 @@
             <li class=""><a href="no-axis-title">No Axis Title</a></li>
             <li class=""><a href="no-ticks">No Axis Ticks</a></li>
             <li class=""><a href="axis-sub-tick">Sub Axis Ticks</a></li>
+            <li class=""><a href="axis-compress-ticks">Axis Compress Ticks</a></li>
           </ul>
         </div>
         <div>
@@ -208,7 +211,8 @@ var i;
 for (i = 0; i < dataLength; i ++) {
   dataset.push({
     date: dates[i%dates.length], 
-    value: Math.random() * 1000
+    value: Math.random() * 1000,
+    value2: Math.random() * 1000,
   });
 }
 
@@ -219,8 +223,10 @@ jelly.line().container('#jelly-container')
     interval: 'month',
     format: '%Y-%m'
   })
-  .measures([{field: 'value', op:'mean'}])
+  .measures([{field: 'value', op:'mean'}, {field: 'value2', op:'mean'}])
   .axis('x').axis('y')
+  .legend({orient: 'right', thickness:100})
+  .multiTooltip(true)
   .render();</code></pre>
     
       <footer>
@@ -231,15 +237,15 @@ jelly.line().container('#jelly-container')
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(function() {
-        var dates = d3.timeDays(new Date(2016, 0, 1), new Date(2017, 11, 31), 1);
+      var dates = d3.timeDays(new Date(2016, 0, 1), new Date(2017, 11, 31), 1);
 var dataLength = 1000;
 var dataset = [];
 var i;
 for (i = 0; i < dataLength; i ++) {
   dataset.push({
     date: dates[i%dates.length], 
-    value: Math.random() * 1000
+    value: Math.random() * 1000,
+    value2: Math.random() * 1000,
   });
 }
 
@@ -250,10 +256,11 @@ jelly.line().container('#jelly-container')
     interval: 'month',
     format: '%Y-%m'
   })
-  .measures([{field: 'value', op:'mean'}])
+  .measures([{field: 'value', op:'mean'}, {field: 'value2', op:'mean'}])
   .axis('x').axis('y')
+  .legend({orient: 'right', thickness:100})
+  .multiTooltip(true)
   .render();
-      }, 200);
     });
   </script>
 </body>

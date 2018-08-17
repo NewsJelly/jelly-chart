@@ -739,6 +739,15 @@ function measureField(measure) {
 
 setMethodsFromAttrs(MeasureField, attrs);
 
+/**
+ * aggregate data which have N-measures (used in Bar and Line only)
+ * @private
+ * @memberOf Core#
+ * @param {boolean} reverse=false
+ * @param {boolean} useHierarchy=true
+ * @param {boolean} sum=true
+ * @return {hierarchy}
+ */
 function aggregateMixed() {
   var reverse = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
   var useHierarchy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -922,6 +931,12 @@ function mute(nodeOrRegion, intensity) {
   return this;
 }
 
+/**
+ * recovers the selection's opacity from {@link Core#mute}
+ * @memberOf Core#
+ * @param {d3Selection} nodeOrRegion the selection of nodes and regions in the chart
+ * @return {Core}
+ */
 function demute(nodeOrRegion) {
   nodeOrRegion.transition().duration(duration).attr('opacity', 1);
   return this;
@@ -965,6 +980,15 @@ function conditionForMute (filter) {
   return cond;
 }
 
+/**
+ * Fiters nodes according to excemptionFilter in the chart and {@link Core#demute demutes} the nodes. If excemptionFilter is no specified, demutes all nodes.
+ * @memberOf Core#
+ * @example
+ * core.demuteNodes('Sales'); // nodes whose key is not 'Sales' are demuted
+ * core.demuteNodes(d => d.key !== 'Sales') // nodes whose key is not 'Sales' are demuted
+ * @param {string|function} [excemptionFilter] If the fiter is a string, select nodes which has different key with the filter. If the a function, it is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]).
+ * @return {Core}
+ */
 function demuteNodes(excemptionFilter) {
   var nodes = void 0;
   if (!arguments.length) {
@@ -1038,11 +1062,50 @@ function _dimensionType(dimension) {
   }
 }
 
+/**
+ * appends a dimension to {@link Core#dimensions dimensions} array. A dimenension(key) acts as an index that is used to look up measure(value). A synonym for dimension is independent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions; multi-dimensions can make multiple levels of grouping. The combination of all dimensions would be unique for each item. Each dimension is converted into a mark(region or node) according to its chart type and level.
+ * 
+ * @memberOf Core#
+ * @function
+ * @example
+ * core.dimension({field:'Sales', order:'ascending'});
+ * core.dimension({field: 'Sales Date', format: '%y', interval: 'year'})
+ * core.dimension('Profit');
+ * @param {(string|object)} dimension
+ * @param {string} dimension.field refers a key property in objects from the {@link Core#data data array}. The key property will be invoked for each element in the input array and must return a string identifier to assign the element to its group. 
+ * @param {string} [dimension.order=natural] chooses comparator types among natural, ascending and descending, sorting nodes in selected order. 
+ * @param {number} [dimension.max=100] maximum number of nodes
+ * @param {string|function} [dimension.format=undefined] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
+ * @param {string|function} [dimension.formatSub=undefined] a sub-time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}, which used sub-ticks on it's axis.
+ * @param {string} [dimension.interval=undefined] If the dimension has Date type values, set an {@link https://github.com/d3/d3-time#intervals interval} which is a conventional unit of time to grouped its value.
+ * @return {Core}
+ */
 function dimension$1(dimension) {
   this.__attrs__.dimensions.push(_dimensionType(dimension));
   return this;
 }
 
+/**
+ * If dimensions is specified, sets dimensions and returns the instance itself. If dimensions is an object or string, it would be turned into an array with a dimension. If dimensions is not specified, returns the instance's current dimensions. 
+ * A dimenension(key) acts as an index that is used to look up measure(value). A synonym for dimension is independent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions; multi-dimensions can make multiple levels of grouping. The combination of all dimensions would be unique for each item. Each dimension is converted into a region or a node according to its chart type and level.
+ * @memberOf Core#
+ * @function
+ * @example
+ * bar.data([
+ *    {category:'Blue', name: 'A', value: 10},
+ *    {category:'Blue', name: 'B', value: 20},
+ *    {category:'Blue', name: 'C', value: 30},
+ *    {category:'Blue', name: 'D', value: 40},
+ *    {category:'Red', name: 'A', value: 20},
+ *    {category:'Red', name: 'B', value: 10},
+ *    {category:'Red', name: 'C', value: 40},
+ *    {category:'Red', name: 'D', value: 10},
+ *  ]) //sets data
+ *  .dimensions(['category', {field:'name', order:'ascending'}])
+ *  //generates a grouped bar chart which has 2 regions (Red, Blue) with 4 bars(A,B,C,D) each.
+ * @param {(string|object|Object[])} [dimensions] sets a {@link Core#dimension dimension} array which are objects has properties for aggregation(grouping).
+ * @return {(dimensions|Core)}
+ */
 function dimensions(dimensions) {
   if (!arguments.length) return this.__attrs__.dimensions;
   if (!Array.isArray(dimensions)) {
@@ -1085,6 +1148,16 @@ function filterNodes(filter) {
   return nodes.filter(filter);
 }
 
+/**
+ * Fiters regions in the chart, returning a new selection that contains only the elements for which the specified filter is true. 
+ * @memberOf Core#
+ * @example
+ * core.filterRegions(function(d) {
+ *    return d.key === key;
+ * })
+ * @param {(string|function)} filter The filter may be specified either as a selector stringfilter is  or a function. If the a function, it is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]).
+ * @return {d3Selection}
+ */
 function filterRegions(callback) {
   var noFacet = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -1238,6 +1311,7 @@ function margin() {
   var curMargin = this.__attrs__.margin;
   if (!arguments.length) return this.__attrs__.margin;
   if ((typeof margin === 'undefined' ? 'undefined' : _typeof(margin)) === 'object') {
+    this.__attrs__.margin = margin;
     ['top', 'right', 'left', 'bottom'].forEach(function (prop) {
       return append(margin, curMargin, prop);
     });
@@ -1245,6 +1319,19 @@ function margin() {
   return this;
 }
 
+/**
+ * appends a measure to {@link Core#measures measures} array. A measure(value) acts as an value that is looked up by dimensions(key). A synonym for measure is dependent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions. If measures are specified, leaves of the tree will be summarized by them. 
+ * @memberOf Core#
+ * @function
+ * @example
+ * core.measure({field:'Sales', 'op': 'mean'});
+ * core.measure('Profit');
+ * @param {(string|object)} measure
+ * @param {string} [measure.field] refers a value property in objects from the {@link Core#data data array}. The value property will be invoked for leaf elements during aggregation and their values in the property will be summarized by the specified operator as an value.
+ * @param {string} [measure.op=sum] an operator(sum, mean, variance, min, max, median) to summarize leaf elements.
+ * @param {string} [measure.format] a time formatter for the given string {@link https://github.com/d3/d3-time-format#locale_format specifier}
+ * @return {Core}
+ */
 function measure(measure) {
   if (typeof measure === 'string') {
     this.__attrs__.measures.push({ field: measure, op: 'sum' });
@@ -1255,12 +1342,44 @@ function measure(measure) {
   return this;
 }
 
+/**
+ * get a transformed field name of a measure
+ * @memberOf Core#
+ * @function
+ * @private
+ * @param {object} measure
+ * @param {string} suffix 
+ */
 function measureName(measure, suffix) {
   measure = measure || this.measures()[0];
   var name = measure.field;
   if (!this.aggregated() || measure.field !== mixedMeasure.field) name += '-' + measure.op;
   return name + (suffix !== undefined ? '-' + suffix : '');
 }
+
+/**
+ * If measures is specified, sets measures and returns the instance itself. If measures is an object or string, it would be turned into an array with a measure. If measures is not specified, returns the instance's current measures. 
+ * A measure(value) acts as an value that is looked up by dimensions(key). A synonym for dimension is independent attribute. Jelly-chart has {@link Core#data data} in an array to be grouped into a hierarchical tree structure with dimensions. If measures are specified, leaves of the tree will be summarized by them. 
+ * @memberOf Core#
+ * @function
+ * @example
+ * bar.data([
+ *    {name: 'A', sales: 10},
+ *    {name: 'B', sales: 20},
+ *    {name: 'C', sales: 30},
+ *    {name: 'D', sales: 40},
+ *    {name: 'A', sales: 20},
+ *    {name: 'B', sales: 10},
+ *    {name: 'C', sales: 40},
+ *    {name: 'D', sales: 10},
+ *  ]) //sets data
+ *  .dimensions(['name'])
+ *  .measures([{field:'sales', op: 'mean'}])
+ *  //generates a mono bar chart with 4 bars(A,B,C,D).
+ *  //each bar's length will be determined mean of 'sales' values from leaf elements.
+ * @param {(string|object|Object[])} [measures] sets a {@link Core#measure measure} array which are objects has properties for aggregation(grouping).
+ * @return {(measures|Core)}
+ */
 
 function measures(measures) {
   if (!arguments.length) return this.__attrs__.measures;
@@ -1387,7 +1506,7 @@ var zeroMargin = { top: 0, right: 0, bottom: 0, left: 0 };
  * @return {object} {top, right, bottom, left} offset in pixels
  */
 function offset() {
-  if (this.zeroOffset()) return zeroMargin;
+  if (this.zeroOffset()) return this.margin();
   var offset = Object.assign({}, this.zeroMargin() ? zeroMargin : this.margin());
   var legend = this.legend();
   if (legend) offset[legend.orient] += legend.thickness;
@@ -1442,6 +1561,10 @@ function process(type, call) {
   }
 }
 
+/**
+ * @private
+ * @param {d3Dispatch} listeners 
+ */
 function rebindOnMethod$1 (listeners) {
   return rebindOnMethod(this, listeners);
 }
@@ -2004,6 +2127,14 @@ Legend.prototype.isHorizontal = isHorizontal;
 
 setMethodsFromAttrs(Legend, _attrs$4);
 
+/**
+ * render a legend according to internal {@link Core#legend legend} settings
+ * @memberOf Core#
+ * @function
+ * @private
+ * @param {string} [field=region] specify a field name to select color scale.
+ * @return {Core}
+ */
 function renderLegend() {
   var field = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'region';
 
@@ -2026,7 +2157,7 @@ function renderLegend() {
   var offsetThickness = legendToggle.font ? legendToggle.font['font-size'] : 20;
   if (legendToggle.orient === 'bottom' || legendToggle.orient === 'top') {
     x = 0;
-    if (legendToggle.orient === 'bottom') y = innerSize.height + offset.bottom - margin.bottom - legendToggle.thickness + offsetThickness;else y = -offset.top + margin.top - offsetThickness;
+    if (legendToggle.orient === 'bottom') y = innerSize.height + offset.bottom - legendToggle.thickness + offsetThickness;else y = -offset.top + margin.top - offsetThickness;
     if (this.axisX && !this.axisX()) {
       y += offsetThickness * (legendToggle.orient === 'bottom' ? 1 : -1);
     }
@@ -2064,6 +2195,17 @@ function renderLegend() {
   return this;
 }
 
+/**
+ * render regions
+ * @memberOf Core#
+ * @function
+ * @private
+ * @param {function} posFunc specifies positions of a region by set x and y value of the region data
+ * @param {function} [dataFunc=d => d] specify a data accessor
+ * @param {boolean} [isFacet=false] 
+ * @param {string} [suffix='']
+ * @return {Core}
+ */
 function renderRegion(posFunc) {
   var dataFunc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (d) {
     return d;
@@ -2236,6 +2378,13 @@ Spectrum.prototype.update = update$1;
 
 setMethodsFromAttrs(Spectrum, _attrs$5);
 
+/**
+ * render a spectrum instead of a legend according to internal {@link Core#legend legend} settings. Charts such as treeemap and xy-heatmap, which use a contniuous color scale to present their measure level, use this method.
+ * @memberOf Core#
+ * @function
+ * @private
+ * @return {Core}
+ */
 function renderSpectrum() {
   var legendToggle = this.legend();
   if (!legendToggle) return;
@@ -2273,17 +2422,18 @@ function renderSpectrum() {
 }
 
 var arrowWidth = 4;
-var backgroundColor = '#001a32';
-var whiteColor = '#fff';
-var greyColor = '#7b92ae';
+var backgroundColor = '#ffffff';
+var greyColor = '#485464';
+var greyColor2 = '#171b20';
 var IS_IE9 = (typeof navigator === 'undefined' ? 'undefined' : _typeof(navigator)) === 'object' ? /MSIE 9/i.test(navigator.userAgent) : false;
 var defaultFont$3 = {
   'font-family': 'sans-serif',
-  'font-size': 11,
+  'font-size': 12,
   'font-weight': 'normal',
   'font-style': 'normal'
 };
 var pointOriginColor = '#fff';
+
 var _attrs$6 = {
   absolute: false,
   anchor: { x: 'left', y: 'top' },
@@ -2391,11 +2541,21 @@ function _render$2(selection) {
   var tooltip = this.__execs__.tooltip; //selection.select('.tooltip'); //FIXME: can not generate tooltip area independently.
   if (selection.style('position') === 'static') selection.style('position', 'relative');
   if (!tooltip || tooltip.empty()) {
-    tooltip = selection.append('div').attr('class', className('tooltip')).style('color', whiteColor).style('pointer-events', 'none').style('background-color', backgroundColor).style('padding', '9px').style('border-radius', '8px').style('position', 'absolute').style('z-index', '999').call(_styleOpacity, 0);
+    tooltip = selection.append('div').attr('class', className('tooltip')).style('pointer-events', 'none').style('background-color', backgroundColor).style('padding', '9px').style('border-radius', '2px').style('border-color', '#b2c0d0').style('box-shadow', '0 0 10px 0 rgba(72, 84, 100, 0.2)').style('position', 'absolute').style('z-index', '999').style('min-width', '127px').call(_styleOpacity, 0);
 
-    tooltip.append('div').attr('class', className('keys')).style('padding-bottom', '1em').style('letter-spacing', '0.1px').call(_styleOpacity, 0.9);
-    tooltip.append('table').attr('class', className('values')).style('border-collapse', 'collapse').call(_styleOpacity, 0.72);
-    tooltip.append('div').attr('class', className('arrow')).style('position', 'absolute').style('top', 'calc(' + arrowWidth + 'px + 50%)').style('left', '0%').style('margin', -(arrowWidth * 2) + 'px').style('border-width', arrowWidth + 'px').style('border-style', 'solid').style('border-color', 'transparent ' + backgroundColor + ' transparent transparent').text(' ');
+    tooltip.append('div').attr('class', className('keys')).style('padding-bottom', '1em').style('letter-spacing', '0.1px').style('color', greyColor2).style('font-weight', 'bold').style('font-size', '12px');
+    tooltip.append('ul').attr('class', className('values')).style('list-style', 'none').style('padding', 0).style('margin', 0);
+    // remove arrow
+    // tooltip.append('div')
+    //   .attr('class', className('arrow'))
+    //   .style('position', 'absolute')
+    //   .style('top', 'calc(' + arrowWidth + 'px + 50%)')
+    //   .style('left', '0%')
+    //   .style('margin', -(arrowWidth*2) + 'px')
+    //   .style('border-width', arrowWidth + 'px')
+    //   .style('border-style', 'solid')
+    //   .style('border-color', 'transparent ' + backgroundColor + ' transparent transparent')
+    //   .text(' ');
   }
   for (var fontKey in this.font()) {
     tooltip.style(fontKey, this.font()[fontKey] + (fontKey === 'font-size' ? 'px' : ''));
@@ -2461,6 +2621,8 @@ function renderPoint(point) {
 function show$1(point) {
   var valueFormat = this.valueFormat();
   var tooltip = this.__execs__.tooltip;
+  var scale = this.__attrs__.target.__execs__.scale;
+  var isMultiTooltip = !!this.__attrs__.target.__attrs__.multiTooltip;
 
   renderPoint.call(this, point);
 
@@ -2474,30 +2636,45 @@ function show$1(point) {
   }
   var value = tooltip.select(className('values', true)).selectAll(className('value', true)).data(this.values());
   value.exit().remove();
-  value = value.enter().append('tr').attr('class', className('value')).merge(value);
+  value = value.enter().append('li').attr('class', className('value')).style('list-style', 'none').style('padding', 0).style('margin', 0).style('overflow', 'hidden').merge(value);
   if (this.showDiff() && value.size() > 1) {
-    value.style('color', function (_, i) {
-      return i === 0 ? greyColor : whiteColor;
-    });
+    value.style('color', greyColor);
   } else {
-    value.style('color', whiteColor);
+    value.style('color', greyColor);
   }
 
-  var label = value.selectAll('td').data(function (d) {
-    return [d.name, d.value];
+  var label = value.selectAll('span').data(function (d) {
+    return [d, d.name, d.value];
   });
   label.exit().remove();
-  label = label.enter().append('td').style('padding', 0).style('margin', 0).style('padding-bottom', '.35em').style('padding-right', function (_, i) {
-    return i === 0 ? '2em' : 0;
+  label = label.enter().append('span').style('padding', 0).style('margin', 0).style('color', function (_, i) {
+    return i === 1 ? greyColor : greyColor2;
+  }).style('margin-bottom', '.35em').style('margin-right', function (_, i) {
+    if (isMultiTooltip) {
+      return i === 0 ? '1em' : i === 1 ? '2em' : 0;
+    } else {
+      return i === 1 ? '2em' : 0;
+    }
   }).style('text-align', function (_, i) {
     return i === 0 ? 'left' : 'right';
-  }).merge(label).text(function (d, i) {
-    if (i === 0) {
-      return d.localeCompare(countMeasure.field) === 0 ? countMeasureTitle : d;
+  }).style('display', 'block').style('float', 'left').style('width', function (_, i) {
+    if (isMultiTooltip) {
+      return i === 0 ? '11px' : 'auto';
     } else {
+      return i === 0 ? '0px' : 'auto';
+    }
+  }).style('height', function (_, i) {
+    return i === 0 ? '11px' : 'auto';
+  }).style('background-color', function (d, i) {
+    return i === 0 && isMultiTooltip ? scale.color(d.name) : 'none';
+  }).merge(label).text(function (d, i) {
+    if (i === 1) {
+      return d.localeCompare(countMeasure.field) === 0 ? countMeasureTitle : d;
+    } else if (i === 2) {
       return valueFormat(d);
     }
   });
+
   var tooltipH = tooltip.node().getBoundingClientRect().height / 2;
   tooltip.style('left', this.x() + this.dx() + 'px').style('top', this.y() + this.dy() - tooltipH + 'px').transition().duration(180).call(_styleOpacity, 1);
 }
@@ -2527,6 +2704,23 @@ Tooltip.prototype.value = value;
 
 setMethodsFromAttrs(Tooltip, _attrs$6);
 
+/**
+ * renders tooltip according to the internal {@link Core#tooltip tooltip} settings.
+ * @memberOf Core#
+ * @function
+ * @private
+ * @param {object} setting
+ * @param {number} [setting.dx]
+ * @param {number} [setting.dy]
+ * @param {string} [setting.color ]
+ * @param {function} [setting.key]
+ * @param {function} [setting.value]
+ * @param {function} [setting.offset]
+ * @param {boolean} [setting.showDiff]
+ * @param {boolean} fromMulti=false
+ * @param {boolean} absolute=false
+ * @return {Tooltip}
+ */
 function renderTooltip() {
   var setting = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var fromMulti = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -2543,6 +2737,13 @@ function renderTooltip() {
   return tooltipObj;
 }
 
+/**
+ * reset the chart
+ * @memberOf Core#
+ * @function
+ * @param {boolean} [keep=false] If keep is true, not reset existing scales.
+ * @return {Core} 
+ */
 function reset() {
   var keep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
@@ -2608,6 +2809,12 @@ function scale(name) {
   return this.__execs__.scale[name];
 }
 
+/**
+ * @memberOf Core#
+ * @function
+ * @private
+ * @param {*} attrs 
+ */
 function setAttrs$1(attrs) {
   setAttrs(this, attrs);
   return this;
@@ -2684,6 +2891,13 @@ function showTooltip() {
   return this;
 }
 
+/**
+ * @memberOf Core#
+ * @function
+ * @private
+ * @param {*} selection 
+ * @param {*} font 
+ */
 function styleFont(selection, font) {
   font = font || this.font();
   for (var fontKey in font) {
@@ -2699,7 +2913,7 @@ function styleFont(selection, font) {
  * @example
  * core.tooltip(true); //set to show a tooltip
  * core.tooltip({sortByValue:'ascending'}); // set to show a tooltip and sort items in order of their measrue values.
- * @param {boolean|object} [tooltip=false]
+ * @param {boolean|object} [tooltip=true]
  * @return {tooltip|Core}
  */
 
@@ -3089,6 +3303,7 @@ var _attrs$7 = {
   showTitle: true,
   showDomain: true,
   showTicks: true,
+  compressTicks: false,
   thickness: 40,
   target: targets[0],
   tickFormat: null,
@@ -3206,7 +3421,7 @@ function _overflow$1(selection) {
     if (scaleDist === 0) scaleDist = scale.range()[0] * 2;
     if (_this.isHorizontal()) {
       rectPos.width = scaleDist;
-      rectPos.height = _this.thickness() - (_this.showTitle() ? _this.font()['font-size'] * 1.71 : 0);
+      rectPos.height = _this.thickness();
       rectPos.x = -rectPos.width / 2;
       rectPos.y = orient === 'bottom' ? 0 : -rectPos.height;
     } else {
@@ -3229,6 +3444,14 @@ function _overflow$1(selection) {
     var showTicks = _this.showTicks();
     var isSmall = tickStepSize < _this.font()['font-size'] * (_this.isHorizontal() ? 1 : 0.72);
     selection.selectAll('.tick').style('visibility', isSmall && scale.bandwidth ? 'hidden' : showTicks ? 'inherit' : 'hidden');
+  };
+  var _compressTicks = function _compressTicks() {
+    var compressTicks = _this.compressTicks();
+    if (compressTicks) {
+      selection.selectAll('.tick').filter(function (d, i, list) {
+        return i > 0 && i < list.length - 1;
+      }).attr('display', 'none');
+    }
   };
   var _rotate = function _rotate() {
     var tickPadding = _this.tickPadding();
@@ -3257,7 +3480,7 @@ function _overflow$1(selection) {
         totalW += w;
       });
       var isOver = totalW >= Math.abs(scale.range()[1] - scale.range()[0]);
-      if (isHorizontal) {
+      if (isHorizontal && !_this.compressTicks()) {
         if (isOver) {
           tick.selectAll('text').classed(className('rotated'), true).call(_rotateFunc, defaultTickRotate);
         } else {
@@ -3272,6 +3495,7 @@ function _overflow$1(selection) {
   _clipPath();
   _rotate();
   _hidden();
+  _compressTicks();
 }
 
 function tickFormatForContinious(domain) {
@@ -3352,6 +3576,7 @@ function _preStyle(selection) {
   } else {
     axis._tickNumber = scale.domain().length;
   }
+
   for (var k in font) {
     selection.style(k, k === 'font-size' ? font[k] + 'px' : font[k]);
   }
@@ -3364,7 +3589,6 @@ function _render$3(selection, zoomed) {
   if (selection.selectAll('.domain').size() === 0) {
     selection.attr('transform', 'translate(' + [this.x(), this.y()] + ')');
   }
-
   if (this.transition() && !zoomed) {
     selection.transition(this.__execs__.transition).attr('transform', 'translate(' + [this.x(), this.y()] + ')').call(function (selection) {
       axis(selection);
@@ -3463,8 +3687,11 @@ function _title(selection) {
   var titleSel = selection.selectAll('.title').data([title]);
   titleSel.exit().remove();
   var titleSelEnter = titleSel.enter().append('g').attr('class', 'title').call(_transform);
-  titleSelEnter.append('text').attr('text-anchor', 'middle').style('font-size', titleSize + 'px').style('fill', titleColor).call(_textTransform);
+  titleSelEnter.append('text').attr('text-anchor', 'middle').style('font-size', titleSize + 'px').style('fill', titleColor);
 
+  if (!this.compressTicks()) {
+    titleSelEnter.call(_textTransform);
+  }
   titleSel = titleSelEnter.merge(titleSel);
   titleSel.select('text').text(title);
   if (this.transition()) {
@@ -3545,10 +3772,10 @@ function setVal(axis) {
     val.target = val.orient;
     val.orient = 'left';
   }
-
   var isHorizontal = val.target === 'x';
   if (!('showDomain' in val)) val.showDomain = true;
   if (!('showTicks' in val)) val.showTicks = true;
+  if (!('compressTicks' in val)) val.compressTicks = false;
   if (!('showTitle' in val)) val.showTitle = true;
   if (!('orient' in val)) val.orient = isHorizontal ? 'bottom' : 'left'; // x축일 경우 기본 bottom;
   if (!('thickness' in val)) {
@@ -3578,6 +3805,7 @@ function setVal(axis) {
  * @param {number} [axis.thickness=18]
  * @param {boolean} [axis.showDomain=true]
  * @param {boolean} [axis.showticks=true]
+ * @param {boolean} [axis.compressTicks=false] if is true, only first or end value of the tick shown.
  * @param {boolean} [axis.showTitle=true]
  * @param {string} [axis.title]
  * @param {string} [axis.titleOrient] top|right|bottom|left
@@ -3658,7 +3886,7 @@ function axisDefault(scale, axisSetting) {
     if (field.interval && field.interval()) curAxis.interval(field.interval());
     if (field.format && field.format() && !axisSetting.autoTickFormat) curAxis.tickFormat(field.format());else if (axisSetting.autoTickFormat) curAxis.tickFormat(null);
   } else curAxis.interval(null);
-  ['tickPadding', 'thickness', 'showTitle', 'showDomain', 'showTicks'].forEach(function (k) {
+  ['tickPadding', 'thickness', 'showTitle', 'showDomain', 'showTicks', 'compressTicks'].forEach(function (k) {
     return _set(axisSetting, curAxis, k);
   });
   _axisExec.call(this, axisSetting.target, axisSetting.field, curAxis);
@@ -3731,11 +3959,16 @@ function axisTitle(targetAndField, title) {
   return this;
 }
 
+/**
+ * @memberOf RectLinear#
+ * @private
+ */
 function renderAxis() {
   var _this = this;
 
   var canvas = this.__execs__.canvas;
   var axisObj = this.__execs__.axis;
+
   var _appendAxis = function _appendAxis(selection, axis, targetNum) {
     var cName = 'axis target-' + axis.target() + ' orient-' + axis.orient() + ' targetNum-' + targetNum;
     var axisSel = selection.selectAll(className(cName, true)).data([targetNum]);
@@ -3773,6 +4006,10 @@ function renderAxis() {
   return this;
 }
 
+/**
+ * @memberOf RectLinear#
+ * @private
+ */
 function thickness(axisSetting, scale) {
   var isHorizontal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
   var isOrdinal = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
@@ -4048,6 +4285,15 @@ var paddingMixin = function paddingMixin(Base) {
   return PaddingMixin;
 };
 
+/**
+ * If is true or a comparator string(natural, ascending, descending), sort nodes according to their values. If sortByValue is not specified, returns the current sortByValue setting.
+ * @memberOf SortMixin#
+ * @function
+ * @example 
+ * bar.sortByValue('ascending') //sort bars in ascending order.
+ * @param {boolean|string} [sortByValue=false] (false|natural|ascending|descending)
+ * @return {sortByValue|SortMixin}
+ */
 function sortByValue(sortByValue) {
   if (!arguments.length) return this.__attrs__.sortByValue;
   if (sortByValue && (typeof sortByValue !== 'string' || !orders.find(function (o) {
@@ -4298,6 +4544,18 @@ function tempPosForOrdinalScale(key, scale) {
   }
 }
 
+/**
+ * If unit is number or string, limit the key domain's length or distance within the interval. If the key domain's scale is ordnial, the length of domain will be the same to unit. Also, if the scale is continous, the distance of domain will be fixed as much as unit. If unit is string, it must be a time interval. When multiple exists, it will multiply the unit.
+ * If unit is not specified, returns the existing viewInterval. 
+ * @memberOf StreamMixin#
+ * @function
+ * @example
+ * stream.viewInterval(1000)
+ * stream.viewInterval('month', 3)
+ * @param {number|string} [unit=null] 
+ * @param {number} [multiple=1]
+ * @return {zoom|ZoomMixin}
+ */
 function viewInterval(unit) {
   var multiple = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
@@ -4421,12 +4679,14 @@ function _axis$1() {
   var innerSize = this.innerSize();
   var fieldObj = this.__execs__.field;
   var isVertical = this.isVertical();
+  var font = this.font();
 
   var _axisScaleX = function _axisScaleX(axisToggle) {
     var targetField = nested ? fieldObj.region : isVertical ? fieldObj.x : fieldObj.y;
     var targetScale = nested ? scale.region : isVertical ? scale.x : scale.y;
     targetField.axis(axisToggle);
     var curAxis = that.axisDefault(targetScale, axisToggle);
+    curAxis.font(font); //font update
     if (axisToggle.orient === 'bottom') {
       curAxis.y(isVertical ? scale.y.range()[0] : scale.x.range()[1]);
     }
@@ -4438,6 +4698,7 @@ function _axis$1() {
     var targetScale = isVertical ? scale.y : scale.x;
     targetField.axis(axisToggle);
     var curAxis = that.axisDefault(targetScale, axisToggle);
+    curAxis.font(font); //font update
     curAxis.grid(grid).gridSize(axisToggle.orient === 'bottom' || axisToggle.orient === 'top' ? innerSize.height : innerSize.width);
     if (axisToggle.orient === 'right') curAxis.x((nested ? scale.region : scale.x).range()[1]);
     return curAxis;
@@ -4530,6 +4791,7 @@ function _facet() {
   var measures = this.isMixed() ? [mixedMeasure] : this.measures();
   var width = void 0,
       height = void 0;
+  var barWidth = this.barWidth();
   var settings = ['axisTitles', 'normalized', 'padding', 'orient', 'font', 'label', 'grid', 'tooltip'].map(function (d) {
     return { key: d, value: _this[d]() };
   });
@@ -4537,7 +4799,7 @@ function _facet() {
   var hasY = this.axisY();
   var _smallbar = function _smallbar(d) {
     var smallBar = bar().container(this).data(d).dimensions(dimensions).measures(measures).width(width).height(height).legend(false).zeroMargin(true) //remove margin
-    .aggregated(true).parent(parent);
+    .aggregated(true).parent(parent).barWidth(barWidth);
     settings.forEach(function (d) {
       smallBar[d.key](d.value);
     });
@@ -4588,6 +4850,7 @@ function _mark() {
   var diffColor = this.showDiff();
   var isShowDiff = !nested && diffColor;
   var isNestedAndSortByValue = this.isNestedAndSortByValue();
+  var barWidth = this.barWidth();
 
   var __local = function __local(selection) {
     var monoColor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -4672,13 +4935,29 @@ function _mark() {
   };
   var __bar = function __bar(selection) {
     selection.transition(trans).attr('x', function (d) {
-      return d.x;
+      if (stacked || !vertical || !barWidth || barWidth > d.w) {
+        return d.x;
+      } else {
+        return d.x + (d.w - barWidth) / 2;
+      }
     }).attr('y', function (d) {
-      return d.y;
+      if (stacked || vertical || !barWidth || barWidth > d.h) {
+        return d.y;
+      } else {
+        return d.y + (d.h - barWidth) / 2;
+      }
     }).attr('width', function (d) {
-      return d.w;
+      if (stacked || !vertical || !barWidth || barWidth > d.w) {
+        return d.w;
+      } else {
+        return barWidth;
+      }
     }).attr('height', function (d) {
-      return d.h;
+      if (stacked || vertical || !barWidth || barWidth > d.h) {
+        return d.h;
+      } else {
+        return barWidth;
+      }
     }).style('fill', function (d) {
       if (d3.select(this).classed(className('diff'))) return 'none';else return d.color;
     });
@@ -5221,7 +5500,8 @@ var _attrs = {
   orient: orients[0],
   padding: 0.05,
   showDiff: false,
-  regionPadding: 0.1
+  regionPadding: 0.1,
+  thickness: false
 };
 
 /**
@@ -5367,6 +5647,16 @@ Bar.prototype.mono = attrFunc('mono');
  */
 Bar.prototype.orient = attrFunc('orient');
 
+/**
+ * If barWidth is specified, sets each bar width(or height on vertical bar) and returns the instance itself. If barWidth is not specified, or barWidth bigger than origin barWidth, just  returns the instance's current barWidth setting. Not surpport Stacked Bar Chart.
+ * @function
+ * @example
+ * bar.orient('horizontal'); // renders the horizontal bar chart
+ * @param {boolean|number} [barWidth=false] false or specific number
+ * @return {barWidth|Bar}
+ */
+Bar.prototype.barWidth = attrFunc('barWidth');
+
 function domainY(yField, munged) {
   var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   var nested = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -5488,6 +5778,41 @@ var fitLineMixin = function fitLineMixin(Base) {
   return FitLineMixin;
 };
 
+var _attrs$15 = {
+  fixLine: false
+};
+
+var fixLineMixin = function fixLineMixin(Base) {
+  /**
+   * adds FitLine features
+   * @mixin FitLineMixin
+   */
+  var FitLineMixin = function (_Base) {
+    inherits(FitLineMixin, _Base);
+
+    function FitLineMixin() {
+      classCallCheck(this, FitLineMixin);
+
+      var _this = possibleConstructorReturn(this, (FitLineMixin.__proto__ || Object.getPrototypeOf(FitLineMixin)).call(this));
+
+      _this.setAttrs(_attrs$15);
+      return _this;
+    }
+
+    return FitLineMixin;
+  }(Base);
+  /**
+   * If fixLine is specified value, it draw horizon fixed line.
+   * @function
+   * @example
+   * line.fixLine(50)
+   * @param {number, boolean} [fixLine=false] If is not false, drawn fixed line.
+   * @return {fixLine|Line}
+   */
+  FitLineMixin.prototype.fixLine = attrFunc('fixLine');
+  return FitLineMixin;
+};
+
 function seriesName(_val) {
   if (!arguments.length || _val === false) return this.__attrs__.seriesName;else if (typeof _val === 'boolean' && _val) {
     return this.__attrs__.seriesName.split('.').join(' ').trim();
@@ -5499,7 +5824,7 @@ function seriesName(_val) {
 }
 
 var curves = ['linear', 'stepped', 'curved'];
-var _attrs$15 = {
+var _attrs$16 = {
   curve: curves[0],
   point: false,
   pointRatio: 3,
@@ -5518,7 +5843,7 @@ var seriesMixin = function seriesMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (SeriesMixin.__proto__ || Object.getPrototypeOf(SeriesMixin)).call(this));
 
-      _this.setAttrs(_attrs$15);
+      _this.setAttrs(_attrs$16);
       return _this;
     }
 
@@ -5672,7 +5997,7 @@ function zoomTransform(group, transform) {
   return this;
 }
 
-var _attrs$16 = {
+var _attrs$17 = {
   zoom: false,
   zoomGen: null
 };
@@ -5689,7 +6014,7 @@ var zoomMixin = function zoomMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (ZoomMixin.__proto__ || Object.getPrototypeOf(ZoomMixin)).call(this));
 
-      _this.setAttrs(_attrs$16);
+      _this.setAttrs(_attrs$17);
       _this.__execs__.zoom = null;
       _this.__execs__.zoomDispatch = d3.dispatch('zoom');
       _this.rebindOnMethod(_this.__execs__.zoomDispatch);
@@ -5705,7 +6030,7 @@ var zoomMixin = function zoomMixin(Base) {
   ZoomMixin.prototype.zoomGen = zoomGen;
   ZoomMixin.prototype.zoomTransform = zoomTransform;
   ZoomMixin.prototype.isBrushZoom = isBrushZoom;
-  setMethodsFromAttrs(ZoomMixin, _attrs$16);
+  setMethodsFromAttrs(ZoomMixin, _attrs$17);
   return ZoomMixin;
 };
 
@@ -5713,7 +6038,7 @@ function isBrushZoom() {
   return this.__attrs__.zoom && this.__attrs__.zoom === 'brush';
 }
 
-var _attrs$17 = {
+var _attrs$18 = {
   shape: null
 };
 
@@ -5729,7 +6054,7 @@ var shapeMixin = function shapeMixin(Base) {
 
       var _this = possibleConstructorReturn(this, (ShapeMixin.__proto__ || Object.getPrototypeOf(ShapeMixin)).call(this));
 
-      _this.setAttrs(_attrs$17);
+      _this.setAttrs(_attrs$18);
       return _this;
     }
 
@@ -5958,12 +6283,13 @@ function _mark$2() {
       var url = function url(d) {
         return 'url(#areaGradient-' + d.data.key + ')';
       };
-      selection.attr('stroke', c).attr("fill", url);
+      selection.attr("fill", url);
     } else if (area$$1) {
       selection.attr('fill', c);
     } else {
-      selection.attr('stroke', c).attr('stroke-width', size.range[0] + 'px');
+      selection.attr('stroke', c);
     }
+    selection.attr('stroke-width', size.range[0] + 'px');
   };
   var __pointInit = function __pointInit(selection) {
     selection.attr('r', (size.range[0] - size.range[0] / 4) * pointRatio).attr('stroke-width', size.range[0] / 4 * pointRatio).attr('opacity', showPoint ? 1 : 0).style('cursor', 'pointer').attr('cx', function (d) {
@@ -6296,10 +6622,12 @@ function _axis$3() {
   var individualScale = this.isIndividualScale();
   var innerSize = this.innerSize();
   var fieldObj = this.__execs__.field;
+  var font = this.font();
 
   var _axisScaleX = function _axisScaleX(axisToggle) {
     fieldObj.x.axis(axisToggle);
     var curAxis = that.axisDefault(scale.x, axisToggle);
+    curAxis.font(font); //font update
     if (scale.x.invert) curAxis.grid(grid).gridSize(innerSize.height);
     if (axisToggle.orient === 'bottom') curAxis.y(scale.y.range()[0]);
     return curAxis;
@@ -6315,6 +6643,7 @@ function _axis$3() {
       axisToggle.field = field;
     }
     var curAxis = that.axisDefault(scaleY, axisToggle);
+    curAxis.font(font); //font update
     curAxis.grid(grid).gridSize(innerSize.width);
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     return curAxis;
@@ -6405,7 +6734,7 @@ function _region$2() {
   var isFacet = this.isFacet();
   var color = this.color();
   var areaGradient = this.areaGradient();
-  var __regionLocal = function __regionLocal(d, index) {
+  var __regionLocal = function __regionLocal(d) {
     if (aggregated) return;
     var xy = void 0;
     if (!nested) {
@@ -6510,7 +6839,6 @@ function _fitLine () {
       return l.slope * d + l.intercept;
     });
   });
-
   if (fitLineG.empty()) {
     fitLineG = canvas.append('g').attr('class', className('fit-line-g')).attr('clip-path', 'url(#' + canvas.selectAll(className('canvas-g-clip-path', true)).attr('id'));
   }
@@ -6533,6 +6861,45 @@ function _fitLine () {
   });
 }
 
+var fixLineColor = '#43cdef';
+function _fixLine () {
+  var canvas = this.__execs__.canvas;
+  var scale = this.__execs__.scale;
+  var fixLineValue = this.fixLine();
+  var trans = d3.transition().duration(this.transition().duration).delay(this.transition().delay);
+  var fixLineG = canvas.selectAll(className('fix-line-g', true));
+  if (!fixLineValue) {
+    if (!fixLineG.empty()) canvas.select(className('fix-line-g', true)).remove();
+    return;
+  }
+
+  if (fixLineG.empty()) {
+    fixLineG = canvas.append('g').attr('class', className('fix-line-g'));
+    //.attr('clip-path', `url(#${canvas.selectAll(className('canvas-g-clip-path', true)).attr('id')}`);
+  }
+
+  var xValues = scale.x.domain();
+  var yValues = [[fixLineValue, fixLineValue]];
+
+  fixLineG.datum(yValues);
+
+  var fixLine = fixLineG.selectAll(className('fix-line', true)).data(function (d) {
+    return d;
+  });
+  fixLine.exit().remove();
+  var fixLineEnter = fixLine.enter().append('line').attr('class', className('fix-line')).style('fill', 'none').style('stroke', fixLineColor).style('stroke-width', 2).attr('opacity', 0.8).attr('x1', scale.x(xValues[0])).attr('x2', scale.x(xValues[1])).attr('y1', function (d) {
+    return (d.scale ? d.scale : scale.y).range()[0];
+  }).attr('y2', function (d) {
+    return (d.scale ? d.scale : scale.y).range()[0];
+  });
+  fixLine = fixLineEnter.merge(fixLine);
+  fixLine.transition(trans).attr('x1', scale.x.range()[0], scale.x(xValues[0])).attr('x2', scale.x(xValues[1])).attr('y1', function (d) {
+    return (d.scale ? d.scale : scale.y)(d[0]);
+  }).attr('y2', function (d) {
+    return (d.scale ? d.scale : scale.y)(d[1]);
+  });
+}
+
 var defaultFont$5 = {
   'font-family': 'sans-serif',
   'font-size': 12,
@@ -6541,7 +6908,7 @@ var defaultFont$5 = {
 };
 var pointOriginColor$1 = '#fff';
 var baseColor = '#b0bec5';
-var _attrs$18 = {
+var _attrs$19 = {
   anchor: { x: 'left', y: 'top' },
   color: baseColor,
   dx: 0,
@@ -6562,7 +6929,7 @@ var _attrs$18 = {
 var MultiTooltip = function MultiTooltip() {
   classCallCheck(this, MultiTooltip);
 
-  this.__attrs__ = JSON.parse(JSON.stringify(_attrs$18));
+  this.__attrs__ = JSON.parse(JSON.stringify(_attrs$19));
   this.__execs__ = { tooltip: null, domain: null, dispatch: d3.dispatch('start', 'move', 'end') };
   this.valueFormat(labelFormat);
   rebindOnMethod(this, this.__execs__.dispatch);
@@ -6636,11 +7003,10 @@ function _hide(selection) {
   selection.select(className('baseline', true)).transition(trans).attr('opacity', 0);
 
   var target = this.target();
-  // let circle = target.nodes().filter(function() {
-  //   return select(this).classed(className('show'));
-  // }).classed(className('show'), false).selectAll('circle');
-  // if (!target.point()) circle.attr('opacity', 0);
-  // else circle.style('fill', pointOriginColor);
+  var circle = target.nodes().filter(function () {
+    return d3.select(this).classed(className('show'));
+  }).classed(className('show'), false).selectAll('circle');
+  if (!target.point()) circle.attr('opacity', 0);
   if (this.tooltip()) this.tooltip().hide();
 }
 
@@ -6663,37 +7029,26 @@ function _show(selection, tick) {
   var showTrans = d3.transition().duration(140);
   var target = this.target();
   var filtered = [];
+
+  //point redraw
+  if (!target.point()) {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('opacity', 0);
+  } else {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor$1).attr('stroke', function (d) {
+      return d.color;
+    });
+  }
+  //current point redraw
   var points = d3.selectAll(tick.points).each(function (d) {
     var x = d.x;
     if (x === tick.x) {
       filtered.push({ key: d.key, x: d.x, y: d.y, text: d.text });
     }
   });
-  var pointType = target.__attrs__.point.type ? target.__attrs__.point.type : 'empty';
-  if (pointType === 'empty') {
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor$1);
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', function (d) {
-      return d.color;
-    });
-  } else {
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', function (d) {
-      return d.color;
-    });
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', pointOriginColor$1);
-  }
-
-  var shwoPoints = points.classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1);
-  if (pointType === 'empty') {
-    shwoPoints.style('fill', function (d) {
-      return d.color;
-    });
-    shwoPoints.attr('stroke', 'rgb(255, 255, 255)');
-  } else {
-    shwoPoints.style('fill', 'rgb(255, 255, 255)');
-    shwoPoints.attr('stroke', function (d) {
-      return d.color;
-    });
-  }
+  var pointsShow = points.classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1);
+  pointsShow.style('fill', function (d) {
+    return d.color;
+  }).attr('stroke', pointOriginColor$1);
 
   var baseline = selection.select(className('baseline', true));
   baseline.transition(showTrans).attr('opacity', 1).attr('x1', tick.x + 0.5).attr('x2', tick.x + 0.5);
@@ -6778,7 +7133,7 @@ MultiTooltip.prototype.hide = hide$2;
 MultiTooltip.prototype.render = render$6;
 MultiTooltip.prototype.tick = tick;
 
-setMethodsFromAttrs(MultiTooltip, _attrs$18);
+setMethodsFromAttrs(MultiTooltip, _attrs$19);
 
 function _single() {
   var fromMulti = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -6918,6 +7273,8 @@ var Line = function (_mix$with) {
       } }).process('meanLine', _meanLine, { allow: function allow() {
         return !this.isBrushZoom();
       } }).process('fitLine', _fitLine, { allow: function allow() {
+        return !this.isBrushZoom();
+      } }).process('fixLine', _fixLine, { allow: function allow() {
         return !this.isBrushZoom();
       } }).process('tooltip', _tooltip$3, { allow: function allow() {
         return !this.isBrushZoom();
@@ -7082,7 +7439,7 @@ var Line = function (_mix$with) {
     }
   }]);
   return Line;
-}(mix(Facet).with(fitLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin, streamMixin));
+}(mix(Facet).with(fitLineMixin, fixLineMixin, seriesMixin, brushMixin, zoomMixin, paddingMixin, shapeMixin, stackMixin, streamMixin));
 /**
  * If meanLine is specified sets the meanLine setting and returns the Line instance itself. If meanLine is true renders a mean-line on each series. If meanLine is not specified, returns the current meanLine setting.
  * @function
@@ -7130,10 +7487,12 @@ function _axis$5() {
   var grid = this.grid();
   var innerSize = this.innerSize();
   var field = this.__execs__.field;
+  var font = this.font();
 
   var _axisScaleX = function _axisScaleX(axisToggle) {
     field.x.axis(axisToggle);
     var curAxis = that.axisDefault(scale.x, axisToggle);
+    curAxis.font(font); //font update
     if (axisToggle.orient === 'bottom') curAxis.y(scale.y.range()[0]);
     curAxis.grid(grid).gridSize(innerSize.height);
     return curAxis;
@@ -7142,6 +7501,7 @@ function _axis$5() {
   var _axisScaleY = function _axisScaleY(axisToggle) {
     field.y.axis(axisToggle);
     var curAxis = that.axisDefault(scale.y, axisToggle);
+    curAxis.font(font); //font update
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     curAxis.grid(grid).gridSize(innerSize.width);
     return curAxis;
@@ -7566,7 +7926,7 @@ function _zoom$2() {
 
 var size$3 = { range: [3, 12], scale: 'linear', reverse: false };
 var conditions$2 = ['normal', 'color', 'bubble', 'mixed'];
-var _attrs$19 = {
+var _attrs$20 = {
   regionPadding: 0.1,
   size: size$3
 };
@@ -7590,7 +7950,7 @@ var Scatter = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Scatter.__proto__ || Object.getPrototypeOf(Scatter)).call(this));
 
-    _this.setAttrs(_attrs$19);
+    _this.setAttrs(_attrs$20);
     _this.process('munge', _munge$4, { isPre: true }).process('domain', _domain$5, { isPre: true }).process('range', _range$4, { isPre: true }).process('axis', _axis$5).process('fitLine', _fitLine$1).process('region', _region$4).process('facet', _facet$4, { allow: function allow() {
         return this.isFacet();
       } }).process('mark', _mark$4, { allow: function allow() {
@@ -7804,10 +8164,12 @@ function _axis$7() {
   var that = this;
   var scale = this.__execs__.scale;
   var field = this.__execs__.field;
+  var font = this.font();
 
   var _axisScaleX = function _axisScaleX(axisToggle) {
     field.x.axis(axisToggle);
     var curAxis = that.axisDefault(scale.x, axisToggle);
+    curAxis.font(font); //font update
     if (axisToggle.orient === 'bottom') curAxis.y(scale.y.range()[1]);
 
     return curAxis;
@@ -7816,6 +8178,7 @@ function _axis$7() {
   var _axisScaleY = function _axisScaleY(axisToggle) {
     field.y.axis(axisToggle);
     var curAxis = that.axisDefault(scale.y, axisToggle);
+    curAxis.font(font); //font update
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     return curAxis;
   };
@@ -7860,7 +8223,7 @@ function _tooltip$7() {
 }
 
 var conditions$3 = ['normal', 'count'];
-var _attrs$20 = {
+var _attrs$21 = {
   color: continousColorScheme,
   padding: 0.05,
   reverse: false
@@ -7880,7 +8243,7 @@ var XYHeatmap = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (XYHeatmap.__proto__ || Object.getPrototypeOf(XYHeatmap)).call(this));
 
-    _this.setAttrs(_attrs$20);
+    _this.setAttrs(_attrs$21);
     _this.process('munge', _munge$6, { isPre: true }).process('domain', _domain$7, { isPre: true }).process('range', _range$6, { isPre: true }).process('region', _region$6).process('axis', _axis$7).process('mark', _mark$6).process('spectrum', _legend$7).process('tooltip', _tooltip$7);
     return _this;
   }
@@ -8165,7 +8528,7 @@ function _tooltip$9() {
 
 var shapes$1 = ['treemap', 'pack', 'word'];
 var conditions$4 = ['normal', 'count'];
-var _attrs$21 = {
+var _attrs$22 = {
   autoResizeSkip: ['domain'], //treemap needs to re-munge beacuase of using .treemap method
   color: continousColorScheme,
   reverse: false,
@@ -8189,7 +8552,7 @@ var Treemap = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Treemap.__proto__ || Object.getPrototypeOf(Treemap)).call(this));
 
-    _this.setAttrs(_attrs$21);
+    _this.setAttrs(_attrs$22);
     _this.process('munge', _munge$8, { isPre: true }).process('domain', _domain$9, { isPre: true }).process('range', _range$8, { isPre: true }).process('mark', _mark$8).process('spectrum', _legend$8).process('tooltip', _tooltip$9);
     return _this;
   }
@@ -8420,9 +8783,11 @@ function _parCoords() {
   var that = this;
   var measures = this.measures();
   var scale = this.__execs__.scale;
+  var font = this.font();
 
   var _axisScaleY = function _axisScaleY(yScale, axisToggle) {
     var curAxis = that.axisDefault(yScale, axisToggle);
+    curAxis.font(font); //font update
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     curAxis.x(scale.x(axisToggle.field));
     return curAxis;
@@ -8609,7 +8974,7 @@ function _brush$2() {
 var size$4 = { range: [1, 1], scale: 'linear', reverse: false };
 var shapes$2 = ['par-coords', 'scatter-matrix'];
 var conditions$5 = ['normal', 'color'];
-var _attrs$22 = {
+var _attrs$23 = {
   regionPadding: 0.1,
   size: size$4,
   shape: shapes$2[0]
@@ -8634,7 +8999,7 @@ var ParCoords = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (ParCoords.__proto__ || Object.getPrototypeOf(ParCoords)).call(this));
 
-    _this.setAttrs(_attrs$22);
+    _this.setAttrs(_attrs$23);
     _this.brush(true);
     _this.process('munge', _munge$10, { isPre: true }).process('domain', _domain$11, { isPre: true }).process('range', _range$10, { isPre: true }).process('axis', _axis$9).process('region', _region$8).process('mark', _mark$10, { allow: function allow() {
         return this.isParcoords();
@@ -8792,7 +9157,7 @@ function _mark$12() {
       return arcGen(i(t));
     };
   };
-
+  var font = this.font();
   var __local = function __local(selection) {
     var sizeMean = d3.mean(size.range);
     selection.each(function (d) {
@@ -8820,14 +9185,14 @@ function _mark$12() {
   var __labelInit = function __labelInit(selection) {
     selection.each(function (d) {
       d3.select(this).attr('x', d.dx).attr('dy', '.35em').attr('y', d.dy).attr('text-anchor', 'middle').style('pointer-events', 'none').text(d.text);
-      that.styleFont(d3.select(this));
+      that.styleFont(d3.select(this), font);
     });
   };
 
   var __label = function __label(selection) {
     selection.each(function (d) {
       d3.select(this).style('visibility', label ? 'visible' : 'hidden').text(d.text).transition(trans).attr('x', d.dx).attr('y', d.dy);
-      that.styleFont(d3.select(this));
+      that.styleFont(d3.select(this), font);
     });
   };
 
@@ -8887,7 +9252,7 @@ function _tooltip$11() {
 
 var size$5 = { range: [0, 150], scale: 'linear', reverse: false };
 var conditions$6 = ['normal', 'count'];
-var _attrs$23 = {
+var _attrs$24 = {
   limitKeys: 20,
   padding: 0,
   size: size$5
@@ -8909,7 +9274,7 @@ var Pie = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Pie.__proto__ || Object.getPrototypeOf(Pie)).call(this));
 
-    _this.setAttrs(_attrs$23);
+    _this.setAttrs(_attrs$24);
     _this.process('munge', _munge$12, { isPre: true }).process('domain', _domain$13, { isPre: true }).process('mark', _mark$12).process('legend', _legend$11).process('tooltip', _tooltip$11);
     return _this;
   }
@@ -9158,7 +9523,7 @@ var lngMeasure = { field: '__--jelly-lng--__' };
 
 var size$6 = { range: [0.5, 4], scale: 'linear', reverse: false };
 var conditions$7 = ['normal', 'point'];
-var _attrs$24 = {
+var _attrs$25 = {
   addr: false,
   mapBaseType: 'ROADMAP', // ROADMAP SKYVIEW HYBRID
   needCanvas: false,
@@ -9179,7 +9544,7 @@ var MarkerMap = function (_Default) {
 
     var _this = possibleConstructorReturn(this, (MarkerMap.__proto__ || Object.getPrototypeOf(MarkerMap)).call(this));
 
-    _this.setAttrs(_attrs$24);
+    _this.setAttrs(_attrs$25);
     _this.__execs__.dispatch = d3.dispatch('loading', 'end');
     rebindOnMethod(_this, _this.__execs__.dispatch);
     _this.process('munge', _munge$14, { isPre: true }).process('domain', _domain$15, { isPre: true }).process('map', _map).process('mark', _mark$14);
@@ -9227,15 +9592,21 @@ function _axis$11() {
     return a.target === 'y' && a.orient === 'right';
   });
   var fieldObj = this.__execs__.field;
+  var font = this.font();
+  var innerSize = this.innerSize();
+  var grid = this.grid();
 
   var _axisScaleX = function _axisScaleX(axisToggle) {
     axisToggle.field = fieldObj.x.field();
     var curAxis = _this.axisDefault(scale.x, axisToggle);
+    curAxis.font(font); //font update
     if (axisToggle.orient === 'bottom') curAxis.y(scale.yBar.range()[0]);
     return curAxis;
   };
   var _axisScaleY = function _axisScaleY(yScale, axisToggle) {
     var curAxis = _this.axisDefault(yScale, axisToggle);
+    curAxis.font(font); //font update
+    if (axisToggle.orient === 'right') curAxis.grid(grid).gridSize(innerSize.width);
     if (axisToggle.orient === 'right') curAxis.x(scale.x.range()[1]);
     return curAxis;
   };
@@ -9367,6 +9738,7 @@ function _facet$8() {
       height = innerSize.height;
   var padding = this.padding();
   var dimensions = this.dimensions();
+  var barWidth = this.barWidth();
   var barMeasures = [field.yBar.toObject()];
   var barSettings = ['axisTitles', 'padding', 'font', 'label', 'grid'].map(function (d) {
     return { key: d, value: _this[d]() };
@@ -9376,14 +9748,14 @@ function _facet$8() {
     return { key: d, value: parent[d]() };
   });
   var _smallLine = function _smallLine() {
-    var smallLine = line$2().container(this).data(data).dimensions(dimensions).measures(lineMeasures).width(width).height(height).legend(false).tooltip(false).padding(padding).parent(parent).zeroOffset(true).color(color[1]).scaleBandMode(true);
+    var smallLine = line$2().container(this).data(data).dimensions(dimensions).measures(lineMeasures).width(width).height(height).legend(false).tooltip(false).padding(padding).parent(parent).zeroOffset(true).color(color[1]).shape('area').margin({ top: 0, right: 0, bottom: 0, left: 0 }).scaleBandMode(true);
     lineSettings.forEach(function (d) {
       return smallLine[d.key](d.value);
     });
     smallLine.render();
   };
   var _smallbar = function _smallbar() {
-    var smallBar = bar().container(this).data(data).dimensions(dimensions).measures(barMeasures).width(width).height(height).padding(padding).legend(false).tooltip(false).zeroOffset(true).parent(parent).color(color[0]);
+    var smallBar = bar().container(this).data(data).dimensions(dimensions).measures(barMeasures).width(width).height(height).padding(padding).legend(false).tooltip(false).zeroOffset(true).parent(parent).barWidth(barWidth).margin({ top: 0, right: 0, bottom: 0, left: 0 }).color(color[0]);
     barSettings.forEach(function (d) {
       smallBar[d.key](d.value);
     });
@@ -9410,12 +9782,14 @@ function _tooltip$13() {
 
 var size$7 = { range: [2, 2], scale: 'linear', reverse: false };
 var conditions$8 = ['normal'];
-var _attrs$25 = {
+var _attrs$26 = {
   padding: 0.05,
   point: false,
   pointRatio: 3,
   regionPadding: 0.1,
-  size: size$7
+  size: size$7,
+  barWidth: false,
+  margin: { top: 10, right: 0, bottom: 0, left: 0 }
 };
 
 /**
@@ -9435,7 +9809,7 @@ var Combo = function (_mix$with) {
 
     var _this = possibleConstructorReturn(this, (Combo.__proto__ || Object.getPrototypeOf(Combo)).call(this));
 
-    _this.setAttrs(_attrs$25);
+    _this.setAttrs(_attrs$26);
     _this.process('munge', _munge$16, { isPre: true }).process('domain', _domain$17, { isPre: true }).process('range', _range$12, { isPre: true }).process('region', _region$10).process('facet', _facet$8).process('axis', _axis$11).process('legend', _legend$13).process('tooltip', _tooltip$13);
     return _this;
   }
@@ -9461,8 +9835,24 @@ var Combo = function (_mix$with) {
   return Combo;
 }(mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin));
 
+/**
+ * If barWidth is specified, sets each bar width(or height on vertical bar) and returns the instance itself. If barWidth is not specified, or barWidth bigger than origin barWidth, just  returns the instance's current barWidth setting. Not surpport Stacked Bar Chart.
+ * @function
+ * @example
+ * bar.orient('horizontal'); // renders the horizontal bar chart
+ * @param {boolean|number} [barWidth=false] false or specific number
+ * @return {barWidth|Bar}
+ */
+
+
+Combo.prototype.barWidth = attrFunc('barWidth');
+
 var combo = genFunc(Combo);
 
+/**
+ * @namespace jelly
+ * @type {object}
+ */
 var _layout = {
   /**
    * Generator returns a {@link Bar} instance

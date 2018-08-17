@@ -9,11 +9,7 @@
   <link type="text/css" rel="stylesheet" href="../style/demo.css">
   <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
   <script src="//d3js.org/d3.v4.min.js"></script>
-<<<<<<< Updated upstream
-    <script src="../release/latest/dist/jelly.min.js"></script>
-=======
     <script src="../../dist/jelly.js"></script>
->>>>>>> Stashed changes
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>
     hljs.initHighlightingOnLoad();
@@ -57,6 +53,7 @@
             <li class=""><a href="normalized-stacked-area">Normalized Stacked Area Chart</a></li>
             <li class=""><a href="facet-line">Small Multiples Line Chart</a></li>
             <li class=""><a href="fitline-line">Fit Line on Line Chart</a></li>
+            <li class=""><a href="fixline-line">Fix Line on Line Chart</a></li>
             <li class=""><a href="meanline-line">Mean Line on Line Chart</a></li>
           </ul>
         </div>
@@ -155,6 +152,7 @@
             <li class=""><a href="no-axis-title">No Axis Title</a></li>
             <li class=""><a href="no-ticks">No Axis Ticks</a></li>
             <li class=""><a href="axis-sub-tick">Sub Axis Ticks</a></li>
+            <li class=""><a href="axis-compress-ticks">Axis Compress Ticks</a></li>
           </ul>
         </div>
         <div>
@@ -235,12 +233,7 @@
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-<<<<<<< Updated upstream
-      setTimeout(function() {
-        jelly.treemap().container('#jelly-container')
-=======
       jelly.treemap().container('#jelly-container')
->>>>>>> Stashed changes
   .data([
     {d0: 'AAA', d1: 'AA', d2: 'A', value: 10},{d0: 'AAA', d1: 'AA', d2: 'B', value: 100},
     {d0: 'AAA', d1: 'BB', d2: 'A', value: 20},{d0: 'AAA', d1: 'BB', d2: 'B', value: 90},
@@ -260,10 +253,6 @@
   .sortByValue('descending')
   .legend(true)
   .render();
-<<<<<<< Updated upstream
-      }, 200);
-=======
->>>>>>> Stashed changes
     });
   </script>
 </body>

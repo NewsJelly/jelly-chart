@@ -9,7 +9,7 @@
   <link type="text/css" rel="stylesheet" href="../style/demo.css">
   <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
   <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="../release/latest/dist/jelly.min.js"></script>
+    <script src="../../dist/jelly.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=7fd8127881fe4e612aabd7d3aca98636&libraries=services"></script>
   <script>
@@ -50,9 +50,11 @@
             <li class=""><a href="multi-measure-line">Multi-measure Line Chart</a></li>
             <li class=""><a href="multi-measure-individual-line">Multi-measure Line Chart w/ Individual Scale</a></li>
             <li class=""><a href="stacked-area">Stacked Area Chart</a></li>
+            <li class=""><a href="stacked-area-gradient">Stacked and Gradient Area Chart</a></li>
             <li class=""><a href="normalized-stacked-area">Normalized Stacked Area Chart</a></li>
             <li class=""><a href="facet-line">Small Multiples Line Chart</a></li>
             <li class=""><a href="fitline-line">Fit Line on Line Chart</a></li>
+            <li class=""><a href="fixline-line">Fix Line on Line Chart</a></li>
             <li class=""><a href="meanline-line">Mean Line on Line Chart</a></li>
           </ul>
         </div>
@@ -151,6 +153,7 @@
             <li class=""><a href="no-axis-title">No Axis Title</a></li>
             <li class=""><a href="no-ticks">No Axis Ticks</a></li>
             <li class=""><a href="axis-sub-tick">Sub Axis Ticks</a></li>
+            <li class=""><a href="axis-compress-ticks">Axis Compress Ticks</a></li>
           </ul>
         </div>
         <div>
@@ -240,8 +243,7 @@ jelly.markerMap().data(dataset)
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(function() {
-        let dataset = [
+      let dataset = [
   {"name":'개포1동주민센터', 'addr':'서울특별시 마포구 성암로 330번 711호', 'size':90},
   {"name":'개포2동주민센터', 'addr':'서울특별시 강남구 개포로 511', 'size':90},
   {"name":'개포4동주민센터', 'addr':'서울특별시 강남구 개포로38길 12', 'size':10},
@@ -270,7 +272,6 @@ jelly.markerMap().data(dataset)
   .dimensions(['name']) 
   .measures(['addr', 'size'])
   .render();
-      }, 200);
     });
   </script>
 </body>

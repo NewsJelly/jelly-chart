@@ -9,11 +9,7 @@
   <link type="text/css" rel="stylesheet" href="../style/demo.css">
   <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
   <script src="//d3js.org/d3.v4.min.js"></script>
-<<<<<<< Updated upstream
-    <script src="../release/latest/dist/jelly.min.js"></script>
-=======
     <script src="../../dist/jelly.js"></script>
->>>>>>> Stashed changes
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>
     hljs.initHighlightingOnLoad();
@@ -57,6 +53,7 @@
             <li class=""><a href="normalized-stacked-area">Normalized Stacked Area Chart</a></li>
             <li class=""><a href="facet-line">Small Multiples Line Chart</a></li>
             <li class=""><a href="fitline-line">Fit Line on Line Chart</a></li>
+            <li class=""><a href="fixline-line">Fix Line on Line Chart</a></li>
             <li class=""><a href="meanline-line">Mean Line on Line Chart</a></li>
           </ul>
         </div>
@@ -155,6 +152,7 @@
             <li class=""><a href="no-axis-title">No Axis Title</a></li>
             <li class=""><a href="no-ticks">No Axis Ticks</a></li>
             <li class=""><a href="axis-sub-tick">Sub Axis Ticks</a></li>
+            <li class=""><a href="axis-compress-ticks">Axis Compress Ticks</a></li>
           </ul>
         </div>
         <div>
@@ -233,12 +231,7 @@ jelly.line().data(dataset)
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-<<<<<<< Updated upstream
-      setTimeout(function() {
-        var randSize = 512;
-=======
       var randSize = 512;
->>>>>>> Stashed changes
 var dataset = [];
 var d, i;
 for (i = 0; i < randSize ; i++) {
@@ -256,10 +249,6 @@ jelly.line().data(dataset)
   .zoom('brush')
   .axis('x').axis('y')
   .render();
-<<<<<<< Updated upstream
-      }, 200);
-=======
->>>>>>> Stashed changes
     });
   </script>
 </body>
