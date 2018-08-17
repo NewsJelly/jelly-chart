@@ -16,9 +16,10 @@ function append(source, target, prop) {
  * @return {margin|Core}
  */
 function margin(margin = {}) {
-  const curMargin =this.__attrs__.margin;
+	const curMargin =this.__attrs__.margin;
   if (!arguments.length) return this.__attrs__.margin;
   if (typeof margin === 'object') {
+		this.__attrs__.margin = margin;
     ['top', 'right', 'left', 'bottom'].forEach(prop => append(margin, curMargin, prop));
   }
   return this;

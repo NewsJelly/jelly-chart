@@ -33,5 +33,7 @@ jelly.line().container('#jelly-container')
   .axis('x').axis({"target":"y","titleOrient":"right"})
   .point(false)
   .legend(true)
+  .zeroOffset(true)
+  .margin({top:0, right:20, bottom: 50, left: 10})
   .multiTooltip(true)
   .render();

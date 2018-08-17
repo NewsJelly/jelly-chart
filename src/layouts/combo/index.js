@@ -22,6 +22,7 @@ const _attrs = {
   regionPadding: 0.1,
 	size: size,
 	barWidth: false,
+	margin: {top:10, right:0, bottom: 0, left: 0}
 };
 
 /**

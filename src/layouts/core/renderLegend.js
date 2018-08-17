@@ -27,7 +27,7 @@ function renderLegend(field = 'region') {
   let offsetThickness = legendToggle.font ? legendToggle.font['font-size'] : 20;
   if (legendToggle.orient === 'bottom' || legendToggle.orient === 'top') {
     x = 0;
-    if (legendToggle.orient === 'bottom') y = innerSize.height  + offset.bottom - margin.bottom - legendToggle.thickness + offsetThickness;
+    if (legendToggle.orient === 'bottom') y = innerSize.height  + offset.bottom - legendToggle.thickness + offsetThickness;
     else y = - offset.top + margin.top - offsetThickness;
     if (this.axisX && !this.axisX()) {
       y += offsetThickness * (legendToggle.orient === 'bottom' ? 1 : -1)
