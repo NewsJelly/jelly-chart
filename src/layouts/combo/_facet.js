@@ -29,7 +29,8 @@ function _facet () {
         .padding(padding)
         .parent(parent) 
         .zeroOffset(true) 
-				.color(color[1])
+        .color(color[1])
+        .shape('area')
         .scaleBandMode(true);
     lineSettings.forEach(d => smallLine[d.key](d.value));
     smallLine.render();
@@ -44,8 +45,8 @@ function _facet () {
         .legend(false)
         .tooltip(false)
         .zeroOffset(true) 
-				.parent(parent)
-				.barWidth(barWidth)
+        .parent(parent)
+        .barWidth(barWidth)
         .color(color[0]);
     barSettings.forEach(d => {smallBar[d.key](d.value)});
     smallBar.render();
