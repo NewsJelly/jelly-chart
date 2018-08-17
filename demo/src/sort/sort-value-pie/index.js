@@ -1,0 +1,15 @@
+jelly.pie()
+  .container('#jelly-container')
+  .data([
+    {category:'AAA', value: 10},
+    {category:'BBB', value: 20},
+    {category:'CCC', value: 30},
+    {category:'AAA', value: 20},
+    {category:'BBB', value: 30},
+    {category:'CCC', value: 10},
+  ])
+  .dimensions({field:'category', order:'descending'})
+  .measures([{field: 'value', op: 'mean'}])
+  .sortByValue('descending')
+  .legend(true)
+  .render();

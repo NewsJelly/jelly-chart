@@ -1,0 +1,1 @@
+Two `dimensions` and a `measure` generate a grouped bar chart. The first dimension divides regions. The second dimension will be bars on each region.

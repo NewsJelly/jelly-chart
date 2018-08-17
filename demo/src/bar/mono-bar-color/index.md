@@ -1,0 +1,1 @@
+If a mono bar chart's `.mono` method is `true`, it will use color patterns instead of mono color.

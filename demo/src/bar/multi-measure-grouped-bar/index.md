@@ -1,0 +1,1 @@
+Multiple `measures` with a `dimension` generates a grouped bar chart. The `dimension` divides regions and the `measures` generates bars.
