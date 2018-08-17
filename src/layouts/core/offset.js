@@ -6,7 +6,6 @@ const zeroMargin = {top:0, right:0, bottom:0, left:0};
  * @return {object} {top, right, bottom, left} offset in pixels
  */
 function offset() {  
-	console.log('margin', this.margin())
   if (this.zeroOffset()) return this.margin();
   let offset = Object.assign({}, this.zeroMargin() ? zeroMargin : this.margin());
   let legend = this.legend();
