@@ -1,0 +1,11 @@
+node_modules
+dist
+test/unit/coverage
+npm-debug.log
+.vscode
+package-lock.json
+.temp
+.idea
+
+.vs
+ 
