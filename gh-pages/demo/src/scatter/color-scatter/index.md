@@ -1,0 +1,1 @@
+A `dimension` applies color patterns on points.

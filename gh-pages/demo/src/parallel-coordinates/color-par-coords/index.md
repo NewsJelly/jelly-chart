@@ -1,0 +1,1 @@
+A `dimension` assigns a color over each series.

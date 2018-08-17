@@ -1,0 +1,1 @@
+`A dimension and a measure` generate a mono line chart.

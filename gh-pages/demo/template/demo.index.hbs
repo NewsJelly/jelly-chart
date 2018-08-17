@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Jelly-Chart Demo</title>
+  <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.css">
+  <link type="text/css" rel="stylesheet" href="../style/demo.css">
+</head>
+
+<body>
+  <aside id="list">
+    {{> sidebar}}
+  </aside>
+  <div id="wrapper">
+    <div>
+    <section id="content">
+      <h2>📊 Jelly-Chart Demo</h2>
+      <div class="categories">
+        {{#each group}}
+          <div class="category">
+            <div class="category-name">{{key}}</div>
+            <div class="items">
+            {{#each values}}
+              <div class="item">{{title}}</div>
+            {{/each}}
+          </div>
+          </div>
+        {{/each}}
+      </div>
+      <footer>
+        <p>© Newsjelly Corp.</p>
+      </footer>
+    </section>
+    </div>
+  </div>
+</body>
+
+</html>

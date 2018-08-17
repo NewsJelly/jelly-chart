@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Jelly-Chart Demo: {{title}}</title>
+  <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.css">
+  <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+  <link type="text/css" rel="stylesheet" href="../style/demo.css">
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+  <script src="//d3js.org/d3.v4.min.js"></script>
+  {{#if dev}}
+    <script src="../../dist/jelly.js"></script>
+  {{else}}
+    <script src="../release/latest/dist/jelly.min.js"></script>
+  {{/if}}
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  {{#if daum}}
+    <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=7fd8127881fe4e612aabd7d3aca98636&libraries=services"></script>
+  {{/if}}
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+</head>
+
+<body>
+  <aside id="list">
+    {{> sidebar}}
+  </aside>
+  <div id="wrapper">
+    <div>
+    <section id="content">
+      <h2>📊 {{title}}</h2>
+      
+      {{!-- chart holders --}}
+      <div>
+        {{#each containers}} {{!-- can has several holders--}}
+          <div class="containers" id="{{this}}"></div>
+        {{/each}}
+      </div>
+      <div class="desc">{{desc}}</div>
+      
+      {{!-- sample code --}}
+      <h3>🔑  Sample Code </h3>
+      <pre><code class="javascript">{{code}}</code></pre>
+    
+      <footer>
+        <p>© Newsjelly Corp.</p>
+      </footer>
+    </section>
+    </div>
+  </div>
+  {{#if dev}} 
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      {{code}}
+    });
+  </script>
+  {{else}}
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(function() {
+        {{code}}
+      }, 200);
+    });
+  </script>
+  {{/if}}
+</body>
+
+</html>

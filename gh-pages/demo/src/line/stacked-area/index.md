@@ -1,0 +1,1 @@
+`.stacekd(true)` and `.shape('area')` turn a [multi-series line chart](./multi-line.html) into a stacked area chart.

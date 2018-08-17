@@ -1,0 +1,1 @@
+`.fitLine(true)` renders fit lines over series.

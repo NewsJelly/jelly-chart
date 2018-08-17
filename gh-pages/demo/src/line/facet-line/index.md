@@ -1,0 +1,1 @@
+`.facet('vertical')|.facet('horizontal'` turns a [multi-series line chart](./multi-line.html) into a [small multiples](https://en.wikipedia.org/wiki/Small_multiple).

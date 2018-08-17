@@ -1,0 +1,1 @@
+`.facet('vertical')|.facet('horizontal'` turns a [color scatter chart](./color-scatter.html) into a [small multiples](https://en.wikipedia.org/wiki/Small_multiple).

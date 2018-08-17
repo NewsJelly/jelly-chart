@@ -1,0 +1,1 @@
+Multiple `measures` without any `dimensions` generates bars as many as `measures' length`.
