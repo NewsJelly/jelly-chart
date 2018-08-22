@@ -13,6 +13,7 @@ jelly.combo()
   .dimensions(['name'])
   .measures(['valueBar', 'valueLine'])
 	.axis('x').axis({target: 'y', autoTickFormat: true})
-	.barWidth(24)
+  .barWidth(24)
+  .shape('area')
 	.grid(true)
   .render();

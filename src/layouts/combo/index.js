@@ -1,6 +1,7 @@
 import paddingMixin from '../paddingMixin';
 import seriesMixin from '../seriesMixin';
 import sortMixin from '../sortMixin/';
+import shapeMixin from '../shapeMixin';
 import RectLinear from '../rectLinear/';
 import {mixedMeasure} from '../../modules/measureField';
 import {genFunc, mix} from '../../modules/util';
@@ -22,7 +23,7 @@ const _attrs = {
   regionPadding: 0.1,
 	size: size,
 	barWidth: false,
-	margin: {top:10, right:0, bottom: 0, left: 0}
+  margin: {top:10, right:0, bottom: 0, left: 0}
 };
 
 /**
@@ -33,7 +34,7 @@ const _attrs = {
  * @augments PaddingMixin
  * @augments SortMixin
  */
-class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin) {
+class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin, shapeMixin) {
   constructor() {
     super();
     this.setAttrs(_attrs);

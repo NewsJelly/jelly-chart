@@ -198,7 +198,6 @@ function _render(selection) {
   }
   
   const labelHeight = this.labelHeight();
-  const labelHeightHalf = labelHeight/2;
   let scale = this.scale();
   let label = area.selectAll(className('label', true))
     .data(scale.domain().filter(d => d !== undefined && d !== null).map(d => {
@@ -212,7 +211,7 @@ function _render(selection) {
     .style('cursor', 'pointer');
   labelEnter.append('title')
   labelEnter.append('rect').style('fill', 'none');
-  labelEnter.append('circle');
+  //labelEnter.append('circle');
   labelEnter.append('text')
     .style('letter-spacing', '-0.1px');
 
@@ -220,21 +219,21 @@ function _render(selection) {
     .style('fill', d => d.color);
   label.select('title')
     .text(d => this.format() ? this.format()(d.key) : d.key);
-  label.select('circle')
-    .attr('cx', labelHeightHalf).attr('cy', labelHeightHalf)
-    .attr('r', 5)
+  label.select('rect')
+    .attr('width', 10).attr('height', 10)
+    .style('fill', d => d.color)
   label.select('text')
     .attr('x', labelHeight)
     .attr('dx', '.35em')
     .attr('dy', '.9em')
     .style('fill', this.color())
     .text(d => this.format() ? this.format()(d.key) : d.key);
-  label.select('rect')
-    .attr('width', function() {
-      return this.parentNode.getBBox().width;
-    }).attr('height', function() {
-      return this.parentNode.getBBox().height;
-    })
+  // label.select('rect')
+  //   .attr('width', function() {
+  //     return this.parentNode.getBBox().width;
+  //   }).attr('height', function() {
+  //     return this.parentNode.getBBox().height;
+  //   })
   const dispatch = this.__execs__.dispatch;
   label.on('click', function(d) {
     dispatch.call('selectClick', this, d);
