@@ -15,6 +15,7 @@ const fixLineMixin = Base => {
       this.setAttrs(_attrs);
     }
   }
+  
   /**
    * If fixLine is specified value, it draw horizon fixed line.
    * @function

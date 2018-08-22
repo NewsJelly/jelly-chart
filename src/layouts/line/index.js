@@ -2,7 +2,7 @@ import {dispatch} from 'd3';
 import Facet from '../facet/';
 import brushMixin from '../brushMixin';
 import fitLineMixin from '../fitLineMixin';
-import fixLineMixin from '../fixLineMixin';
+import fixLineMixin from '../fixlineMixin';
 import seriesMixin from '../seriesMixin';
 import zoomMixin from '../zoomMixin';
 import paddingMixin from '../paddingMixin';
