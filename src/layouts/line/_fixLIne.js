@@ -15,7 +15,6 @@ export default function() {
 
   if (fixLineG.empty()) {
     fixLineG = canvas.append('g').attr('class',  className('fix-line-g'))
-      //.attr('clip-path', `url(#${canvas.selectAll(className('canvas-g-clip-path', true)).attr('id')}`);
   }
 
   let xValues = scale.x.domain();
