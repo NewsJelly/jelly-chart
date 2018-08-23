@@ -11,11 +11,13 @@ export default function() {
   if (!fixLineValue) {
     if (!fixLineG.empty()) canvas.select(className('fix-line-g', true)).remove();
     return;
-  }
+	}
+	
 
   if (fixLineG.empty()) {
     fixLineG = canvas.append('g').attr('class',  className('fix-line-g'))
-  }
+	}
+	
 
   let xValues = scale.x.domain();
   let yValues = [[fixLineValue,fixLineValue]]
