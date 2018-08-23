@@ -195,7 +195,7 @@ function renderPoint(point){
   const isMulti = !!target.__attrs__.multiTooltip;
   if(isMulti) return;
   const isShowPoint = !!target.__attrs__.point;
-  const pointType = target.__attrs__.point.type ? target.__attrs__.point.type : 'empty';
+  const pointType = target.__attrs__.point && target.__attrs__.point.type ? target.__attrs__.point.type : 'empty';
   if(pointType === 'empty'){
     target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
     target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', function(d){
@@ -226,7 +226,6 @@ function renderPoint(point){
 function show(point) {
   let valueFormat = this.valueFormat();
 	let tooltip = this.__execs__.tooltip;
-	let scale = this.__attrs__.target.__execs__.scale;
 	const isMultiTooltip = !!this.__attrs__.target.__attrs__.multiTooltip
 	
 	renderPoint.call(this, point)
@@ -242,7 +241,7 @@ function show(point) {
   }
   let value = tooltip.select(className('values', true)).selectAll(className('value', true))
     .data(this.values());
-  value.exit().remove();
+  
   value = value.enter().append('li')
 		.attr('class', className('value'))
 		.style('list-style', 'none')
@@ -255,11 +254,12 @@ function show(point) {
   } else {
     value.style('color', greyColor);
   }
-  
+
   let label = value.selectAll('span')
-    .data(d => [d, d.name, d.value])
-  label.exit().remove();
-  label = label.enter().append('span')
+    .data(d => [d, d.name, d.value, d.color])
+		.enter().append('span')
+	
+	tooltip.select(className('values', true)).selectAll(className('value', true)).selectAll('span')
     .style('padding', 0)
 		.style('margin', 0)
 		.style('color', (_,i) => (i === 1 ? greyColor : greyColor2))
@@ -284,7 +284,7 @@ function show(point) {
 		})
 		.style('height', (_,i) => (i === 0 ? '11px' : 'auto'))
 		.style('background-color', (d,i) => {
-			return i === 0 && isMultiTooltip ? scale.color(d.name) : 'none'
+			return i === 0 && isMultiTooltip ? d.color : 'none'
 		})
     .merge(label)
     .text((d,i) => {
@@ -294,7 +294,9 @@ function show(point) {
         return valueFormat(d);
       }
 		})
-
+	//exit
+	value.exit().remove();
+	label.exit().remove();
   let tooltipH = tooltip.node().getBoundingClientRect().height/2;
   tooltip
     .style('left', (this.x() + this.dx()) + 'px')

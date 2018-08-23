@@ -166,9 +166,11 @@ function _show(selection, tick) {
     x = pos.x;
     y.push(pos.y);
     values.push(d);
-  });
+	});
   _sortByValue(values, this.sortByValue())
-  values = values.map(d => {return {name: d.parent.data.key || d.data.key, value: d.text}})
+  values = values.map(d => {
+		return {name: d.parent.data.key || d.data.key, value: d.text, color: d.color}
+	})
   
   if (this.keyFormat()) {
     const f = this.keyFormat();
@@ -180,7 +182,7 @@ function _show(selection, tick) {
   y = Math.round(y);
   if (x && y) {
     let keyValue = tick.value;
-    if (this.keyFormat() && (keyValue instanceof Date || typeof keyValue === 'number') ) keyValue = this.keyFormat()(keyValue);
+		if (this.keyFormat() && (keyValue instanceof Date || typeof keyValue === 'number') ) keyValue = this.keyFormat()(keyValue);
     tooltip.x(x).y(y)
     .key({name:'key', value:keyValue})
     .value(values)

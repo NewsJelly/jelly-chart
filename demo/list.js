@@ -98,8 +98,8 @@ module.exports = [
   },
   {
     category: 'Line',
-    path: 'stacked-area-gradient',
-    title: 'Stacked and Gradient Area Chart'
+    path: 'area-gradient',
+    title: 'Gradient Area Chart'
   },
   {
     category: 'Line',
