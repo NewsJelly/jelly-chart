@@ -12,7 +12,8 @@ function _facet () {
   let padding = this.padding();
 	let dimensions =  this.dimensions();
 	let barWidth = this.barWidth();
-	let barMeasures = [field.yBar.toObject()];
+  let barMeasures = [field.yBar.toObject()];
+  let shape = this.shape();
   let barSettings =   ['axisTitles', 'padding', 'font', 'label', 'grid']
     .map(d => { return {key: d, value:this[d]()};});
 	let lineMeasures = [field.yLine.toObject()];
@@ -30,7 +31,7 @@ function _facet () {
         .parent(parent) 
         .zeroOffset(true) 
         .color(color[1])
-				.shape('area')
+				.shape(shape).areaGradient(true)
 				.margin({top:0, right:0, bottom: 0, left: 0})
         .scaleBandMode(true);
     lineSettings.forEach(d => smallLine[d.key](d.value));
