@@ -258,7 +258,7 @@ function _mark() {
   if (nested && stacked) { //show diff of stacked
     let pathLocal = local();
     region.each(function(r,i,arr) {
-      if(arr.length===1) return;
+      if(arr.length === 1) return;
       let neighbor = select(i < arr.length-1 ? arr[i+1] : arr[i-1]).datum();
       let nds = neighbor.children;
       select(this).selectAll(that.nodeName())
