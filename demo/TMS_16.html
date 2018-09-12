@@ -2,185 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sample</title>
+    <title>TMS_16 Sample</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
-    <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="../dist/jelly.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="../dist/jelly.js"></script>
     <!--script src="./src/common.js"></script-->
+</head>
+<body onload="drawChart();">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <div class="input-group">
+                    <input type="text" class="form-control">
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group">
+                <div class="col-md-4">
+                    <input type="checkbox" id="chk_1" class="form-control" placeholder="Search this blog"><label for="chk_1">프로파일</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="checkbox" id="chk_2" class="form-control" placeholder="Search this blog">
+                    <label for="chk_2">조직</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="checkbox" id="chk_3" class="form-control" placeholder="Search this blog">
+                    <label for="chk_3">분석결과</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <div id="jelly-container1"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm">
+
+            </div>
+            <div class="col-sm">
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
-        $(document).ready(function(){
-            var width = $(".col-sm").width();
-            jelly.bar().container('#jelly-container')
-                .data([
-                    {category:'Blue', name: 'A', value: 10},
-                    {category:'Blue', name: 'B', value: 20},
-                    {category:'Blue', name: 'C', value: 30},
-                    {category:'Blue', name: 'D', value: 40},
-                    {category:'Red', name: 'A', value: 20},
-                    {category:'Red', name: 'B', value: 10},
-                    {category:'Red', name: 'C', value: 40},
-                    {category:'Red', name: 'D', value: 10}
-                ]).dimensions(['category', 'name'])
-                .measures('value')
-                .width(width)
-                .autoResize(true)
-                //.facet('vertical')
-                .orient('horizontal')
-                //.axis('x')
-                //.axis('y')
-                .legend(true)
-                .render();
-
-
-            jelly.bar().container('#jelly-container2')
-                .data([
-                    {category:'Blue', name: 'A', value: 10},
-                    {category:'Blue', name: 'B', value: 20},
-                    {category:'Blue', name: 'C', value: 30},
-                    {category:'Blue', name: 'D', value: 40},
-                    {category:'Red', name: 'A', value: 20},
-                    {category:'Red', name: 'B', value: 10},
-                    {category:'Red', name: 'C', value: 40},
-                    {category:'Red', name: 'D', value: 10}
-                ])
-                .dimensions(['category'])
-                .measures('value')
-                .width(width)
-                .autoResize(true)
-                //.facet('vertical')
-                .orient('horizontal')
-                .axis('x').axis('y')
-                .legend(true)
-                .render();
-
-            jelly.bar()
-            .container('#jelly-container3')
-            .data([
-                {category:'Blue', name: 'A', value: 10},
-                {category:'Blue', name: 'B', value: 20},
-                {category:'Blue', name: 'C', value: 30},
-                {category:'Blue', name: 'D', value: 40},
-                {category:'Red', name: 'A', value: 20},
-                {category:'Red', name: 'B', value: 10},
-                {category:'Red', name: 'C', value: 40},
-                {category:'Red', name: 'D', value: 10}
-            ])
-            .width(width)
-            .autoResize(true)
-            .dimensions(['category', 'name']).facet('vertical')
-            .measures([{field: 'value', op: 'sum'}])
-            .orient('horizontal')
-            .mono(false)
-            .axis('x').axis('y')
-            .render();
-
-
-            jelly.bar().container('#jelly-container5')
-                .data([
-                    {category:'Blue', name: 'A', value: 10},
-                    {category:'Blue', name: 'B', value: 20},
-                    {category:'Blue', name: 'C', value: 30},
-                    {category:'Blue', name: 'D', value: 40},
-                    {category:'Red', name: 'A', value: 20},
-                    {category:'Red', name: 'B', value: 10},
-                    {category:'Red', name: 'C', value: 40},
-                    {category:'Red', name: 'D', value: 10}
-                ]).dimensions(['category', 'name'])
-                .width(width)
-                .autoResize(true)
-                .measures('value')
-                .stacked(true)
-                .axis('x').axis('y')
-                .legend(true)
-                .render();
-
-
-            jelly.bar().container('#jelly-container6')
-                .data([
-                    {category:'Blue', name: 'A', value: 10},
-                    {category:'Blue', name: 'B', value: 20},
-                    {category:'Blue', name: 'C', value: 30},
-                    {category:'Blue', name: 'D', value: 40},
-                    {category:'Red', name: 'A', value: 20},
-                    {category:'Red', name: 'B', value: 10},
-                    {category:'Red', name: 'C', value: 40},
-                    {category:'Red', name: 'D', value: 10}
-                ]).dimensions(['category', 'name'])
-                .width(width)
-                .autoResize(true)
-                .measures('value')
-                .stacked(true)
-                .orient('horizontal')
-                .axis('x').axis('y')
-                .legend(true)
-                .render();
-
-            jelly.line().container('#jelly-container7')
-                .data([
-                    {category:'AAA', x: 1000, y: 10},{category:'AAA', x: 2000, y: 20},
-                    {category:'AAA', x: 3000, y: 30},{category:'AAA', x: 4000, y: 40},
-                    {category:'AAA', x: 1000, y: 50},{category:'AAA', x: 2000, y: 30},
-                    {category:'AAA', x: 3000, y: 40},{category:'AAA', x: 4000, y: 100},
-                    {category:'BBB', x: 1000, y: 80},{category:'BBB', x: 2000, y: 60},
-                    {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 70},
-                    {category:'BBB', x: 1000, y: 20},{category:'BBB', x: 2000, y: 60},
-                    {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 60}
-                ]).dimensions([
-                {
-                    field: 'x',
-                    order: 'ascending'
-                }, {
-                    field: 'category',
-                    order: 'descending'
-                }])
-                //.orient('horizontal')
-                .width(width)
-                .autoResize(true)
-                .measures({field:'y', op:'mean'})
-                .axis('x').axis('y')
-                .legend(true)
-                .point(true)
-                .multiTooltip(true)
-                .render();
-
-            jelly.line().container('#jelly-container8')
-                .data([
-                    {category:'AAA', x: 1000, y: 10},{category:'AAA', x: 2000, y: 20},
-                    {category:'AAA', x: 3000, y: 30},{category:'AAA', x: 4000, y: 40},
-                    {category:'AAA', x: 1000, y: 50},{category:'AAA', x: 2000, y: 30},
-                    {category:'AAA', x: 3000, y: 40},{category:'AAA', x: 4000, y: 100},
-                    {category:'BBB', x: 1000, y: 80},{category:'BBB', x: 2000, y: 60},
-                    {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 70},
-                    {category:'BBB', x: 1000, y: 20},{category:'BBB', x: 2000, y: 60},
-                    {category:'BBB', x: 3000, y: 50},{category:'BBB', x: 4000, y: 60}
-                ]).dimensions([
-                {
-                    field: 'x',
-                    order: 'ascending'
-                }, {
-                    field: 'category',
-                    order: 'descending'
-                }])
-                .width(width)
-                .measures({field:'y', op:'mean'})
-                .stacked(true)
-                .point(true)
-                //.shape('area')
-                .axis('x').axis('y')
-                .legend(true)
-                .multiTooltip(true)
-                .render();
-
+        function drawChart(){
+            var width = $("#jelly-container1").width();
             jelly.pie()
-                .container('#jelly-container9')
+                .container('#jelly-container1')
                 .data([
                     {category:'AAA', value: 10},
                     {category:'BBB', value: 20},
@@ -189,116 +77,18 @@
                     {category:'BBB', value: 30},
                     {category:'CCC', value: 10},
                 ])
-                .width(width)
-                .size([0,width/2])
+                //.width(width)
+                //.size([0,width/2])
                 .autoResize(true)
                 .zeroMargin(true)
                 .dimensions({field:'category', order:'descending'})
                 .measures([{field: 'value', op: 'mean'}])
                 .legend({orient: 'bottom', align: 'middle'})
                 .render();
-
-            jelly.pie()
-                .container('#jelly-container10')
-                .data([
-                    {category:'AAA', value: 10},
-                    {category:'BBB', value: 20},
-                    {category:'CCC', value: 30},
-                    {category:'AAA', value: 20},
-                    {category:'BBB', value: 30},
-                    {category:'CCC', value: 10},
-                ])
-                .width(width)
-                .size([0, 40])
-                .dimensions({field:'category', order:'descending'})
-                .measures([{field: 'value', op: 'mean'}])
-                .legend({orient: 'bottom', align: 'middle'})
-                .render();
-
-            jelly.pie()
-                .container('#jelly-container11')
-                .data([
-                    {category:'AAA', value: 10},
-                    {category:'BBB', value: 20},
-                    {category:'CCC', value: 30},
-                    {category:'AAA', value: 20},
-                    {category:'BBB', value: 30},
-                    {category:'CCC', value: 10},
-                ])
-                .width(width)
-                .dimensions({field:'category', order:'descending'})
-                .measures([{field: 'value', op: 'mean'}])
-                .size([40, 10])
-                .legend({align: 'middle'})
-                .render();
-
-            jelly.combo()
-                .container('#jelly-container12')
-                .data([
-                    {name: 'A', valueBar: 1000000, valueLine: 1000000000},
-                    {name: 'B', valueBar: 2000000, valueLine: 20000000},
-                    {name: 'C', valueBar: 3000000, valueLine: 30000000},
-                    {name: 'D', valueBar: 4000000, valueLine: 40000000},
-                    {name: 'A', valueBar: 2000000, valueLine: 20000000},
-                    {name: 'B', valueBar: 1000000, valueLine: 10000000},
-                    {name: 'C', valueBar: 4000000, valueLine: 40000000},
-                    {name: 'D', valueBar: 1000000, valueLine: 10000000}
-                ])
-                .width(width)
-                //.orient('horizontal')
-                .dimensions(['name'])
-                .measures(['valueBar', 'valueLine'])
-                .axis('x').axis({target: 'y', autoTickFormat: true})
-                .render();
-        });
+        }
+/*        $(function(){
+        //$(document).ready(function(){
+        });*/
     </script>
-</head>
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm">
-                <div id="jelly-container"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container2"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container3"></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm">
-                <div id="jelly-container5"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container6"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container7"></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm">
-                <div id="jelly-container8"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container9"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container10"></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm">
-                <div id="jelly-container11"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container12"></div>
-            </div>
-            <div class="col-sm">
-                <div id="jelly-container13"></div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
