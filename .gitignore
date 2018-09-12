@@ -5,3 +5,10 @@ node_modules
 doc/
 gh-pages/
 dist/
+demo/
+*.log
+yarn.lock
+WEB-INF/
+how\ to\ make\ build\ environment
+.idea/
+package-lock.json
