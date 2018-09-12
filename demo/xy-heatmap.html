@@ -6,13 +6,25 @@
   <title>Jelly-Chart Demo: XY Heatmap</title>
   <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.css">
   <link type="text/css" rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
-  <link type="text/css" rel="stylesheet" href="../style/demo.css">
+  <link type="text/css" rel="stylesheet" href="./style/demo.css">
   <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
   <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="../release/latest/dist/jelly.min.js"></script>
+    <script src="../dist/jelly.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>
     hljs.initHighlightingOnLoad();
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('a').on('click', function(e){
+        e.preventDefault();
+        var src = $(this).prop("href") + ".html";
+        window.location.href = src;
+      });
+    });
   </script>
 </head>
 

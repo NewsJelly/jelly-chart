@@ -31,9 +31,9 @@
     "data visualization"
   ],
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "babelify": "^8.0.0",
     "browserify": "^16.2.0",
     "copyfiles": "^1.2.0",
@@ -50,9 +50,9 @@
     "karma-tap": "^4.0.0",
     "marked": "^0.3.12",
     "rimraf": "^2.6.2",
-    "rollup": "^0.53.3",
-    "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup": "^0.53.4",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-node-resolve": "^3.4.0",
     "tape": "^4.8.0",
     "uglify-js": "^3.3.5",
     "watchify": "^3.11.0"

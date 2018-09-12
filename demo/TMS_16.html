@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TMS_16 Sample</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="../dist/jelly.js"></script>
+    <!--script src="./src/common.js"></script-->
+</head>
+<body onload="drawChart();">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <div class="input-group">
+                    <input type="text" class="form-control">
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group">
+                <div class="col-md-4">
+                    <input type="checkbox" id="chk_1" class="form-control" placeholder="Search this blog"><label for="chk_1">프로파일</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="checkbox" id="chk_2" class="form-control" placeholder="Search this blog">
+                    <label for="chk_2">조직</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="checkbox" id="chk_3" class="form-control" placeholder="Search this blog">
+                    <label for="chk_3">분석결과</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <div id="jelly-container1"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm">
+
+            </div>
+            <div class="col-sm">
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function drawChart(){
+            var width = $("#jelly-container1").width();
+            jelly.pie()
+                .container('#jelly-container1')
+                .data([
+                    {category:'AAA', value: 10},
+                    {category:'BBB', value: 20},
+                    {category:'CCC', value: 30},
+                    {category:'AAA', value: 20},
+                    {category:'BBB', value: 30},
+                    {category:'CCC', value: 10},
+                ])
+                //.width(width)
+                //.size([0,width/2])
+                .autoResize(true)
+                .zeroMargin(true)
+                .dimensions({field:'category', order:'descending'})
+                .measures([{field: 'value', op: 'mean'}])
+                .legend({orient: 'bottom', align: 'middle'})
+                .render();
+        }
+/*        $(function(){
+        //$(document).ready(function(){
+        });*/
+    </script>
+</body>
+</html>
