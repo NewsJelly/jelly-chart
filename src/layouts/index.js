@@ -80,5 +80,5 @@ _layout.type = function(type) {
   if (_layout.hasOwnProperty(type))  return _layout[type];
   throw new Error(`Undefined type: ${type} is not available`);
 }
-_layout.version = "2018091201";
+_layout.version = "2018091202";
 export default _layout;
