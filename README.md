@@ -1,6 +1,8 @@
 Jelly-Chart
 ===
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/NewsJelly/jelly-chart.svg)](https://greenkeeper.io/)
+
 Jelly-Chart is a chart library based on D3v4 and SVG.
 
 ![chart-types](https://user-images.githubusercontent.com/253408/36471496-f56f6ed6-1731-11e8-8eaf-e9446b32b3cd.png)
