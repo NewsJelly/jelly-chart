@@ -56,7 +56,7 @@ function _arrow(selection, that, rowNum) {
   const height = that.height();
   const labelHeight = that.labelHeight();
   const labelPadding = that.labelPadding();
-  const rectW = labelHeight + labelPadding;
+  const rectW = labelHeight + (labelPadding/2);
   const arrowColor = schemeCategory10[0], rectColor = '#A3A3A3';
   const area = selection.select(className('label-area', true));
   let curRowNum = 0;
@@ -82,7 +82,7 @@ function _arrow(selection, that, rowNum) {
     .attr('fill', d => d === 'up' ? rectColor : arrowColor);
   arrow = arrowEnter.merge(arrow)
     .attr('transform', function (d,i) {
-      if (isHorizontal) return 'translate(' + [ width + labelPadding, i * (labelHeight + labelPadding) ] + ')';
+      if (isHorizontal) return 'translate(' + [ width - rectW, i * (labelHeight + (labelPadding/2)) ] + ')';
       else return 'translate(' + [0, height + labelPadding*1.25 + i * (labelHeight + labelPadding)] +')'
     })
   arrow.on('click', function(d) {
@@ -135,9 +135,10 @@ function _clipPath (selection, that) {
 function _overflow(selection) {
   const isHorizontal = this.isHorizontal();
   const width = this.width();
-  const maxLabelW = isHorizontal ? width /2 : width;
   const labelHeight = this.labelHeight();
   const labelPadding = this.labelPadding();
+  const rectW = labelHeight + labelPadding;
+  const maxLabelW = isHorizontal ? width /2: width;
   let rowNum = 0, curX = 0, curY = 0;
   selection.call(_clipPath, this);
   selection.selectAll(className('label', true))
@@ -145,7 +146,7 @@ function _overflow(selection) {
       let selection = select(this);
       let x,y;
       let w = Math.min(this.getBBox().width, maxLabelW);
-      if(i === 0  || (isHorizontal && curX + w + labelPadding * 2 <= width)) {
+      if(i === 0  || (isHorizontal && curX + w + labelPadding * 2 <= width - rectW)) {
         x = curX;
         y = curY;
       } else {

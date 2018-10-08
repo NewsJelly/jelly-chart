@@ -84,7 +84,7 @@ const _attrs = {
   name: null,
   nodeName: className('mark node', true),
   needCanvas: true,
-  margin: {top: 40, right: 40, bottom: 40, left: 40},
+  margin: {top: 10, right: 10, bottom: 10, left: 10},
   measures: [],
   muteIntensity: 0.3,
   parent : null,

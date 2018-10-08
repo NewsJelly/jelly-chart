@@ -3,7 +3,7 @@ import {className, labelFormat, setMethodsFromAttrs, getUniqueId, zeroPoint} fro
 import {countMeasure, countMeasureTitle} from './measureField';
 import interval from '../modules/interval';
 
-const offsetThickness = 14;
+const offsetThickness = 10;
 const verticalAxisThickness = 18; 
 const horizontalAxisThickness = 18;
 const tickFormatForOrdinal = labelFormat;
@@ -18,7 +18,7 @@ const defaultFont = {
   'font-style': 'normal',
   'letter-spacing': '0.1px'
 };
-const titleSize = 13;
+const titleSize = 12;
 const domainColor = '#c0ccda';
 const titleColor = '#485465';
 const gridColor = '#e7ebef';

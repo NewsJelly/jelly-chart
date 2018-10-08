@@ -1,4 +1,4 @@
-const horizontalThickness = 54;
+const horizontalThickness = 40;
 const verticalThickness = 162;
 
 /**

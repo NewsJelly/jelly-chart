@@ -1,5 +1,5 @@
 function append(source, target, prop) {
-  if (source[prop] && typeof source[prop] === 'number') target[prop] = source[prop]; 
+  if (source[prop] !== null  && typeof source[prop] === 'number') target[prop] = source[prop];
 }
 /**
  * If margin is specified, sets margin of the container and returns the instance itself. The unit of margin is a pixel. If margin is not specified, returns the instance's current margin.
