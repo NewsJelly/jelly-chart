@@ -366,7 +366,7 @@ function _title(selection) {
       if (titleOrient === 'bottom' || titleOrient === 'top') {
         selection.attr('transform', 'translate(' + [0, titleOrient === 'bottom' ? max(scale.range()) : min(scale.range())] +')');
       } else {
-        selection.attr('transform', 'translate(' + [that.thickness() * (orient === 'left' ? -1: 1), halfPos] +') ' + (orient === 'left' ? 'rotate(90)' : 'rotate(-90)'));
+        selection.attr('transform', 'translate(' + [that.thickness() * (orient === 'left' ? -1: 1), halfPos] +') ' + (orient === 'left' ? 'rotate(-90)' : 'rotate(90)'));
       }
     }
   }

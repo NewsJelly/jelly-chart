@@ -28,7 +28,7 @@ function _mark() {
       } else if (shape === 'word'){
         let result = selection.datum();
         let vertical = result.w < result.h;
-        selection.attr('dy', vertical ? '-.35em' : '.8em')
+        selection.attr('dy', vertical ? '-.2em' : '.8em')
           .attr('textLength', vertical? result.h : result.w)
           .attr('lengthAdjust', 'spacingAndGlyphs')
           .attr('transform', vertical ? 'rotate(90)' : '')

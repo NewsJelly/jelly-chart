@@ -3580,7 +3580,7 @@
         if (titleOrient === 'bottom' || titleOrient === 'top') {
           selection.attr('transform', 'translate(' + [0, titleOrient === 'bottom' ? d3.max(scale.range()) : d3.min(scale.range())] + ')');
         } else {
-          selection.attr('transform', 'translate(' + [that.thickness() * (orient === 'left' ? -1 : 1), halfPos] + ') ' + (orient === 'left' ? 'rotate(90)' : 'rotate(-90)'));
+          selection.attr('transform', 'translate(' + [that.thickness() * (orient === 'left' ? -1 : 1), halfPos] + ') ' + (orient === 'left' ? 'rotate(-90)' : 'rotate(90)'));
         }
       }
     };
@@ -7749,7 +7749,7 @@
       } else if (shape === 'word') {
         var result = selection.datum();
         var vertical = result.w < result.h;
-        selection.attr('dy', vertical ? '-.35em' : '.8em').attr('textLength', vertical ? result.h : result.w).attr('lengthAdjust', 'spacingAndGlyphs').attr('transform', vertical ? 'rotate(90)' : '').style('font-size', (vertical ? result.w : result.h) - 1 + 'px').style('fill', result.color).style('pointer-events', 'all').style('cursor', 'pointer');
+        selection.attr('dy', vertical ? '-.2em' : '.8em').attr('textLength', vertical ? result.h : result.w).attr('lengthAdjust', 'spacingAndGlyphs').attr('transform', vertical ? 'rotate(90)' : '').style('font-size', (vertical ? result.w : result.h) - 1 + 'px').style('fill', result.color).style('pointer-events', 'all').style('cursor', 'pointer');
       } else {
         var _result = selection.datum();
         selection.attr('visibility', _result.children ? 'hidden' : 'visible').attr('text-anchor', 'middle').attr('dy', '.35em');
