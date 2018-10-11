@@ -4483,6 +4483,7 @@
     var nested = this.isNested();
     var stacked = this.stacked();
     var aggregated = this.aggregated();
+    var label = this.label();
     var field = this.__execs__.field;
     var isNestedAndSortByValue = this.isNestedAndSortByValue();
     var yDomain = void 0,
@@ -4514,6 +4515,9 @@
 
     if (this.showDiff() && !nested) {
       if (yDomain[0] === 0) yDomain[1] *= 1.25;else if (yDomain[1] === 0) yDomain[0] *= 1.25;
+    }
+    if (label) {
+      if (yDomain[0] === 0) yDomain[1] *= 1.1;else if (yDomain[1] === 0) yDomain[0] *= 1.1;
     }
     if (isNestedAndSortByValue) {
       xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
@@ -5987,6 +5991,7 @@
     var aggregated = this.aggregated();
     var field = this.__execs__.field;
     var level = 1;
+    var label = this.label();
     var isMixed = this.isMixed();
     var individualScale = this.isIndividualScale();
 
@@ -6032,6 +6037,10 @@
       scale.x = d3.scalePoint().padding(this.padding());
     }
     scale.x.domain(xDomain);
+
+    if (label) {
+      if (yDomain[0] === 0) yDomain[1] *= 1.1;else if (yDomain[1] === 0) yDomain[0] *= 1.1;
+    }
     this.setCustomDomain('y', yDomain);
 
     if (isMixed && individualScale) {

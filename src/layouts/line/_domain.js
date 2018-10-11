@@ -22,6 +22,7 @@ function _domain(keep) {
   const aggregated = this.aggregated();
   const field = this.__execs__.field;
   const level = 1;
+  const label = this.label();
   const isMixed = this.isMixed();
   const individualScale = this.isIndividualScale();
 
@@ -65,6 +66,11 @@ function _domain(keep) {
     scale.x = scalePoint().padding(this.padding());
   }
   scale.x.domain(xDomain);
+
+    if (label) {
+        if (yDomain[0] === 0) yDomain[1] *= 1.1;
+        else if (yDomain[1] === 0) yDomain[0] *= 1.1;
+    }
   this.setCustomDomain('y', yDomain);
 
   if (isMixed && individualScale) {

@@ -6,6 +6,7 @@ function _domain(keep) { //set scales and domains
   const nested = this.isNested();
   const stacked = this.stacked();
   const aggregated = this.aggregated();
+  const label = this.label();
   const field = this.__execs__.field;
   const isNestedAndSortByValue = this.isNestedAndSortByValue();
   let yDomain, xDomain;
@@ -42,6 +43,10 @@ function _domain(keep) { //set scales and domains
   if (this.showDiff() && !nested) {
     if (yDomain[0] === 0) yDomain[1] *= 1.25;
     else if (yDomain[1] === 0) yDomain[0] *= 1.25;
+  }
+  if (label) {
+      if (yDomain[0] === 0) yDomain[1] *= 1.1;
+      else if (yDomain[1] === 0) yDomain[0] *= 1.1;
   }
   if (isNestedAndSortByValue) {
     xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);
