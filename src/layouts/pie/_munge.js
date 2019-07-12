@@ -31,7 +31,20 @@ function _munge() {
   if (field.region.interval()) { 
     result.forEach(d => { d.data.key = new Date(d.data.key)});
   }
-  this.__execs__.munged = result;
+
+  // 게이지 차트에서 dimensions의 집산 결과가 여러개인지 1개인지 체크
+  // 게이지 차트의 dimensions 집산 결과는 1개의 종류만 허용
+  if (this.shape() === 'gauge') {
+    if (result.length !== 1) {
+      throw new ConditionException();
+    } else {
+      this.__execs__.munged = result;
+    }
+  } else {
+    this.__execs__.munged = result;
+  }
+
+  // this.__execs__.munged = result;
 }
 
 export default _munge;

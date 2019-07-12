@@ -14,7 +14,7 @@ function _tooltip() {
   }
   let value = (d, text) => {
     let name;
-     if (count) {
+    if (count) {
       name = countMeasureTitle;
     } else {
       name = field.region.field();
