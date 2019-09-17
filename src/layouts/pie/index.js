@@ -16,7 +16,7 @@ const _attrs = {
   padding: 0,
   size: size,
   shape: shapes[0],
-  maxValue: 100
+  name: 'Pie'
 };
 
 /**
@@ -43,11 +43,37 @@ class Pie extends mix(Core).with(paddingMixin, sortMixin) {
   }
   
   muteFromLegend(legend) {
-    this.muteNodes(legend.key);
+    if (this.shape() !== 'sunburst') {
+      this.muteNodes(legend.key);
+    } else {
+      let keys = [legend.key];
+      let munged = this.__execs__.munged;
+      munged.each(d => {
+        if (d.data.key === legend.key && d.hasOwnProperty('children')) {
+          d.children.forEach(children => {
+            keys.push(children.data.key);
+          });
+        }
+      });
+      this.muteNodes(keys);
+    }
   }
   
   demuteFromLegend(legend) {
-    this.demuteNodes(legend.key);
+    if (this.shape() !== 'sunburst') {
+      this.demuteNodes(legend.key);
+    } else {
+      let keys = [legend.key];
+      let munged = this.__execs__.munged;
+      munged.each(d => {
+        if (d.data.key === legend.key && d.hasOwnProperty('children')) {
+          d.children.forEach(children => {
+            keys.push(children.data.key);
+          });
+        }
+      });
+      this.demuteNodes(keys);
+    }
   }
   
   muteToLegend(d) {

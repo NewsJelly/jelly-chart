@@ -145,6 +145,11 @@ module.exports = [
   },
   {
     category: 'Pie',
+    path: 'sunburst',
+    title: 'Sunburst'
+  },
+  {
+    category: 'Pie',
     path: 'gauge',
     title: 'Gauge Chart'
   },

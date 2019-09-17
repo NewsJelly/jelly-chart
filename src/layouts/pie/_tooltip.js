@@ -2,8 +2,8 @@ import {countMeasureTitle} from '../../modules/measureField';
 
 function _tooltip() {
   if(!this.tooltip()) return;
-  const count = this.isCount();
   const field = this.__execs__.field;
+  const count = this.isCount();
   const tFormat = d => {
     let f = field.region.isInterval() ? field.region.format(): null;
     return f ? f(d) : d;

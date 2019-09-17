@@ -36,7 +36,17 @@ class DimensionField extends Field {
     }
     function _keys(nodes, curLevel) {
       if (curLevel === level) {
-        const domain = nodes.map(accessor ? accessor : d => {return {key: d.data.key, value: d.value};});
+        // const domain = nodes.map(accessor ? accessor : d => {return {key: d.data.key, value: d.value};});
+        const domain = nodes.map(accessor ? accessor : d => {
+          if (d.hasOwnProperty('data')) return {key: d.data.key, value: d.value};
+          else {
+            if(d.hasOwnProperty('children')) {
+              return {key: d.key, children: d.children};
+            } else {
+              return {key: d.key, value: d.value};
+            }
+          }
+        });
         if (needMultipleDomain) {
           duplicateDomain = duplicateDomain.concat(domain);
           return _domain(domain, false);
