@@ -13,3 +13,7 @@ cache:
   bundler: true
   directories:
     - node_modules
+script:
+- npm run test
+after_success:
+- npm run build
