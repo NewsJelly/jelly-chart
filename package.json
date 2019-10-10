@@ -17,7 +17,6 @@
   "scripts": {
     "demo:dev": "copyfiles -f demo/style/*.css gh-pages/style && node demo/demo dev",
     "demo": "rimraf gh-pages && copyfiles -f demo/style/*.css gh-pages/style && node demo/main && node demo/demo",
-    "pretest": "rollup -c rollup.node.js && npm run demo:dev",
     "test": "karma start karma.conf.js --single-run && eslint src",
     "start": "http-server -c-1 | rollup -c --watch",
     "build": "rimraf dist && rollup -c && uglifyjs dist/jelly.js --source-map -m -o dist/jelly.min.js",
