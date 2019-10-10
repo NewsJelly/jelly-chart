@@ -20,7 +20,6 @@
     "test": "karma start karma.conf.js --single-run && eslint src",
     "start": "http-server -c-1 | rollup -c --watch",
     "build": "rimraf dist && rollup -c && uglifyjs dist/jelly.js --source-map -m -o dist/jelly.min.js",
-    "prepublish": "npm run test && npm run build",
     "jsdoc": "rimraf doc && mkdir doc && jsdoc -c .jsdoc.json"
   },
   "keywords": [
