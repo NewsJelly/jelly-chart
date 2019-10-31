@@ -2,6 +2,7 @@ import bar from './bar/';
 import line from './line/';
 import scatter from './scatter/';
 import xyHeatmap from './xy-heatmap/';
+import pivotTable from './pivot-table/';
 import treemap from './treemap/';
 import parCoords from './par-coords/';
 import pie from './pie/';
@@ -41,6 +42,13 @@ const _layout = {
    * @memberOf jelly
    */
   xyHeatmap,
+  /**
+   * Generator returns a {@link Pivot Table} instance
+   * @type {function}
+   * @see {@link Pivot Table}
+   * @memberOf jelly
+   */
+  pivotTable,
   /**
    * Generator returns a {@link Treemap} instance
    * @type {function} 

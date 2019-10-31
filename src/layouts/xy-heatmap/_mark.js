@@ -9,7 +9,7 @@ function _mark() {
   const canvas = this.__execs__.canvas;
   const scale = this.__execs__.scale;
   const label = this.label();
-  const trans = transition().duration(this.transition().duration).delay(this.transition().delay); 
+  const trans = transition().duration(this.transition().duration).delay(this.transition().delay);
   const yValue = d => scale.y(d.data.key);
   const colorValue =  d => scale.color(d.value);
   const textValue = d => labelFormat(d.value);
