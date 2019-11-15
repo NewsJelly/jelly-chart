@@ -120,6 +120,9 @@ $ npm test
 $ npm run build
 ```
 
+** CONTRIBUTING **
+Fork to modify or update the content, then modify and request with Pull Request!
+
 LICENSE
 ---
 GPL-3.0+
