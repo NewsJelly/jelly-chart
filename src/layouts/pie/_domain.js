@@ -1,8 +1,8 @@
-function _domain(keep) {
+function _domain(keep, data=null) {
   const scale = this.scale();
-  const munged = this.__execs__.munged;
+  const munged = data === null ? this.__execs__.munged : data;
   const field = this.__execs__.field;
-  let regionDomain = field.region.munged(munged).domain();
+  let regionDomain = field.region.munged(munged.hasOwnProperty('data') ? munged.data['children'] : munged).domain();
   scale.color = this.updateColorScale(regionDomain, keep);
 }
 

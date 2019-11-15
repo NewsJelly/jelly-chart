@@ -4,7 +4,7 @@
   "author": "Newsjelly Corp.",
   "license": "GPL-3.0+",
   "description": "Jelly-Chart is a chart library based on D3v4 and SVG.",
-  "main": "dist/jelly.js",
+  "main": "gh-pages/release/latest/dist/jelly.min.js",
   "unpkg": "dist/jelly.min.js",
   "jsdelivr": "dist/jelly.min.js",
   "module": "index",
@@ -53,12 +53,13 @@
     "rollup": "^0.53.3",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-polyfill": "^2.0.1",
     "tape": "^4.8.0",
     "uglify-js": "^3.3.5",
-    "watchify": "^3.11.0"
+    "watchify": "^3.11.0",
+    "rollup-plugin-polyfill": "^2.0.1"
   },
   "dependencies": {
-    "d3": "^4.9.1"
+    "d3": "^4.9.1",
+    "http-server": "^0.11.1"
   }
 }

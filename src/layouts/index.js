@@ -2,11 +2,13 @@ import bar from './bar/';
 import line from './line/';
 import scatter from './scatter/';
 import xyHeatmap from './xy-heatmap/';
+import pivotTable from './pivot-table/';
 import treemap from './treemap/';
 import parCoords from './par-coords/';
 import pie from './pie/';
 import markerMap from './marker-map/';
 import combo from './combo/';
+import spider from './spider/';
 /**
  * @namespace jelly
  * @type {object}
@@ -41,6 +43,13 @@ const _layout = {
    */
   xyHeatmap,
   /**
+   * Generator returns a {@link Pivot Table} instance
+   * @type {function}
+   * @see {@link Pivot Table}
+   * @memberOf jelly
+   */
+  pivotTable,
+  /**
    * Generator returns a {@link Treemap} instance
    * @type {function} 
    * @see {@link Treemap} 
@@ -74,7 +83,14 @@ const _layout = {
    * @see {@link Combo} 
    * @memberOf jelly
    */
-  combo
+  combo,
+  /**
+   * Generator returns a {@link Spider} instance
+   * @type {function}
+   * @see {@link Spider}
+   * @memberOf jelly
+   */
+  spider
 };
 _layout.type = function(type) {
   if (_layout.hasOwnProperty(type))  return _layout[type];

@@ -5,3 +5,4 @@ node_modules
 doc/
 gh-pages/
 dist/
+.idea

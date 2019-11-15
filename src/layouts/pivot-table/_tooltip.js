@@ -1,8 +1,9 @@
 function _tooltip() {
   if(!this.tooltip()) return;
   // const field = this.__execs__.field;
-  const shape = this.shape();
 
+  const innerSize = this.innerSize();
+  const scale = this.__execs__.scale;
   let key = function(d) {
     let title = d.parent.data.hasOwnProperty('key') !== null ? d.parent.data.key : '';
     return {name: 'key', value: title};
@@ -12,10 +13,9 @@ function _tooltip() {
     return {name: d.data.key, value: text};
     // return {name: field.color.field(), value: text};
   }
-  let offset = function(d) {
-    let x = 0, y = 0;
-    if (shape === 'heatmap') x = d.w; // 일반 히트맵 툴팁 offset
-    else x = d.w / 3; // 버블 히트맵 툴팁 offset
+  let offset = function(_, i) {
+    let x = innerSize.width / (scale.x.domain().length + 1);
+    let y = (innerSize.height / (scale.y.domain().length + 1)) * (i % 4);
     return {x:x, y:y};
   }
   this.renderTooltip({offset, key, value, color: '#111'});

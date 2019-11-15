@@ -7,7 +7,11 @@ export default function (exceptionFilter) {
   } else if (exceptionFilter === null) { 
     nodes = this.filterNodes().classed('mute', false).call(this.demute);
   } else {
-    nodes = this.filterNodes(conditionForMute(exceptionFilter));
+    if (this.__attrs__.name === 'Pie' && this.__attrs__.shape === 'sunburst') {
+      nodes = this.filterNodes(exceptionFilter);
+    } else {
+      nodes = this.filterNodes(conditionForMute(exceptionFilter));
+    }
     if (nodes.size() > 0) {
       nodes.classed('mute', true).call(this.mute, this.muteIntensity());
     }

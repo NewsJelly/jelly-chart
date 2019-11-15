@@ -10,7 +10,25 @@
  */
 function filterNodes(filter) {
   let nodes = this.nodes();
-  if (!filter || typeof filter !== 'function') return nodes;
+  if (!filter || typeof filter !== 'function') {
+    if (filter.length > 0) {
+      let rootKey = filter[0];
+      filter.forEach(_filter => {
+        nodes = nodes.filter(d => {
+          if (d.data.key === _filter) {
+            if (d.data.key === rootKey || d.parent.data.key === rootKey) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return true;
+          }
+        });
+      });
+    }
+    return nodes;
+  }
   return nodes.filter(filter);
 }
 

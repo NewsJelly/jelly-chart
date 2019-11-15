@@ -1,7 +1,7 @@
 import Core from '../core';
 import paddingMixin from '../paddingMixin';
 import sortMixin from '../sortMixin';
-import {genFunc, mix} from '../../modules/util';
+import {attrFunc, genFunc, mix} from '../../modules/util';
 import _munge from './_munge';
 import _domain from './_domain';
 import _mark from './_mark';
@@ -10,10 +10,13 @@ import _tooltip from './_tooltip';
 
 const size = {range: [0, 150], scale: 'linear', reverse: false}; 
 const conditions = ['normal', 'count'];
+const shapes = ['normal', 'gauge'];
 const _attrs = {
   limitKeys: 20,
   padding: 0,
-  size: size
+  size: size,
+  shape: shapes[0],
+  name: 'Pie'
 };
 
 /**
@@ -40,11 +43,37 @@ class Pie extends mix(Core).with(paddingMixin, sortMixin) {
   }
   
   muteFromLegend(legend) {
-    this.muteNodes(legend.key);
+    if (this.shape() !== 'sunburst') {
+      this.muteNodes(legend.key);
+    } else {
+      let keys = [legend.key];
+      let munged = this.__execs__.munged;
+      munged.each(d => {
+        if (d.data.key === legend.key && d.hasOwnProperty('children')) {
+          d.children.forEach(children => {
+            keys.push(children.data.key);
+          });
+        }
+      });
+      this.muteNodes(keys);
+    }
   }
   
   demuteFromLegend(legend) {
-    this.demuteNodes(legend.key);
+    if (this.shape() !== 'sunburst') {
+      this.demuteNodes(legend.key);
+    } else {
+      let keys = [legend.key];
+      let munged = this.__execs__.munged;
+      munged.each(d => {
+        if (d.data.key === legend.key && d.hasOwnProperty('children')) {
+          d.children.forEach(children => {
+            keys.push(children.data.key);
+          });
+        }
+      });
+      this.demuteNodes(keys);
+    }
   }
   
   muteToLegend(d) {
@@ -59,6 +88,11 @@ class Pie extends mix(Core).with(paddingMixin, sortMixin) {
     return this.condition() === conditions[1];
   }
 }
+
+// Pie 유형 선택 옵션 (일반, 게이지)
+Pie.prototype.shape = attrFunc('shape');
+// 게이지 차트 설정 시 max value 값 설정 옵션
+Pie.prototype.maxValue = attrFunc('maxValue');
 
 export default genFunc(Pie);
 export {conditions};

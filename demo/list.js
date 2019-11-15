@@ -143,6 +143,16 @@ module.exports = [
     path: 'donut-pie',
     title: 'Donut Pie Chart'
   },
+  {
+    category: 'Pie',
+    path: 'sunburst',
+    title: 'Sunburst'
+  },
+  {
+    category: 'Pie',
+    path: 'gauge',
+    title: 'Gauge Chart'
+  },
   //Scatter Plot
   {
     category: 'Scatter',
@@ -206,6 +216,23 @@ module.exports = [
     category: 'XY Heatmap',
     path: 'xy-heatmap',
     title: 'XY Heatmap'
+  },
+  {
+    category: 'XY Heatmap',
+    path: 'bubble-xy-heatmap',
+    title: 'Bubble XY Heatmap'
+  },
+  // Pivot table
+  {
+    category: 'Pivot Table',
+    path: 'pivot-table',
+    title: 'Pivot Table'
+  },
+  // spider
+  {
+    category: 'Spider',
+    path: 'spider',
+    title: 'Spider Chart'
   },
   //marker-map
   {
