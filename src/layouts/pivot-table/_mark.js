@@ -8,6 +8,7 @@ function _mark() {
   const innerSize = this.innerSize();
   const padding = this.padding();
   const labelFont = this.labelFont();
+  const borderColor = this.borderColor();
   const colorValue =  d => scale.color(d.value);
   const textValue = d => labelFormat(d.value);
 
@@ -36,6 +37,7 @@ function _mark() {
     selection
         .attr('width', width)
         .attr('height', height)
+        .style('stroke', borderColor)
         .style('fill', '#d9d9d9');
   }
 
@@ -59,6 +61,7 @@ function _mark() {
     selection
         .attr('width', width)
         .attr('height', height)
+        .style('stroke', borderColor)
         .style('fill', '#d9d9d9');
   }
 

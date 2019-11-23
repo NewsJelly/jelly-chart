@@ -17,6 +17,7 @@ const _attrs = {
   color: continousColorScheme,
   headerFont: null,
   labelFont: null,
+  borderColor: '#dddddd',
   padding: 15,
   reverse: false
 };
@@ -44,6 +45,7 @@ class PivotTable extends mix(RectLinear).with(paddingMixin, sortMixin) {
   }
 }
 
+PivotTable.prototype.borderColor = attrFunc('borderColor');
 PivotTable.prototype.labelFont = attrFunc('labelFont');
 
 export default genFunc(PivotTable);
