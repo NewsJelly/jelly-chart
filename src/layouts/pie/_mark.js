@@ -146,10 +146,105 @@ function _mark() {
       .style('fill', d => d.color)
       .transition(trans)
       .attrTween('d', tweenArc);
+    if (shape === 'sunburst') { // 선버스트 유형에서의 자식요소가 있는 노드 클릭이벤트 바인딩
+      selection
+        .filter(d => d.children)
+        .on('click', current => {
+          selection.data(current.parent);
+          parentNode = current.parent;
+          // 자식요소 데이터로 차트 리드로우
+          munged.each(node => {
+            node.target = {
+              x0: Math.max(0, Math.min(1, (node.x0 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+              x1: Math.max(0, Math.min(1, (node.x1 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+              y0: Math.max(0, node.y0 - current.depth),
+              y1: Math.max(0, node.y1 - current.depth)
+            }
+          });
+
+          let trans = transition().duration(600).delay(0);
+
+          // 차트요소 위치 재배열
+          selection
+            .style('fill', d => d.color)
+            .transition(trans)
+            .tween("data", d => {
+              const i = interpolate(d.current, d.target);
+              return t => {
+                return d.current = i(t);
+              }
+            })
+            .filter(function(d) {
+              return +this.getAttribute("fill-opacity") || d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0;
+            })
+            .attr('pointer-events', d => { // 자식 노드가 없으면 포인트 이벤트 없음
+              return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? 'all' : 'none';
+            })
+            .attr("fill-opacity", d => {
+              return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? (d.children ? 1 : 0.6) : 0
+            })
+            .attrTween('d', d => {
+              let i = interpolate(d.current, d.target);
+              return function(t) {
+                return sunburstGen(i(t));
+              };
+            });
+        });
+    }
+  }
+
+  let __rootNode = function (selection) {
+    selection
+      .attr('r', size.range[0])
+      .style('cursor', 'pointer')
+      .style('fill', '#fff')
+      .on('click', current => {
+        current = parentNode;
+        parentNode = parentNode.parent || current;
+        selection.data(current.parent);
+        // 부모요소 데이터로 차트 리드로우
+        munged.each(node => {
+          node.target = {
+            x0: Math.max(0, Math.min(1, (node.x0 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+            x1: Math.max(0, Math.min(1, (node.x1 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+            y0: Math.max(0, node.y0 - current.depth),
+            y1: Math.max(0, node.y1 - current.depth)
+          }
+        });
+
+        let trans = transition().duration(600).delay(0);
+        let selectNode = selectAll(className('node', true));
+
+        // 차트요소 위치 재배열
+        selectNode.selectAll('path')
+          .style('fill', d => d.color)
+          .transition(trans)
+          .tween("data", d => {
+            const i = interpolate(d.current, d.target);
+            return t => {
+              return d.current = i(t);
+            }
+          })
+          .filter(function (d) {
+            return +this.getAttribute("fill-opacity") || d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0;
+          })
+          .attr('pointer-events', d => { // 자식 노드가 없으면 포인트 이벤트 없음
+            return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? 'all' : 'none';
+          })
+          .attr("fill-opacity", d => {
+            return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? (d.children ? 1 : 0.6) : 0
+          })
+          .attrTween('d', d => {
+            let i = interpolate(d.current, d.target);
+            return function (t) {
+              return sunburstGen(i(t));
+            };
+          });
+      });
   }
 
 
-  let __labelInit = function (selection) {
+          let __labelInit = function (selection) {
     selection.each(function(d) {
       if (shape !== 'gauge') { // normal pie chart
         select(this).attr('x', d.dx)
@@ -235,6 +330,8 @@ function _mark() {
           .attr('class', className('root-node'));
         rootNodeEnter.merge(rootNode)
           .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
+        rootNodeEnter.append('circle')
+          .call(__rootNode);
 
         let node = selection.selectAll(that.nodeName()).data(d => d.descendants().slice(1), d => d.data.key);
         let nodeEnter = node.enter().append('g')
