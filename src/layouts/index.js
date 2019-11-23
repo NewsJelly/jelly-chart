@@ -7,6 +7,7 @@ import parCoords from './par-coords/';
 import pie from './pie/';
 import markerMap from './marker-map/';
 import combo from './combo/';
+import spider from './spider/';
 /**
  * @namespace jelly
  * @type {object}
@@ -74,7 +75,14 @@ const _layout = {
    * @see {@link Combo} 
    * @memberOf jelly
    */
-  combo
+  combo,
+  /**
+   * Generator returns a {@link Spider} instance
+   * @type {function}
+   * @see {@link Spider}
+   * @memberOf jelly
+   */
+  spider
 };
 _layout.type = function(type) {
   if (_layout.hasOwnProperty(type))  return _layout[type];
