@@ -9,6 +9,7 @@ function _mark() {
   const padding = this.padding();
   const labelFont = this.labelFont();
   const borderColor = this.borderColor();
+  const headerFontColor = this.headerFontColor();
   const colorValue =  d => scale.color(d.value);
   const textValue = d => labelFormat(d.value);
 
@@ -48,6 +49,7 @@ function _mark() {
         .attr('x', x)
         .attr('y', y)
         .attr('dy', '.35em')
+        .attr('fill', headerFontColor)
         .style('font-size', '12px')
         .style('font-weight', 'normal')
         .style('text-anchor', 'middle')
@@ -72,6 +74,7 @@ function _mark() {
         .attr('x', x)
         .attr('y', y)
         .attr('dy', '.35em')
+        .attr('fill', headerFontColor)
         .style('font-size', '12px')
         .style('font-weight', 'normal')
         .append('tspan')
