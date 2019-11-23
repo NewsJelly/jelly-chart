@@ -3,7 +3,6 @@ import {labelFormat, className} from '../../modules/util';
 
 function _mark() {
   const that = this;
-  const innerSize = this.innerSize();
   const shape = this.shape();
   const munged = this.__execs__.munged;
   const canvas = this.__execs__.canvas;
@@ -145,7 +144,9 @@ function _mark() {
   let __subLabel = function(selection) {
     selection.each(function (d) {
       let selection = select(this);
-      selection.text(labelFormat((d.value / d.total), false, ',.1%'));
+      selection
+        .style('visibility', label ? 'visible' : 'hidden')
+        .text(labelFormat((d.value / d.total), false, ',.1%'));
 
       let textArea = selection.node().getBoundingClientRect();
       if (shape === 'heatmap') {

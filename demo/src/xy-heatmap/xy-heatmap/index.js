@@ -11,5 +11,6 @@ jelly.xyHeatmap().container('#jelly-container')
   ]).dimensions(['category', 'name'])
   .measures('value')
   .axis('x').axis('y')
+  .label(true)
   .legend(true)
   .render();

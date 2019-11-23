@@ -19,6 +19,7 @@ jelly.xyHeatmap().container('#jelly-container')
     ]).dimensions(['category', 'name'])
     .measures('value')
     .axis('x').axis('y')
+    .label(true)
     .shape('bubble-heatmap')
     .legend(true)
     .render();
