@@ -165,9 +165,30 @@ function _render(selection) { //pre-render the tooltip
 }
 
 function hide() {
-  let tooltip = this.__execs__.tooltip;
-  tooltip.transition().duration(180).call(_styleOpacity, 0)
+  const showTrans = transition().duration(140);
+  const tooltip = this.__execs__.tooltip;
+  const target = this.__attrs__.target;
+  const chartType = target.__attrs__.name;
 
+  target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill',
+      chartType === 'XYHeatmap' ? d => d.color : pointOriginColor);
+  target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke',
+      chartType === 'XYHeatmap' ? pointOriginColor : d => d.color);
+
+  target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle')
+      .transition(showTrans)
+      .attr('opacity', d => {
+        let point = target.__attrs__.hasOwnProperty('point') ? target.__attrs__.point : null;
+        let opacity = 1;
+        if (d.hasOwnProperty('opacity')) opacity = d.opacity;
+        else if (!point && point !== null) opacity = 0;
+        return opacity;
+      })
+  if(chartType === 'Spider') {
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll(className('dummy', true)).transition(showTrans).attr('opacity', 0)
+  }
+
+  tooltip.transition().duration(180).call(_styleOpacity, 0)
 }
 
 function render(selection) {

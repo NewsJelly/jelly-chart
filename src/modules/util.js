@@ -7,10 +7,15 @@ let labelFormat = (function() {
   let plusIntegerFormat = format('+,');
   let floatFormat = format(',.2f');
   let plusFloatFormat = format('+,.2f');
-  return function(value, plus = false) {
-   if(isNaN(value)) return value;
-   else if(typeof value === 'string') value = +value;
-   return (Number.isInteger(value) ? (plus ? plusIntegerFormat: integerFormat) : (plus? plusFloatFormat : floatFormat))(value);
+  return function(value, plus = false, formatString = null) {
+    if(isNaN(value)) return value;
+    else if(typeof value === 'string') value = +value;
+
+    if (formatString !== null && typeof formatString === 'string') {
+      let userFormat = format(formatString);
+      return userFormat(value);
+    }
+    return (Number.isInteger(value) ? (plus ? plusIntegerFormat: integerFormat) : (plus? plusFloatFormat : floatFormat))(value);
   }
 })();
 
