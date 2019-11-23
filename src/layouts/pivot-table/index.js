@@ -50,6 +50,7 @@ class PivotTable extends mix(RectLinear).with(paddingMixin, sortMixin) {
 PivotTable.prototype.borderColor = attrFunc('borderColor');
 PivotTable.prototype.headerFontColor = attrFunc('headerFontColor');
 PivotTable.prototype.headerBgColor = attrFunc('headerBgColor');
+PivotTable.prototype.headerFont = attrFunc('headerFont');
 PivotTable.prototype.labelFont = attrFunc('labelFont');
 
 export default genFunc(PivotTable);
