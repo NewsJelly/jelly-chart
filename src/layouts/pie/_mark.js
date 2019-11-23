@@ -163,6 +163,7 @@ function _mark() {
           });
 
           let trans = transition().duration(600).delay(0);
+          let selectNode = selectAll(className('node', true));
 
           // 차트요소 위치 재배열
           selection
@@ -189,6 +190,18 @@ function _mark() {
                 return sunburstGen(i(t));
               };
             });
+
+            // 툴팁 위치 리셋
+            selectNode.each(d => {
+              let mid = (d.target.x1 + d.target.x0) / 2;
+              let dx = Math.sin(mid) * (radius * d.target.y0 + (radius / 2));
+              let dy = -Math.cos(mid) * (radius * d.target.y0 + (radius / 2));
+              d.mid = mid;
+              d.x = innerSize.width / 2 + dx;
+              d.y = innerSize.height / 2 + dy;
+            });
+            that.resetTooltip();
+            _tooltip.call(that);
         });
     }
   }
@@ -240,11 +253,23 @@ function _mark() {
               return sunburstGen(i(t));
             };
           });
+
+          // 툴팁 위치 리셋
+          selectNode.each(d => {
+            let mid = (d.target.x1 + d.target.x0) / 2;
+            let dx = Math.sin(mid) * (radius * d.target.y0 + (radius / 2));
+            let dy = -Math.cos(mid) * (radius * d.target.y0 + (radius / 2));
+            d.mid = mid;
+            d.x = innerSize.width / 2 + dx;
+            d.y = innerSize.height / 2 + dy;
+          });
+          that.resetTooltip();
+          _tooltip.call(that);
       });
   }
 
 
-          let __labelInit = function (selection) {
+  let __labelInit = function (selection) {
     selection.each(function(d) {
       if (shape !== 'gauge') { // normal pie chart
         select(this).attr('x', d.dx)
