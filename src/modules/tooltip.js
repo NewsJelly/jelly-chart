@@ -215,32 +215,27 @@ function renderPoint(point){
   const target = this.target();
   const isMulti = !!target.__attrs__.multiTooltip;
   if(isMulti) return;
+  const shape = target.__attrs__.shape;
   const isShowPoint = !!target.__attrs__.point;
   const pointType = target.__attrs__.point && target.__attrs__.point.type ? target.__attrs__.point.type : 'empty';
   if(pointType === 'empty'){
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', function(d){
-      return d.color;
-    })
+    if (shape === 'line') {
+      target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', pointOriginColor);
+    }
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', d => d.color);
   }else{
-    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', function(d){
-      return d.color;
-    });
+    target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).style('fill', d => d.color);
     target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('stroke', pointOriginColor)
   }
-  if(!isShowPoint) target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').attr('opacity', 0)
+  if(!isShowPoint) target.__execs__.canvas.selectAll(this.nodeName()).selectAll('circle').transition(showTrans).attr('opacity',
+      shape === 'line' ? 0 : 0.3)
   let showPoint =  select(point).classed(className('show'), true).selectAll('circle').transition(showTrans).attr('opacity', 1)
   if(pointType === 'empty'){
-    showPoint
-      .style('fill', function(d){
-        return d.color;
-      })
+    showPoint.style('fill', d => d.color)
     showPoint.attr('stroke', 'rgb(255, 255, 255)')
   }else{
     showPoint.style('fill', 'rgb(255, 255, 255)')
-    showPoint.attr('stroke', function(d){
-      return d.color;
-    })
+    showPoint.attr('stroke', d => d.color);
   }
 }
 
