@@ -212,6 +212,12 @@ module.exports = [
     path: 'xy-heatmap',
     title: 'XY Heatmap'
   },
+  // spider
+  {
+    category: 'Spider',
+    path: 'spider',
+    title: 'Spider Chart'
+  },
   //marker-map
   {
     category: 'Marker Map',
