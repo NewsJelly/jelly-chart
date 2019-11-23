@@ -89,6 +89,7 @@ function _mark() {
     selection
         .attr('width', width)
         .attr('height', height)
+        .style('stroke', borderColor)
         .style('fill', d => d.color);
   }
 
