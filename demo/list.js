@@ -143,6 +143,11 @@ module.exports = [
     path: 'donut-pie',
     title: 'Donut Pie Chart'
   },
+  {
+    category: 'Pie',
+    path: 'gauge',
+    title: 'Gauge Chart'
+  },
   //Scatter Plot
   {
     category: 'Scatter',
