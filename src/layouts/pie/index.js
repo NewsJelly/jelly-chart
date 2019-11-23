@@ -33,7 +33,7 @@ class Pie extends mix(Core).with(paddingMixin, sortMixin) {
     this.process('munge', _munge, {isPre:true})
       .process('domain', _domain, {isPre: true})
       .process('mark', _mark)
-      .process('legend', _legend)
+      .process('legend', _legend, {allow: function(){return this.shape() === 'normal'}})
       .process('tooltip', _tooltip);
   }
   
