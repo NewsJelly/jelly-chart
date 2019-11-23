@@ -43,6 +43,8 @@ function _munge() {
       } else {
         this.__execs__.munged = result;
       }
+    } else {
+      this.__execs__.munged = result;
     }
   } else { // sunburst
     let root = hierarchy(this.data()).sum(d => d.value);
