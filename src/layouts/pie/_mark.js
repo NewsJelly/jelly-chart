@@ -170,6 +170,18 @@ function _mark() {
           that.resetLegend();
           _legend.call(that);
 
+          // 노드 색상 설정
+          selectNode.each(d => {
+            if(d.parent.data.key === current.data.key) {
+              d.color = scale.color(d.data.key);
+              if (d.children) {
+                d.children.forEach(_d => {
+                  _d.color = d.color;
+                });
+              }
+            }
+          });
+
           // 차트요소 위치 재배열
           selection
             .style('fill', d => d.color)
@@ -250,6 +262,19 @@ function _mark() {
         _domain.call(that, null, current);
         that.resetLegend();
         _legend.call(that);
+
+        // 노드 색상 설정
+        selectNode.each(d => {
+          if(d.parent.data.key === current.data.key) {
+            d.color = scale.color(d.data.key);
+            if (d.children) {
+              d.children.forEach(_d => {
+                _d.color = _d.parent.color;
+              });
+            }
+          }
+        });
+
 
         // 차트요소 위치 재배열
         selectNode.selectAll('path')
