@@ -165,6 +165,11 @@ function _mark() {
           let trans = transition().duration(600).delay(0);
           let selectNode = selectAll(className('node', true));
 
+          // 범례 내용 리셋
+          _domain.call(that, null, current);
+          that.resetLegend();
+          _legend.call(that);
+
           // 차트요소 위치 재배열
           selection
             .style('fill', d => d.color)
@@ -240,6 +245,11 @@ function _mark() {
 
         let trans = transition().duration(600).delay(0);
         let selectNode = selectAll(className('node', true));
+
+        // 범례 내용 리셋
+        _domain.call(that, null, current);
+        that.resetLegend();
+        _legend.call(that);
 
         // 차트요소 위치 재배열
         selectNode.selectAll('path')
