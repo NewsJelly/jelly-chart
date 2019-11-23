@@ -202,6 +202,19 @@ function _mark() {
             });
             that.resetTooltip();
             _tooltip.call(that);
+
+          // 레이블 위치 조정
+          if (label) {
+            selectNode.selectAll('text')
+                .attr('x', d => {
+                  return Math.sin(d.mid) * (radius * d.target.y0 + (radius / 2));
+                })
+                .attr('y', d => {
+                  return -Math.cos(d.mid) * (radius * d.target.y0 + (radius / 2));
+                }).attr('visibility', d => { // 전체 노드 중 2번째 노드 까지만 레이블 표시
+              return d.target.y1 <= 3 && d.target.y0 >= 1 && (d.target.y1 - d.target.y0) * (d.target.x1 - d.target.x0) > 0.03 ? 'visible' : 'hidden'
+            });
+          }
         });
     }
   }
@@ -265,6 +278,19 @@ function _mark() {
           });
           that.resetTooltip();
           _tooltip.call(that);
+
+        // 레이블 위치 조정
+        if (label) {
+          selectNode.selectAll('text')
+              .attr('x', d => {
+                return Math.sin(d.mid) * (radius * d.target.y0 + (radius / 2));
+              })
+              .attr('y', d => {
+                return -Math.cos(d.mid) * (radius * d.target.y0 + (radius / 2));
+              }).attr('visibility', d => { // 전체 노드 중 2번째 노드 까지만 레이블 표시
+            return d.target.y1 <= 3 && d.target.y0 >= 1 && (d.target.y1 - d.target.y0) * (d.target.x1 - d.target.x0) > 0.03 ? 'visible' : 'hidden'
+          });
+        }
       });
   }
 
