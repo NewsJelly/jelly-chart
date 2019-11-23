@@ -36,28 +36,54 @@ class Pie extends mix(Core).with(paddingMixin, sortMixin) {
       .process('legend', _legend, {allow: function(){return this.shape() !== 'gauge'}})
       .process('tooltip', _tooltip);
   }
-  
+
   axis() {
     if(!arguments.length) return [];
     return this;
   }
-  
+
   muteFromLegend(legend) {
-    this.muteNodes(legend.key);
+    if (this.shape() !== 'sunburst') {
+      this.muteNodes(legend.key);
+    } else {
+      let keys = [legend.key];
+      let munged = this.__execs__.munged;
+      munged.each(d => {
+        if (d.data.key === legend.key && d.hasOwnProperty('children')) {
+          d.children.forEach(children => {
+            keys.push(children.data.key);
+          });
+        }
+      });
+      this.muteNodes(keys);
+    }
   }
-  
+
   demuteFromLegend(legend) {
-    this.demuteNodes(legend.key);
+    if (this.shape() !== 'sunburst') {
+      this.demuteNodes(legend.key);
+    } else {
+      let keys = [legend.key];
+      let munged = this.__execs__.munged;
+      munged.each(d => {
+        if (d.data.key === legend.key && d.hasOwnProperty('children')) {
+          d.children.forEach(children => {
+            keys.push(children.data.key);
+          });
+        }
+      });
+      this.demuteNodes(keys);
+    }
   }
-  
+
   muteToLegend(d) {
     this.muteLegend(d.data.key);
   }
-  
+
   demuteToLegend(d) {
     this.demuteLegend(d.data.key);
   }
-  
+
   isCount() {
     return this.condition() === conditions[1];
   }

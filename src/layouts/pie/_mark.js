@@ -377,71 +377,70 @@ function _mark() {
       let node = selection.selectAll(that.nodeName()).data(d => d, d => d.data.key);
       node.exit().remove();
       let nodeEnter = node.enter().append('g')
-        .attr('class', that.nodeName(true)  + ' pie')
-          .call(__local)
-        if (shape === 'normal') { // normal pie
-          nodeEnter.append('path')
-            .call(__nodeInit);
-            nodeEnter.append('text')
-              .call(__labelInit);
-            node.call(__local);
-            node = nodeEnter.merge(node)
-              .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
-            node.select('path')
-              .call(__node);
-            node.select('text')
-              .call(__label);
-        } else if ('gauge'){ // gauge chart
-          nodeEnter.append('path')
-            .attr('class', 'gauge-bg')
-            .call(__gaugeBgInit);
-            nodeEnter.append('path')
-              .attr('class', 'pie-node')
-              .call(__nodeInit);
-            nodeEnter.append('text')
-              .call(__labelInit);
-            node.call(__local);
-            node = nodeEnter.merge(node)
-              .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
-            node.select('.gauge-bg')
-              .call(__gaugeBg);
-            node.select('.pie-node')
-              .call(__node);
-            node.select('text')
-              .call(__label);
-          }
-      } else { // sunburst chart
-        let rootNode = selection.selectAll(className('root-node')).data(d => [d.descendants()[0]], d => d.data.key);
-        let rootNodeEnter = rootNode.enter().append('g')
-          .attr('class', className('root-node'));
-        rootNodeEnter.merge(rootNode)
-          .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
-        rootNodeEnter.append('circle')
-          .call(__rootNode);
-
-        let node = selection.selectAll(that.nodeName()).data(d => d.descendants().slice(1), d => d.data.key);
-        let nodeEnter = node.enter().append('g')
           .attr('class', that.nodeName(true)  + ' pie')
           .call(__local)
-
+      if (shape === 'normal') { // normal pie
         nodeEnter.append('path')
-          .call(__nodeInit);
+            .call(__nodeInit);
         nodeEnter.append('text')
-          .call(__labelInit);
+            .call(__labelInit);
         node.call(__local);
         node = nodeEnter.merge(node)
-          .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
+            .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
         node.select('path')
-          .call(__node);
+            .call(__node);
         node.select('text')
-          .call(__label);
+            .call(__label);
+      } else if ('gauge'){ // gauge chart
+        nodeEnter.append('path')
+            .attr('class', 'gauge-bg')
+            .call(__gaugeBgInit);
+        nodeEnter.append('path')
+            .attr('class', 'pie-node')
+            .call(__nodeInit);
+        nodeEnter.append('text')
+            .call(__labelInit);
+        node.call(__local);
+        node = nodeEnter.merge(node)
+            .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
+        node.select('.gauge-bg')
+            .call(__gaugeBg);
+        node.select('.pie-node')
+            .call(__node);
+        node.select('text')
+            .call(__label);
       }
+    } else { // sunburst chart
+      let rootNode = selection.selectAll(className('root-node')).data(d => [d.descendants()[0]], d => d.data.key);
+      let rootNodeEnter = rootNode.enter().append('g')
+          .attr('class', className('root-node'));
+      rootNodeEnter.append('circle')
+          .call(__rootNode);
+      rootNodeEnter.merge(rootNode)
+          .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
+
+      let node = selection.selectAll(that.nodeName()).data(d => d.descendants().slice(1), d => d.data.key);
+      let nodeEnter = node.enter().append('g')
+          .attr('class', that.nodeName(true)  + ' pie')
+          .call(__local)
+      nodeEnter.append('path')
+          .call(__nodeInit);
+      nodeEnter.append('text')
+          .call(__labelInit);
+      node.call(__local);
+      node = nodeEnter.merge(node)
+          .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
+      node.select('path')
+          .call(__node);
+      node.select('text')
+          .call(__label);
+    }
   }
-  
+
   this.renderRegion(d => {
     d.x = 0; d.y = 0;
   }, d => [d])
-  .call(__appendNodes);
+      .call(__appendNodes);
 }
 
 export default _mark;
