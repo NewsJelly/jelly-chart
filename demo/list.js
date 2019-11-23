@@ -222,6 +222,12 @@ module.exports = [
     path: 'bubble-xy-heatmap',
     title: 'Bubble XY Heatmap'
   },
+  // Pivot table
+  {
+    category: 'Pivot Table',
+    path: 'pivot-table',
+    title: 'Pivot Table'
+  },
   // spider
   {
     category: 'Spider',
