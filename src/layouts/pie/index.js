@@ -16,7 +16,7 @@ const _attrs = {
   padding: 0,
   size: size,
   shape: shapes[0],
-  maxValue: 100
+  name: 'Pie'
 };
 
 /**
