@@ -10,6 +10,7 @@ function _mark() {
   const labelFont = this.labelFont();
   const borderColor = this.borderColor();
   const headerFontColor = this.headerFontColor();
+  const headerBgColor = this.headerBgColor();
   const colorValue =  d => scale.color(d.value);
   const textValue = d => labelFormat(d.value);
 
@@ -39,7 +40,7 @@ function _mark() {
         .attr('width', width)
         .attr('height', height)
         .style('stroke', borderColor)
-        .style('fill', '#d9d9d9');
+        .style('fill', headerBgColor);
   }
 
   let __rowHeaderLabel = function (selection) {
@@ -64,7 +65,7 @@ function _mark() {
         .attr('width', width)
         .attr('height', height)
         .style('stroke', borderColor)
-        .style('fill', '#d9d9d9');
+        .style('fill', headerBgColor);
   }
 
   let __colHeaderLabel = function (selection) {
