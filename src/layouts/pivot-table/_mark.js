@@ -146,7 +146,7 @@ function _mark() {
     let dataGrid = selection.selectAll(that.nodeName(true)).data(d => d.children, d => d.data.key);
     dataGrid.exit().remove();
     let dataGridEnter = dataGrid.enter().append('g')
-        .attr('class', that.nodeName(true))
+        .attr('class', that.nodeName(true) + ' point')
         .call(__local);
     dataGridEnter.append('rect')
         .call(__dataGrid);
