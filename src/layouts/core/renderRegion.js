@@ -16,6 +16,7 @@ function renderRegion(posFunc, dataFunc = d => d, isFacet = false, suffix = '') 
   let region = this.__execs__.canvas.select(className('regions', true))
     .selectAll(this.regionName() + (isFacet ? '.facet' : '') + suffix)
     .data(dataFunc, (d,i) => (d.data && d.data.key) ? d.data.key : i);
+  const chartType = this.__attrs__.name;
   const regionName = this.regionName().split('.').join(' ').trim();
   const aggregated = this.aggregated();
   const regionClass = regionName + (isFacet ? ' facet' : '');
@@ -26,7 +27,7 @@ function renderRegion(posFunc, dataFunc = d => d, isFacet = false, suffix = '') 
     selection.each(function(xy) {
       if (!aggregated) select(this).attr('transform', 'translate(' + [xy.x, xy.y] + ')');
       else select(this).attr('transform', 'translate(0,0)');
-      if (_id && !isFacet) select(this).attr('clip-path', 'url(#' + _id+')');
+      if (_id && !isFacet && chartType !== 'Spider') select(this).attr('clip-path', 'url(#' + _id+')');
     })
   };
   let _region = function (selection) {
