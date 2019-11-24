@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/jelly-chart.svg)](https://badge.fury.io/js/jelly-chart)
+
 Jelly-Chart
 ===
 

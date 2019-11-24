@@ -143,6 +143,11 @@ module.exports = [
     path: 'donut-pie',
     title: 'Donut Pie Chart'
   },
+  {
+    category: 'Pie',
+    path: 'gauge',
+    title: 'Gauge Chart'
+  },
   //Scatter Plot
   {
     category: 'Scatter',
@@ -206,6 +211,12 @@ module.exports = [
     category: 'XY Heatmap',
     path: 'xy-heatmap',
     title: 'XY Heatmap'
+  },
+  // spider
+  {
+    category: 'Spider',
+    path: 'spider',
+    title: 'Spider Chart'
   },
   //marker-map
   {

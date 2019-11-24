@@ -13,10 +13,13 @@ import _region from './_region';
 import _tooltip from './_tooltip';
 
 const conditions = ['normal', 'count'];
+const shapes = ['heatmap', 'bubble-heatmap'];
 const _attrs = {
+  name: 'XYHeatmap',
   color: continousColorScheme,
   padding: 0.05,
-  reverse: false
+  reverse: false,
+  shape: shapes[0]
 };
 
 /**
@@ -44,6 +47,7 @@ class XYHeatmap extends mix(RectLinear).with(paddingMixin, sortMixin) {
 }
 
 XYHeatmap.prototype.reverse = attrFunc('reverse');
+XYHeatmap.prototype.shape = attrFunc('shape');
 
 export default genFunc(XYHeatmap);
 export {conditions};
