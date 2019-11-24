@@ -1,6 +1,5 @@
 function _tooltip() {
   if(!this.tooltip()) return;
-  // const field = this.__execs__.field;
 
   const innerSize = this.innerSize();
   const scale = this.__execs__.scale;
@@ -11,7 +10,6 @@ function _tooltip() {
 
   let value = function(d, text) {
     return {name: d.data.key, value: text};
-    // return {name: field.color.field(), value: text};
   }
   let offset = function(_, i) {
     let x = innerSize.width / (scale.x.domain().length + 1);
