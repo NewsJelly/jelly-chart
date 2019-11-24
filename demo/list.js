@@ -212,6 +212,11 @@ module.exports = [
     path: 'xy-heatmap',
     title: 'XY Heatmap'
   },
+  {
+    category: 'XY Heatmap',
+    path: 'bubble-xy-heatmap',
+    title: 'Bubble XY Heatmap'
+  },
   // spider
   {
     category: 'Spider',

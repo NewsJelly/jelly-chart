@@ -102,9 +102,13 @@ function _position() {
     if (absolute) {
       __pos(cur, pos);
     } else {
-      while(cur) {
+      if (target.name() === 'Pie' && target.__attrs__.shape === 'sunburst') {
         __pos(cur, pos);
-        cur = cur.parent;
+      } else {
+        while(cur) {
+          __pos(cur, pos);
+          cur = cur.parent;
+        }
       }
     }
     return pos;
