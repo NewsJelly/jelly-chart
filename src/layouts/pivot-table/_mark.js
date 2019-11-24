@@ -10,6 +10,8 @@ function _mark() {
   const labelFont = this.labelFont();
   const borderColor = this.borderColor();
   const headerFontColor = this.headerFontColor();
+  const headerBgColor = this.headerBgColor();
+  const headerFont = this.headerFont();
   const colorValue =  d => scale.color(d.value);
   const textValue = d => labelFormat(d.value);
 
@@ -39,7 +41,7 @@ function _mark() {
         .attr('width', width)
         .attr('height', height)
         .style('stroke', borderColor)
-        .style('fill', '#d9d9d9');
+        .style('fill', headerBgColor);
   }
 
   let __rowHeaderLabel = function (selection) {
@@ -50,8 +52,8 @@ function _mark() {
         .attr('y', y)
         .attr('dy', '.35em')
         .attr('fill', headerFontColor)
-        .style('font-size', '12px')
-        .style('font-weight', 'normal')
+        .style('font-size', headerFont && headerFont.hasOwnProperty('font-size') ? headerFont['font-size'] : '12px')
+        .style('font-weight', headerFont && headerFont.hasOwnProperty('font-weight') ? headerFont['font-weight'] : 'normal')
         .style('text-anchor', 'middle')
         .append('tspan')
         .text(d => d.data.key).each(wrap);
@@ -64,7 +66,7 @@ function _mark() {
         .attr('width', width)
         .attr('height', height)
         .style('stroke', borderColor)
-        .style('fill', '#d9d9d9');
+        .style('fill', headerBgColor);
   }
 
   let __colHeaderLabel = function (selection) {
@@ -75,8 +77,8 @@ function _mark() {
         .attr('y', y)
         .attr('dy', '.35em')
         .attr('fill', headerFontColor)
-        .style('font-size', '12px')
-        .style('font-weight', 'normal')
+        .style('font-size', headerFont && headerFont.hasOwnProperty('font-size') ? headerFont['font-size'] : '12px')
+        .style('font-weight', headerFont && headerFont.hasOwnProperty('font-weight') ? headerFont['font-weight'] : 'normal')
         .append('tspan')
         .text(d => d).each(wrap);
   }
