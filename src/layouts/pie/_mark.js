@@ -146,6 +146,152 @@ function _mark() {
       .style('fill', d => d.color)
       .transition(trans)
       .attrTween('d', tweenArc);
+    if (shape === 'sunburst') { // 선버스트 유형에서의 자식요소가 있는 노드 클릭이벤트 바인딩
+      selection
+        .filter(d => d.children)
+        .on('click', current => {
+          selection.data(current.parent);
+          parentNode = current.parent;
+          // 자식요소 데이터로 차트 리드로우
+          munged.each(node => {
+            node.target = {
+              x0: Math.max(0, Math.min(1, (node.x0 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+              x1: Math.max(0, Math.min(1, (node.x1 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+              y0: Math.max(0, node.y0 - current.depth),
+              y1: Math.max(0, node.y1 - current.depth)
+            }
+          });
+
+          let trans = transition().duration(600).delay(0);
+          let selectNode = selectAll(className('node', true));
+
+          // 차트요소 위치 재배열
+          selection
+            .style('fill', d => d.color)
+            .transition(trans)
+            .tween("data", d => {
+              const i = interpolate(d.current, d.target);
+              return t => {
+                return d.current = i(t);
+              }
+            })
+            .filter(function(d) {
+              return +this.getAttribute("fill-opacity") || d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0;
+            })
+            .attr('pointer-events', d => { // 자식 노드가 없으면 포인트 이벤트 없음
+              return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? 'all' : 'none';
+            })
+            .attr("fill-opacity", d => {
+              return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? (d.children ? 1 : 0.6) : 0
+            })
+            .attrTween('d', d => {
+              let i = interpolate(d.current, d.target);
+              return function(t) {
+                return sunburstGen(i(t));
+              };
+            });
+
+            // 툴팁 위치 리셋
+            selectNode.each(d => {
+              let mid = (d.target.x1 + d.target.x0) / 2;
+              let dx = Math.sin(mid) * (radius * d.target.y0 + (radius / 2));
+              let dy = -Math.cos(mid) * (radius * d.target.y0 + (radius / 2));
+              d.mid = mid;
+              d.x = innerSize.width / 2 + dx;
+              d.y = innerSize.height / 2 + dy;
+            });
+            that.resetTooltip();
+            _tooltip.call(that);
+
+          // 레이블 위치 조정
+          if (label) {
+            selectNode.selectAll('text')
+                .attr('x', d => {
+                  return Math.sin(d.mid) * (radius * d.target.y0 + (radius / 2));
+                })
+                .attr('y', d => {
+                  return -Math.cos(d.mid) * (radius * d.target.y0 + (radius / 2));
+                }).attr('visibility', d => { // 전체 노드 중 2번째 노드 까지만 레이블 표시
+              return d.target.y1 <= 3 && d.target.y0 >= 1 && (d.target.y1 - d.target.y0) * (d.target.x1 - d.target.x0) > 0.03 ? 'visible' : 'hidden'
+            });
+          }
+        });
+    }
+  }
+
+  let __rootNode = function (selection) {
+    selection
+      .attr('r', size.range[0])
+      .style('cursor', 'pointer')
+      .style('fill', '#fff')
+      .on('click', current => {
+        current = parentNode;
+        parentNode = parentNode.parent || current;
+        selection.data(current.parent);
+        // 부모요소 데이터로 차트 리드로우
+        munged.each(node => {
+          node.target = {
+            x0: Math.max(0, Math.min(1, (node.x0 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+            x1: Math.max(0, Math.min(1, (node.x1 - current.x0) / (current.x1 - current.x0))) * 2 * Math.PI,
+            y0: Math.max(0, node.y0 - current.depth),
+            y1: Math.max(0, node.y1 - current.depth)
+          }
+        });
+
+        let trans = transition().duration(600).delay(0);
+        let selectNode = selectAll(className('node', true));
+
+        // 차트요소 위치 재배열
+        selectNode.selectAll('path')
+          .style('fill', d => d.color)
+          .transition(trans)
+          .tween("data", d => {
+            const i = interpolate(d.current, d.target);
+            return t => {
+              return d.current = i(t);
+            }
+          })
+          .filter(function (d) {
+            return +this.getAttribute("fill-opacity") || d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0;
+          })
+          .attr('pointer-events', d => { // 자식 노드가 없으면 포인트 이벤트 없음
+            return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? 'all' : 'none';
+          })
+          .attr("fill-opacity", d => {
+            return d.target.y1 <= 3 && d.target.y0 >= 1 && d.target.x1 > d.target.x0 ? (d.children ? 1 : 0.6) : 0
+          })
+          .attrTween('d', d => {
+            let i = interpolate(d.current, d.target);
+            return function (t) {
+              return sunburstGen(i(t));
+            };
+          });
+
+          // 툴팁 위치 리셋
+          selectNode.each(d => {
+            let mid = (d.target.x1 + d.target.x0) / 2;
+            let dx = Math.sin(mid) * (radius * d.target.y0 + (radius / 2));
+            let dy = -Math.cos(mid) * (radius * d.target.y0 + (radius / 2));
+            d.mid = mid;
+            d.x = innerSize.width / 2 + dx;
+            d.y = innerSize.height / 2 + dy;
+          });
+          that.resetTooltip();
+          _tooltip.call(that);
+
+        // 레이블 위치 조정
+        if (label) {
+          selectNode.selectAll('text')
+              .attr('x', d => {
+                return Math.sin(d.mid) * (radius * d.target.y0 + (radius / 2));
+              })
+              .attr('y', d => {
+                return -Math.cos(d.mid) * (radius * d.target.y0 + (radius / 2));
+              }).attr('visibility', d => { // 전체 노드 중 2번째 노드 까지만 레이블 표시
+            return d.target.y1 <= 3 && d.target.y0 >= 1 && (d.target.y1 - d.target.y0) * (d.target.x1 - d.target.x0) > 0.03 ? 'visible' : 'hidden'
+          });
+        }
+      });
   }
 
 
@@ -235,6 +381,8 @@ function _mark() {
           .attr('class', className('root-node'));
         rootNodeEnter.merge(rootNode)
           .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
+        rootNodeEnter.append('circle')
+          .call(__rootNode);
 
         let node = selection.selectAll(that.nodeName()).data(d => d.descendants().slice(1), d => d.data.key);
         let nodeEnter = node.enter().append('g')
