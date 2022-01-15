@@ -48,7 +48,7 @@
     "karma-html": "^1.0.5",
     "karma-spec-reporter": "0.0.32",
     "karma-tap": "^4.0.0",
-    "marked": "^0.3.12",
+    "marked": "^4.0.10",
     "rimraf": "^2.6.2",
     "rollup": "^0.53.3",
     "rollup-plugin-babel": "^3.0.3",
