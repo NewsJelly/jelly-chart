@@ -9,7 +9,7 @@ import interval from '../../modules/interval';
 function thickness(axisSetting, scale, isHorizontal = true, isOrdinal = true) {
   let hidden = this.__execs__.hidden;
   if (!(axisSetting && axisSetting.showTicks) || (axisSetting && axisSetting.autoTickFormat)) return;
-  
+
   let font = axisSetting.font || defaultFont;
   let tickFormat = axisSetting.tickFormat || (isOrdinal ? tickFormatForOrdinal : (axisSetting.autoTickFormat && tickFormatForContinious(scale.domain())));
   let ticks = isOrdinal ? scale.domain() : scale.ticks();
@@ -34,19 +34,19 @@ function thickness(axisSetting, scale, isHorizontal = true, isOrdinal = true) {
     if (w > max) max = w;
     if (w > step) isOver = true;
   });
-  max = max+ offsetThickness;
-  
+  // max = max+ offsetThickness;
+
   if (axisSetting.tickPadding) max += axisSetting.tickPadding;
   if (axisSetting.showTitle) max += offsetThickness;
-  if (axisSetting.thickness) max += offsetThickness;
-  
+  // if (axisSetting.thickness) max += offsetThickness;
+
   if (axisSetting.defaultThickness) {
     if (isOver && max > axisSetting.defaultThickness) {
       axisSetting.thickness = max;
     } else if (axisSetting.defaultThickness < axisSetting.thickness) {
       axisSetting.thickness = axisSetting.defaultThickness;
-    } 
-  } 
+    }
+  }
 
   if (axisSetting.target === 'x') {
     axisSetting.thickness = Math.min(axisSetting.thickness, this.height() * 0.5);

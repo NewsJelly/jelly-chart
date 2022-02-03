@@ -41,6 +41,16 @@ const data = this.data();
     scale.color = this.updateColorScale(xDomain, keep); //FIXME: need to update current colors
   }
   yDomain = domainY(field.y, munged, level, nested, aggregated, stacked, this.showDiff(), label, arrowOnMark);
+  if (yDomain[0]*yDomain[1] < 0 && diffArrow) {
+      if (Math.abs(yDomain[0] + yDomain[1]) > (Math.abs(yDomain[0]) + Math.abs(yDomain[1]))/3) {
+          let isPlus = (yDomain[0] + yDomain[1] > 0) ? 1 : 0;
+          if ((isPlus && diffArrow['value'] < 0) || (!isPlus && diffArrow['value'] > 0)){
+              console.log(yDomain[isPlus ? 0 : 1]);
+              console.log(yDomain[isPlus]/(2*yDomain[isPlus ? 0 : 1]));
+            yDomain[isPlus ? 0 : 1] *= Math.abs(yDomain[isPlus])/(2*Math.abs(yDomain[isPlus ? 0 : 1]));
+        }
+      }
+  }
 
   if (isNestedAndSortByValue) {
     xDomain = field.x.domain(this.sortByValue(), null, isNestedAndSortByValue);

@@ -21,7 +21,7 @@
     "test": "karma start karma.conf.js --single-run && eslint src",
     "start": "http-server -c-1 | rollup -c --watch",
     "build": "rimraf dist && rollup -c && uglifyjs dist/jelly.js --source-map -m -o dist/jelly.min.js",
-    "prepublish": "npm run test && npm run build",
+    "prepublish": "npm run build && npm run test",
     "jsdoc": "rimraf doc && mkdir doc && jsdoc -c .jsdoc.json"
   },
   "keywords": [
@@ -58,6 +58,7 @@
     "watchify": "^3.11.0"
   },
   "dependencies": {
-    "d3": "^4.9.1"
+    "d3": "^4.9.1",
+    "rollup-plugin-polyfill": "^2.0.1"
   }
 }

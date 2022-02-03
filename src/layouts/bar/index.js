@@ -172,14 +172,35 @@ function domainY(yField, munged, level = 0, nested = false, aggregated = false, 
     if (yDomain[0] === 0) yDomain[1] *= 1.25;
     else if (yDomain[1] === 0) yDomain[0] *= 1.25;
   }
-  if (label) {
-    if (yDomain[0] === 0) yDomain[1] *= 1.1;
-    else if (yDomain[1] === 0) yDomain[0] *= 1.1;
-  }
+
   if (arrowOnMark) {
     if (yDomain[0] === 0) yDomain[1] *= 1.25;
     else if (yDomain[1] === 0) yDomain[0] *= 1.25;
+    else {
+        yDomain[1] *= 1.5;
+        // if (yDomain[0] + yDomain[1] > 0){
+        //     yDomain[0] -= (0.25*yDomain[1]);
+        //     yDomain[1] *= 1.5;
+        // } else {
+        //     yDomain[0] *= 1.5;
+        //     yDomain[1] += -(0.25*yDomain[0]);
+        // }
+    }
   }
+  if (label) {
+    if (yDomain[0] === 0) yDomain[1] *= 1.1;
+    else if (yDomain[1] === 0) yDomain[0] *= 1.1;
+    else {
+        if (yDomain[0] + yDomain[1] > 0){
+            yDomain[0] -= (0.15*yDomain[1]);
+            yDomain[1] *= 1.2;
+        } else {
+            yDomain[0] *= 1.2;
+            yDomain[1] += -(0.15*yDomain[0]);
+        }
+    }
+  }
+  console.log(yDomain);
  return yDomain;
 }
 
@@ -187,6 +208,7 @@ Bar.prototype.unit = attrFunc('unit');
 Bar.prototype.title = attrFunc('title');
 Bar.prototype.diffArrow = attrFunc("diffArrow");
 Bar.prototype.arrowOnMark = attrFunc("arrowOnMark");
+Bar.prototype.arrowWidthFactor = attrFunc("arrowWidthFactor");
 // Bar.prototype.textWithLabel = attrFunc("textWithLabel");
 
 export default genFunc(Bar);

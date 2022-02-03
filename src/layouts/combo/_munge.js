@@ -3,7 +3,7 @@ import {ConditionException} from '../../modules/error';
 import dimensionField from '../../modules/dimensionField';
 import measureField from '../../modules/measureField';
 
-function _munge() { 
+function _munge() {
   let conditionFunc = function (dimensions, measures) {
     const field = this.__execs__.field;
     if (dimensions.length === 1 && measures.length === 2) {
@@ -23,7 +23,7 @@ function _munge() {
 
   aggregate (reverse = false, rollup = true, preFormat = false, useHierarchy = true, sum = true, dimensions, measures) {
   */
-  
+
   this.__execs__.munged = this.aggregate();
 }
 

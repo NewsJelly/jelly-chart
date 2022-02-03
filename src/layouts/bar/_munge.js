@@ -37,14 +37,20 @@ function _munge() {
 
     const diffArrow = this.diffArrow();
     const data = this.data();
-    const colorDomin = this.colorDomain();
+    const colorDomain = this.colorDomain();
+    const color = this.color();
     if (diffArrow) {
         var diff = {};
-        diff[field.x.field()] = "diff-arrow";
+        diff[field.x.field()] = "";
         data.splice(diffArrow["pos"], 0, diff);
         this.data(data);
-        colorDomin.splice(diffArrow["pos"], 0, "diff-arrow");
-        this.colorDomain(colorDomin);
+        if(colorDomain){
+            colorDomain.splice(diffArrow["pos"], 0, "");
+            this.colorDomain(colorDomain);
+        } else {
+            color.splice(diffArrow["pos"], 0, "");
+            this.color(color);
+        }
     }
 
   if (this.aggregated()) {

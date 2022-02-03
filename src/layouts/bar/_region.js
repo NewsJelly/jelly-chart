@@ -17,8 +17,9 @@ function _region() {
     let x = xy[0];
     let y = xy[1];
     d.x = x; d.y = y;
+    // console.log(d);
   };
-  
+
   this.renderRegion(__regionLocal, d => d, isFacet);
 }
 

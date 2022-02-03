@@ -9,6 +9,7 @@ function _mark() {
   const size = this.size();
         const font = this.font();
         const textWithLabel = this.textWithLabel();
+        const showType = this.showType();
   const arcGen = arc().innerRadius(size.range[0])
     .outerRadius(size.range[1])
     .startAngle(d => d.startAngle)
@@ -29,8 +30,15 @@ function _mark() {
       d.y = innerSize.height/2 + d.dy;
       d.color = scale.color(d.key);
         d.labeltext = textWithLabel ? d.data.key : null;
-        d.percentage = (d.endAngle - d.startAngle) * 100 / (Math.PI * 2);
-      d.text = labelFormat(d.percentage)+'%';
+        d.percentage = labelFormat((d.endAngle - d.startAngle) * 100 / (Math.PI * 2))+'%';
+        d.text = labelFormat(d.value);
+      // if(showType === 'all'){
+      //     d.text = labelFormat(d.value) + '(' + labelFormat(d.percentage)+'%)';
+      // } else if(showType === 'percent'){
+      //     d.text = labelFormat(d.percentage)+'%';
+      // } else {
+      //     d.text = labelFormat(d.value);
+      // }
     })
   }
 
@@ -49,7 +57,7 @@ function _mark() {
     selection.each(function(d) {
       select(this).attr('x', d.dx)
         .attr('dy', '.35em')
-        .attr('y', d.dy + font['font-size']/2)
+        .attr('y', d.dy - font['font-size'])
         .attr('text-anchor', 'middle')
         .style('pointer-events', 'none')
         .text(d.text);
@@ -66,12 +74,33 @@ function _mark() {
       that.styleFont(select(this));
     })
   }
+  let __labelPercentInit = function (selection) {
+    selection.each(function(d) {
+      select(this).attr('x', d.dx)
+        .attr('dy', '.35em')
+        .attr('y', d.dy + font['font-size'])
+        .attr('text-anchor', 'middle')
+        .style('pointer-events', 'none')
+        .text(d.percentage);
+      that.styleFont(select(this));
+    })
+  }
+
+  let __labelPercent = function (selection) {
+    selection.each(function(d) {
+      select(this).style('visibility',label ? 'visible' : 'hidden')
+        .text(d.percentage)
+        .transition(trans).attr('x', d.dx)
+        .attr('y', d.dy);
+      that.styleFont(select(this));
+    })
+  }
 
   let __labelTextInit = function (selection) {
     selection.each(function(d) {
       select(this).attr('x', d.dx)
         .attr('dy', '.35em')
-        .attr('y', d.dy - font['font-size']/2)
+        .attr('y', d.dy)
         .attr('text-anchor', 'middle')
         .style('pointer-events', 'none')
         .text(d.labeltext);
@@ -101,8 +130,14 @@ function _mark() {
     if(textWithLabel){
         nodeEnter.append('text').attr('class', that.nodeName(true) + " labeltext").call(__labelTextInit)
     }
-    nodeEnter.append('text').attr('class', that.nodeName(true) + " label")
-      .call(__labelInit);
+    if (showType === 'all' || showType === 'value'){
+        nodeEnter.append('text').attr('class', that.nodeName(true) + " label")
+          .call(__labelInit);
+    }
+    if (showType === 'all' || showType === 'percent'){
+        nodeEnter.append('text').attr('class', that.nodeName(true) + " labelpercent")
+          .call(__labelPercentInit);
+    }
     node.call(__local);
     node = nodeEnter.merge(node)
       .attr('transform', 'translate(' + [innerSize.width/2, innerSize.height/2] +')');
@@ -111,8 +146,14 @@ function _mark() {
       if(textWithLabel){
           node.select("labeltext").call(__labelText)
       }
-    node.select('label')
-      .call(__label);
+      if (showType === 'all' || showType === 'value'){
+          node.select('label')
+            .call(__label);
+      }
+      if (showType === 'all' || showType === 'percent'){
+          node.select('labelpercent')
+            .call(__labelPercent);
+      }
     that.__execs__.nodes = node;
   }
 

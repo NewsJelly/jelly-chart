@@ -18,7 +18,7 @@ function appendClipPath(selection, innerSize, margin = 0, transition = null) {
   if (defs.empty()) {
     defs = selection.append('defs')
       .attr('class', className('canvas-g-defs'))
-      .datum(innerSize)  
+      .datum(innerSize)
     defs.append('clipPath')
       .attr('id', () => getUniqueId('canvas-g-'))
       .attr('class', className('canvas-g-clip-path'))
@@ -26,7 +26,7 @@ function appendClipPath(selection, innerSize, margin = 0, transition = null) {
       .attr('class', className('canvas-g-clip-path-rect'))
       .call(pos);
   }
-  
+
   let rect = defs.select(className('canvas-g-clip-path-rect', true));
   if (transition) rect = rect.transition().duration(transition.duration).delay(transition.delay);
   rect.call(pos);
@@ -64,11 +64,11 @@ function renderCanvas (margin = 0) {
   let innerSize= this.innerSize();
   if(typeof selector !== 'string') { //if is DOM
     appendStringContainer(selector, offset, this);
-    if (this.__execs__.canvas) { //if has a canvas, return 
+    if (this.__execs__.canvas) { //if has a canvas, return
       this.__execs__.canvas.datum(this.__execs__.munged);
       this.__execs__.canvas.call(appendClipPath, innerSize, margin, this.transition());
       return;
-    } 
+    }
   }
 
   let svg;
@@ -102,9 +102,12 @@ function renderCanvas (margin = 0) {
   }
   canvas.select(className('background', true))
     .attr('width', innerSize.width).attr('height', innerSize.height);
+    // console.log('innerSize', innerSize);
+    // console.log('margin', margin);
+    // console.log('offset', offset);
   canvas.datum(this.__execs__.munged)
     .call(appendClipPath, innerSize, margin, this.transition())
-  
+
   return this;
 }
 

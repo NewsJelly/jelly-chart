@@ -1,0 +1,7 @@
+@include font-face("Noto Sans Korean", $noto-sans-korean-path + $font-name + "-Thin", 100);
+@include font-face("Noto Sans Korean", $noto-sans-korean-path + $font-name + "-Light", 200);
+@include font-face("Noto Sans Korean", $noto-sans-korean-path + $font-name + "-DemiLight", 300);
+@include font-face("Noto Sans Korean", $noto-sans-korean-path + $font-name + "-Regular", 400);
+@include font-face("Noto Sans Korean", $noto-sans-korean-path + $font-name + "-Medium", 500);
+@include font-face("Noto Sans Korean", $noto-sans-korean-path + $font-name + "-Black", 700);
+@include font-face("Noto Sans Korean", $noto-sans-korean-path + $font-name + "-Bold", 900);

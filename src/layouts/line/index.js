@@ -240,11 +240,24 @@ Line.prototype.individualScale = attrFunc('individualScale');
 Line.prototype.areaGradient = attrFunc('areaGradient');
 Line.prototype.diffWithArrow = attrFunc("diffWithArrow");
 
-function domainY(fieldY, munged, level=0, aggregated=false, stacked=false) {
-  return fieldY.munged(munged).level(level).aggregated(aggregated).domain(0, stacked);
+function domainY(fieldY, munged, level=0, aggregated=false, stacked=false, label = false) {
+  const yDomain =  fieldY.munged(munged)
+      .level(level)
+      .aggregated(aggregated)
+      .domain(0, stacked);
+  if (label) {
+    if (yDomain[0] === 0) yDomain[1] *= 1.1;
+    else if (yDomain[1] === 0) yDomain[0] *= 1.1;
+    else {
+        yDomain[0] *= yDomain[0] > 0 ? 0.9 : 1.1;
+        yDomain[1] *= yDomain[1] > 0 ? 1.1 : 0.9;
+    }
+  }
+  return yDomain;
 }
 
 Line.prototype.unit = attrFunc('unit');
 Line.prototype.title = attrFunc('title');
+Line.prototype.dimension12 = attrFunc('dimension12');
 export default genFunc(Line);
 export {conditions, domainY, shapes};

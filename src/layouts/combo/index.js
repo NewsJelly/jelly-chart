@@ -3,7 +3,7 @@ import seriesMixin from '../seriesMixin';
 import sortMixin from '../sortMixin/';
 import RectLinear from '../rectLinear/';
 import {mixedMeasure} from '../../modules/measureField';
-import {genFunc, mix} from '../../modules/util';
+import {attrFunc, genFunc, mix} from '../../modules/util';
 import _axis from './_axis';
 import _munge from './_munge';
 import _domain from './_domain';
@@ -14,7 +14,7 @@ import _facet from './_facet';
 import _tooltip from './_tooltip';
 
 const size = {range: [2, 2], scale: 'linear', reverse: false};
-const conditions = ['normal'];
+const conditions = ['normal', 'count', 'mixed'];
 const _attrs = {
   padding: 0.05,
   point: false,
@@ -27,7 +27,7 @@ const _attrs = {
  * renders a combo chart, having both a bar and a line chart.
  * @class Combo
  * @augments Core
- * @augments RectLinear 
+ * @augments RectLinear
  * @augments PaddingMixin
  * @augments SortMixin
  */
@@ -50,7 +50,7 @@ class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin) {
   measureName() {
     let measures = this.measures();
     let yField;
-    if (this.condition() === conditions[2]) yField = mixedMeasure.field; 
+    if (this.condition() === conditions[2]) yField = mixedMeasure.field;
     else if (this.aggregated() && measures[0].field === mixedMeasure.field) yField = measures[0].field;
     else yField = measures[0].field + '-' + measures[0].op;
     return yField;
@@ -60,6 +60,8 @@ class Combo extends mix(RectLinear).with(paddingMixin, seriesMixin, sortMixin) {
     return this.condition() === conditions[1];
   }
 }
+Combo.prototype.barMeasure = attrFunc("barMeasure");
+Combo.prototype.lineMeasure = attrFunc("lineMeasure");
 
 export default genFunc(Combo);
 export {conditions};

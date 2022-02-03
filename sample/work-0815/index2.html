@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- Load D3 and jelly-chart separately -->
+    <!-- Load D3 first-->
+    <script src="d3.v4.min.js"></script>
+    <!-- Load jelly-chart after D3 -->
+    <!-- <script src="jelly.min.js"></script> -->
+    <script src='../../dist/jelly.js'></script>
+    <!-- <script src='../../dist/jelly.min.js'></script> -->
+    <style>
+        @import url("css/noto-sans-korean.css");
+    </style>
+</head>
+
+<body>
+    <div id="chart-combo"  style="background: #2e3451;float:left;">
+
+    </div>
+    <script type="text/javascript">
+        jelly.combo()
+            .container('#chart-combo')
+            // 차트 사이즈
+            .width(1000)
+            .height(600)
+            .data([
+                //금융지주총자산
+                {
+                    date: "2018-01",
+                    "농협": 381,
+                    "신한": 413,
+                },
+                {
+                    date: "2018-02",
+                    "농협": 400,
+                    "신한": 413,
+                },
+                {
+                    date: "2018-03",
+                    "농협": 500,
+                    "신한": 600,
+                },
+                {
+                    date: "2018-04",
+                    "농협": 600,
+                    "신한": 413,
+                },
+                {
+                    date: "2018-05",
+                    "농협": 1200,
+                    "신한": 413,
+                },
+            ])
+            // .dimensions({
+            //     field: 'date',
+            //     format: '%Y-%m',
+            //     interval: 'month',
+            //     customDomain: [new Date(2017, 06), new Date(2018, 05)]
+            // }) //x축
+            .dimension('date')
+            .measures(['농협', '신한']) //y축
+            .barMeasure('농협')
+            .lineMeasure('신한')
+            //축 설정
+            .axis({
+                target: 'x',
+                showTitle: false,
+                domainColor: '#ffffff00',
+                showAxisLine: false,
+                font: {
+                    'font-size': 24,
+                    'font-style': 'normal',
+                    'font-family': 'Noto Sans KR',
+                    'font-weight': 'bold'
+                }
+            })
+            .axis({
+                target: 'y',
+                showTitle: false,
+                domainColor: '#ffffff00',
+                showAxisLine: false,
+                font: {
+                    'font-size': 24,
+                    'font-style': 'normal',
+                    'font-family': 'Noto Sans KR',
+                    'font-weight': 'bold'
+                }
+            })
+            // 그리드 설정
+            .grid(true)
+
+            // 틀팁 제거
+            .tooltip(false)
+
+            // 막대 상단 수치 표시
+            .label(true)
+
+            // 막대간격
+            .padding(0.4)
+            .color(['#0a9dc3','#2786cf','#6d5bce'])
+            // 표시 폰트
+            .font({
+                'font-size': 24,
+                'font-style': 'normal',
+                'font-family': 'Noto Sans KR',
+                'font-weight': '600',
+                'fill': 'white'
+            })
+            .render();
+    </script>
+
+    <!-- <div id="chart-diff-arrow" style="background: #2e3451;"></div>
+    <script type="text/javascript">
+        var bar = jelly.bar();
+        bar.container('#chart-diff-arrow')
+            // 차트사이즈
+            .width(460)
+            .height(500)
+
+            // 데이터 설정
+            .data([
+                // {
+                //     name: '전월평균',
+                //     value: -2782
+                // },
+                // {
+                //     name: '전일',
+                //     value: '100'
+                // },
+                // {
+                //     name: '당일',
+                //     value: -3854
+                // }
+                {
+                    name: '전월평균',
+                    value: -200
+                },
+                {
+                    name: '전일',
+                    value: '10'
+                },
+                {
+                    name: '당일',
+                    value: -200
+                }
+
+            ])
+            .dimensions(['name'])
+            .measures(['value'])
+            // 상승 하락 표시 순서 지정
+            .diffArrow({
+                pos: 2,
+                value: -100
+            })
+            .downArrowPath('img/arrow.svg')
+            .upArrowPath('img/arrow_up.svg')
+            .arrowWidthFactor(1.5)
+                        //축 설정
+            .axis({
+                target: 'x',
+                title: 'Axis x',
+                showTitle: false,
+                tickSize: 10,
+                font: {
+                    'font-size': 24,
+                    'font-style': 'normal',
+                    'font-family': 'Noto Sans KR',
+                    'font-weight': 'bold',
+                    'fill' : '#C6CBCE'
+                },
+                // thickness: 30 // 축 영역 크기 지정
+            })
+            .axis({
+                target: 'y',
+                showticks: false,
+                showTitle: false,
+                domainColor: '#ffffff00',
+                font: {
+                    'font-size': 18,
+                    'font-style': 'normal',
+                    'font-family': 'Noto Sans KR',
+                    'font-weight': 'bold',
+                    'fill' : '#C6CBCE'
+                },
+                showAxisLine: false,
+                // thickness: 40   // 축 영역 크기 지정
+            })
+            //막대 독립 설정
+            .mono(false)
+
+            // 그리드 설정
+            .grid(true)
+
+            // 툴팁 제거
+            .tooltip(false)
+
+            // 막대 상단 수치 표시
+            .label(true)
+
+            // 막대 간격 조정
+            .padding(0.4)
+
+
+            //우상단 단위 표시
+            .unit({text:'(단위:억원)', pos:[0, 0]})
+
+            //좌상단 타이틀 표
+            // .title({text: '430만원 상승', pos: [0, 0]})
+            // 차트 영역 마진
+            // .margin({
+            //     bottom: 50,
+            //     left: 70,
+            //     top: 150
+            // })
+
+            // x 축 폰트 설정
+            .font({
+                'font-size': 24,
+                'font-style': 'normal',
+                'font-family': 'Noto Sans KR',
+                'font-weight': 'bold'
+            })
+            // .noAxisOffset(true)
+            // .zeroOffset(true)
+            // .autoResize(true)
+
+            // 막대별 컬러
+            // .colorDomain([{
+            //         key: '전월평균',
+            //         color: '#0a9dc3'
+            //     },
+            //     {
+            //         key: '전일',
+            //         color: '#2786cf'
+            //     },
+            //     {
+            //         key: '당일',
+            //         color: '#6d5bce'
+            //     }
+            // ])
+            .color(['#0a9dc3','#2786cf','#6d5bce'])
+        bar.render();
+    </script> -->
+    <!-- <div id="chart1" style="background: #2e3451;"></div>
+    <script type="text/javascript">
+        var bar = jelly.bar();
+        bar.container('#chart1') //차트 DOM 지정
+            // 차트 사이즈
+            .width(900)
+            .height(900)
+
+            //데이터 입력
+            .data([{
+                    name: '전월평균',
+                    value: -2782
+                },
+                {
+                    name: '전일',
+                    value: '-3424'
+                },
+                {
+                    name: '당일',
+                    value: -3854
+                }
+            ])
+            .dimensions(['name']) //x축
+            .measures(['value']) //y축
+            //축 설정
+            .axis({
+                target: 'x',
+                title: 'Axis x',
+                showTitle: false,
+                tickSize: 10,
+                font: {
+                    'font-size': 24,
+                    'font-style': 'normal',
+                    'font-family': 'Noto Sans KR',
+                    'font-weight': 'bold',
+                    'fill' : '#C6CBCE'
+                }
+            })
+            .axis({
+                target: 'y',
+                showticks: false,
+                showTitle: false,
+                domainColor: '#ffffff00',
+                font: {
+                    'font-size': 18,
+                    'font-style': 'normal',
+                    'font-family': 'Noto Sans KR',
+                    'font-weight': 'bold',
+                    'fill' : '#C6CBCE'
+                },
+                showAxisLine: false
+            })
+
+            // 막대 독립 설정
+            .mono(false)
+
+            // 그리드 설정
+            .grid(true)
+
+            // 틀팁 제거
+            .tooltip(false)
+
+            // 막대 상단 수치 표시
+            .label(true)
+
+            // 막대간격
+            .padding(0.4)
+
+            //우상단 단위 표시
+            .unit({text:'(단위:억원)', pos:[0, 0]})
+
+            //좌상단 타이틀 표
+            .title({text: '430만원 상승', pos: [0, 0]})
+            // 상승 하락 표시 순서 지정
+            .diffArrow({
+                pos: 2,
+                value: 100
+            })
+
+            // 차트 영역 마진
+            .margin({
+                bottom: 50,
+                left: 70,
+                top: 150
+            })
+
+            // x축 폰트
+            .font({
+                'font-size': 24,
+                'font-style': 'normal',
+                'font-family': 'Noto Sans KR',
+                'font-weight': 'bold',
+                'fill' : '#C6CBCE'
+            })
+
+            // 막대별 컬러
+            .colorDomain([{
+                    key: '전월평균',
+                    color: '#0a9dc3'
+                },
+                {
+                    key: '전일',
+                    color: '#2786cf'
+                },
+                {
+                    key: '당일',
+                    color: '#6d5bce'
+                }
+            ])
+        bar.render();
+    </script> -->
+
+</body>
+
+</html>

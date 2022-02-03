@@ -68,6 +68,7 @@ class Pie extends mix(Core).with(paddingMixin, sortMixin) {
 Pie.prototype.unit = attrFunc("unit");
 Pie.prototype.title = attrFunc("title");
 Pie.prototype.textWithLabel = attrFunc("textWithLabel");
+Pie.prototype.showType = attrFunc("showType");
 
 export default genFunc(Pie);
 export {conditions};

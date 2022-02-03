@@ -52,9 +52,11 @@ function _mark() {
         if (stream) {
           d.x0 = that.tempPosForOrdinalScale(d.data.key, scale.x);
         }
-        y =  (vertical ? upward: !upward) ? scale.y(yValue) : (hasZeroPoint ? scale.y(0) : scale.y.range()[0]);
+        // y =  (vertical ? upward: !upward) ? scale.y(yValue) : (hasZeroPoint ? scale.y(0) : scale.y.range()[0]);
+        y =  (vertical ? upward: !upward) ? scale.y(yValue) : scale.y(0);
         w = scale.x.bandwidth();
-        h = Math.abs((hasZeroPoint ?  scale.y(0): scale.y.range()[0]) - scale.y(yValue));
+        // h = Math.abs((hasZeroPoint ?  scale.y(0): scale.y.range()[0]) - scale.y(yValue));
+        h = Math.abs(scale.y(0) - scale.y(yValue));
       }
       let result = vertical ? {x,y : y + (upward ? 0 : 0.5),w,h,upward} : {x:y + (upward ? 0.5 : 0), y:x, w:h, h: w,upward};
       result.key = tFormat(d.data.key);
@@ -64,6 +66,7 @@ function _mark() {
       for (let k in result) {
         if (result.hasOwnProperty(k)) d[k] = result[k];
       }
+      // console.log(d);
     });
   }
   let __barInit = function(selection, vertical=true) {
@@ -94,15 +97,17 @@ function _mark() {
       if (vertical) {
         selection.attr('x', (d.x0 || d.x) + d.w/2).style('text-anchor', 'middle')
         if (stacked) selection.attr('y', d.y + d.h).attr('dy', '1em');
-        else if(d.upward) selection.attr('y', d.y + d.h).attr('dy', '-.25em');
-        else selection.attr('y', d.y).attr('dy', '1em');
+        else if (d.key !== "") {
+            if(d.upward) selection.attr('y', d.y + d.h).attr('dy', '-.25em');
+            else selection.attr('y', d.y).attr('dy', '1em');
+        }
       } else {
         selection.attr('y', (d.x0 || d.y) + d.h/2).attr('dy', '.35em');
         if (stacked) selection.attr('x', d.x + d.w/2).attr('text-anchor', 'middle');
         else if(d.upward) selection.attr('x', d.x).attr('dx', '.5em');
         else selection.attr('x', d.x + d.w).attr('text-anchor', 'end').attr('dx', '-.1em')
       }
-        if (d.key === "diff-arrow") {
+        if (d.key === "") {
             selection.style("visibility", "hidden")
         }
       that.styleFont(selection);
@@ -123,15 +128,16 @@ function _mark() {
     selection.each(function(d) {
       let selection = select(this);
       if (vertical) {
-        selection.transition(trans).attr('y', d.upward ? d.y : d.y + d.h);
+        if (d.key !== "") selection.transition(trans).attr('y', d.upward ? d.y : d.y + d.h);
       } else {
         if (stacked) selection.transition(trans).attr('x', d.x + d.w/2).attr('text-anchor', 'middle');
         else selection.transition(trans).attr('x', d.upward ? d.x + d.w : d.x);
       }
       selection.text(d.text)
-        .style('fill', stacked ? '#fff' : d.color)
+        // .style('fill', stacked ? '#fff' : d.color)
+        .style('fill', '#fff')
         .style('visibility', label && (!diffColor || (diffColor && selection.classed(className('diff')))) ? 'visible' : 'hidden');
-        if (d.key === "diff-arrow") {
+        if (d.key === "") {
            selection.style("visibility", selection.classed(className("diff-arrow")) ? "visible" : "hidden")
        }
     })
@@ -245,6 +251,8 @@ function _mark() {
   if (diffArrow) {
     let last;
     let strokeWidth = 1;
+    let padding = this.padding();
+    let arrowWidthFactor = this.arrowWidthFactor();
     bar.each(function(d, i, arr) {
         if (i === diffArrow["pos"]) {
             d.neighbor = last;
@@ -252,9 +260,30 @@ function _mark() {
                 .attr("class", className("diff-arrow"));
             select(this).append("text")
                 .attr("class", className("diff-arrow"));
-            d.y = last.y - 100;
-            d.h = 100;
+
+            d.w = scale.x.bandwidth();
+            if (arrowWidthFactor) d.w *= arrowWidthFactor;
+            d.h = d.w*150/120;
+
+            if (hasZeroPoint) {
+                d.y = diffArrow["value"] > 0 ? scale.y(0) - d.h : scale.y(0);
+            } else if (scale.y.domain()[0] === 0 ){
+                d.y = Math.abs(scale.y(0) - d.h);
+            } else {
+                d.y = scale.y(0);
+            }
+            let text_y;
+            if (hasZeroPoint) {
+                text_y = diffArrow["value"] > 0 ? d.y - 10 : d.y + d.h + 30;
+            } else if (scale.y.domain()[0] === 0 ){
+                text_y = d.y - 10;
+            } else {
+                text_y = d.y + d.h + 30;
+            }
+            // d.y = last.y + last.h - 100;
+            d.x = (d.x + scale.x.bandwidth()/2) - d.w/2;
             d.text = labelFormat(diffArrow["value"], true);
+            // console.log(d);
             select(this).select("text" + className("bar", true))
                 .each(function(e) {
                 var i = select(this).transition(trans);
@@ -264,12 +293,13 @@ function _mark() {
             select(this).select("image" + className("diff-arrow", true))
                 .attr("x", d.x)
                 .attr("y", d.y)
-                .attr("width", vertical ? d.w - strokeWidth : 0)
-                .attr("height", vertical ? 0 : d.h - strokeWidth)
+                .attr("width", vertical ? d.w : 0)
+                .attr("height", vertical ? 0 : d.h)
                 .attr("xlink:href", diffArrow["value"] < 0 ? downArrow : upArrow)
                 .call(__bar).style("stroke", "#40bbfb");
             select(this).select("text" + className("diff-arrow", true))
                 .datum(d)
+                .attr("y", text_y)
                 .call(__labelInit, vertical)
                 .call(__label, vertical)
                 .style("fill", "#40bbfb")
@@ -291,14 +321,14 @@ if (arrowOnMark) {
             upward: true
         };
         diff.text = labelFormat(diff.value, true);
-        diff.x = d.x + 40;
-        diff.w = d.w - 80;
-        diff.h = 60;
-        diff.y = 50;
+        diff.w = scale.x.bandwidth()*0.5;
+        diff.x = d.x + diff.w/2;
+        diff.h = diff.w*150/120;
+        diff.y = 30;
         select(this).select("text" + className("markarrow", true))
             .each(function(e) {
                 let selection = select(this).transition(trans);
-                selection.attr("y", d.y - 100)
+                selection.attr("y", e.y - 100)
             });
         select(this).select("rect" + className("bar", true))
             .transition(trans);

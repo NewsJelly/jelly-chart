@@ -1,3 +1,6 @@
+import {
+    shapes
+} from './';
 function _region() {
   const aggregated = this.aggregated();
   const canvas = this.__execs__.canvas;
@@ -6,6 +9,8 @@ function _region() {
   const stacked = this.stacked();
   const facet = this.facet();
   const isFacet = this.isFacet();
+  const isArea = this.shape() === shapes[1];
+  const areaGradient = isArea && this.areaGradient();
   const color = this.color();
   let __regionLocal = d => {
     if (aggregated) return;
@@ -46,7 +51,7 @@ function _region() {
     let multiTooltipG = canvas.select('.multi-tooltip-g');
     if (multiTooltipG.empty()) multiTooltipG = canvas.append('g').attr('class', 'multi-tooltip-g');
   }
-  
+
   this.renderRegion(__regionLocal, d => {
       let target = stacked ? d.slice().reverse() : d;
       return target;

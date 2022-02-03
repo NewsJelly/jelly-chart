@@ -27,22 +27,23 @@ function _domain() {
   const isMixed = this.isMixed();
   const individualScale = this.isIndividualScale();
   const viewInterval = this.viewInterval();
+  const label = this.label();
   let yDomain, xDomain;
   let regionDomain;
-  
+
   scale.y = scaleLinear();
   if (nested) {
-    regionDomain = field.region.level(0).munged(munged).domain(); 
+    regionDomain = field.region.level(0).munged(munged).domain();
     scale.color = this.updateColorScale(regionDomain, keep);
   }
 
-  if (this.isFacet()) { 
+  if (this.isFacet()) {
     scale.region  = scaleBand().domain(regionDomain).padding(this.regionPadding());
     return;
-  } 
-  
+  }
+
   xDomain = field.x.munged(munged).level(level).domain();
-  yDomain = domainY(field.y, munged, level, aggregated, stacked);
+  yDomain = domainY(field.y, munged, level, aggregated, stacked, label);
   //use scaleLinear when domain is number
   let isNumberDomain = true;
   for (let i = 0; i < xDomain.length; i++) {
@@ -54,13 +55,12 @@ function _domain() {
       xDomain[i] = +d;
     }
   }
-  
   if (this.scaleBandMode()) {
     if (!keep) scale.x = scaleBand().padding(this.padding());
-  } else if (field.x.interval() || isNumberDomain) { 
+  } else if (field.x.interval() || isNumberDomain) {
     if (field.x.order() === 'natural') {
-      if (xDomain[0] instanceof Date) xDomain = extent(xDomain); 
-      else xDomain = extent(xDomain.map(d => +d)); 
+      if (xDomain[0] instanceof Date) xDomain = extent(xDomain);
+      else xDomain = extent(xDomain.map(d => +d));
     } else {
       xDomain = [xDomain[0], xDomain[xDomain.length-1]]
     }
@@ -68,14 +68,14 @@ function _domain() {
   } else {
     if (!keep) scale.x = scalePoint().padding(this.padding());
   }
-  
-  
+
   if (!keep && viewInterval) {
     xDomain = this.limitViewInterval(scale.x, xDomain);
   } else if (keep && this.stream()) {
     xDomain = this.limitViewInterval(scale.x, xDomain, true);
   }
-  scale.x.domain(xDomain);
+  // scale.x.domain(xDomain);
+  scale.x.domain(field.x.customDomain() ? field.x.customDomain() : xDomain);
   this.setCustomDomain('y', yDomain);
 
   if (isMixed && individualScale) {

@@ -6,7 +6,7 @@ function _domain(keep) {
   const munged = this.__execs__.munged;
   const {x, yBar, yLine} = this.__execs__.field;
   const yAt = this.axisY();
-  
+
   if (yAt && yAt.orient === 'left') { //add the right axis directly
     const yAtRight = Object.assign({}, yAt);
     yAtRight.orient = 'right';
@@ -14,12 +14,13 @@ function _domain(keep) {
   }
   const xDomain = x.level(0).munged(munged).domain(this.sortByValue());
   const scale = this.scale();
+  const label = this.label();
   scale.x = scaleBand().padding(this.padding()).domain(xDomain);
   scale.yBar = scaleLinear();
   scale.yLine = scaleLinear();
 
-  this.setCustomDomain('yBar', domainYBar(yBar, munged));
-  this.setCustomDomain('yLine', domainYLine(yLine, munged));
+  this.setCustomDomain('yBar', domainYBar(yBar, munged, 0, false, false, false, false, label));
+  this.setCustomDomain('yLine', domainYLine(yLine, munged, 0, false, false, label));
   scale.color = this.updateColorScale(this.measures().map(d => d.field), keep);
 }
 

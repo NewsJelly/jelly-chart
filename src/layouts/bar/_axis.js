@@ -17,6 +17,7 @@ function _axis() {
     if (axisToggle.orient === 'bottom') {
       curAxis.y(isVertical? scale.y.range()[0] : scale.x.range()[1]);
     }
+    // console.log('curAxis.y', curAxis.y());
     return curAxis;
   }
 
@@ -28,6 +29,7 @@ function _axis() {
     // curAxis.font(font);
     curAxis.grid(grid).gridSize(axisToggle.orient === 'bottom' || axisToggle.orient === 'top' ? innerSize.height : innerSize.width);
     if (axisToggle.orient === 'right') curAxis.x( (nested ? scale.region : scale.x).range()[1]);
+    // console.log('curAxis.x', curAxis.x());
     return curAxis;
   }
 

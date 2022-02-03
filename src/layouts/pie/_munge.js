@@ -25,10 +25,12 @@ function _munge() {
     .padAngle(this.padding())
   if (this.sortByValue()) {
     pieGen.sortValues(this.sortByValue() === 'ascending' ? (a,b) => a-b : (a,b) => b-a);
-  }
+} else {
+    pieGen.sortValues((a,b) => 0);
+}
   const result = pieGen(this.__execs__.munged)
   result.forEach(d => d.key = d.data.key);
-  if (field.region.interval()) { 
+  if (field.region.interval()) {
     result.forEach(d => { d.data.key = new Date(d.data.key)});
   }
   this.__execs__.munged = result;

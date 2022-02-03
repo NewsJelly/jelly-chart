@@ -8,6 +8,7 @@ function _facet () {
   let field = this.__execs__.field;
   let color = this.color();
   let innerSize = this.innerSize();
+  let font = this.font();
   let width = innerSize.width, height = innerSize.height;
   let padding = this.padding();
   let dimensions =  this.dimensions();
@@ -23,11 +24,12 @@ function _facet () {
         .data(data)
         .dimensions(dimensions).measures(lineMeasures)
         .width(width).height(height)
+        .font(font)
         .legend(false)
         .tooltip(false)
         .padding(padding)
-        .parent(parent) 
-        .zeroOffset(true) 
+        .parent(parent)
+        .zeroOffset(true)
         .color(color[1])
         .scaleBandMode(true);
     lineSettings.forEach(d => smallLine[d.key](d.value));
@@ -39,16 +41,16 @@ function _facet () {
         .data(data)
         .dimensions(dimensions).measures(barMeasures)
         .width(width).height(height)
-        .padding(padding)        
+        .padding(padding)
         .legend(false)
         .tooltip(false)
-        .zeroOffset(true) 
+        .zeroOffset(true)
         .parent(parent)
         .color(color[0]);
     barSettings.forEach(d => {smallBar[d.key](d.value)});
     smallBar.render();
   }
-  
+
   this.regions()
     .each(function(_,i) {
       if (i===0) select(this).each(_smallbar);
